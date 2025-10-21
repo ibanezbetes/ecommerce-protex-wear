@@ -1,0 +1,33 @@
+name: Deploy
+on:
+  push:
+    branches: [dev, main]
+jobs:
+  deploy-frontend:
+    if: contains(fromJson('["dev","main"]'), github.ref_name)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci && npm run build --if-present
+      - name: Sync to S3 (placeholder)
+        run: |
+          echo "Sube ./dist a S3 aquí (aws s3 sync ...)"
+  deploy-backend:
+    if: contains(fromJson('["dev","main"]'), github.ref_name)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - run: npm ci && npm run build --if-present
+      - name: Deploy to EC2 (placeholder)
+        run: |
+          echo "Despliegue a EC2 aquí (scp/rsync/CodeDeploy)"

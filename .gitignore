@@ -1,0 +1,18 @@
+# Node / general
+node_modules/
+dist/
+.build/
+.cache/
+.env
+.env.*
+*.log
+.DS_Store
+
+# AWS / IaC
+terraform.tfstate*
+.cdk.out/
+.aws-sam/
+
+# Editor
+.vscode/
+.idea/
