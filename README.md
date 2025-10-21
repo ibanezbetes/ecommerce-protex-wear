@@ -5,7 +5,7 @@ Plataforma de tienda online para una empresa local de ropa de trabajo: catálogo
 ## Monorepo
 
 ```
-ecommerce-ropa-trabajo/
+ecommerce-protex-wear/
 ├─ apps/
 │  ├─ frontend/      # Web (HTML/CSS/JS o framework)
 │  └─ backend/       # API (Node/Express u otra)
