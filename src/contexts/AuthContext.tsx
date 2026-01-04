@@ -10,7 +10,7 @@ import {
   type SignUpInput,
 } from 'aws-amplify/auth';
 import { User, AuthState, LoginCredentials, RegisterData } from '../types';
-import '../lib/amplify'; // Initialize Amplify configuration
+import '../amplify-setup'; // Initialize Amplify configuration
 
 /**
  * Authentication Context for managing user state and authentication
