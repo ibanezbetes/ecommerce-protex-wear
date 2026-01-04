@@ -6,29 +6,29 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
 
 ## Tasks
 
-- [-] 1. Initialize Amplify Gen 2 project structure
+- [x] 1. Initialize Amplify Gen 2 project structure
   - Create new Amplify Gen 2 project using npm create amplify@latest
   - Configure TypeScript as primary language
   - Set up basic project structure with amplify/ directory
   - Initialize Git repository and connect to GitHub
   - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 2. Configure authentication with Cognito
-  - [ ] 2.1 Create auth resource configuration
+- [x] 2. Configure authentication with Cognito
+  - [x] 2.1 Create auth resource configuration
     - Define auth resource in amplify/auth/resource.ts
     - Configure email-based login with custom role attribute
     - Set up ADMIN and CUSTOMER groups
     - _Requirements: 2.1, 2.3_
 
-  - [ ] 2.2 Write property test for user role assignment
+  - [x] 2.2 Write property test for user role assignment
     - **Property 1: User Role Assignment**
     - **Validates: Requirements 2.2**
 
-  - [ ] 2.3 Write property test for JWT token generation
+  - [x] 2.3 Write property test for JWT token generation
     - **Property 2: JWT Token Generation**
     - **Validates: Requirements 2.5**
 
-  - [ ] 2.4 Write unit tests for authentication integration
+  - [x] 2.4 Write unit tests for authentication integration
     - Test login/logout flows
     - Test role-based access
     - _Requirements: 2.4_
