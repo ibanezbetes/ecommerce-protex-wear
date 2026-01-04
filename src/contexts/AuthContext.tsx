@@ -9,6 +9,7 @@ import {
   type SignInInput,
   type SignUpInput,
 } from 'aws-amplify/auth';
+import { Amplify } from 'aws-amplify';
 import { User, AuthState, LoginCredentials, RegisterData } from '../types';
 import '../amplify-setup'; // Initialize Amplify configuration
 
@@ -16,6 +17,20 @@ import '../amplify-setup'; // Initialize Amplify configuration
  * Authentication Context for managing user state and authentication
  * Integrates with AWS Amplify Cognito for authentication
  */
+
+// Helper function to ensure Amplify is configured
+function ensureAmplifyConfigured() {
+  try {
+    const config = Amplify.getConfig();
+    if (!config || !config.Auth || !config.Auth.Cognito) {
+      throw new Error('Amplify Auth not configured');
+    }
+    return true;
+  } catch (error) {
+    console.error('Amplify configuration check failed:', error);
+    return false;
+  }
+}
 
 interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -103,6 +118,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       dispatch({ type: 'AUTH_START' });
       
+      // Ensure Amplify is configured before attempting to use it
+      if (!ensureAmplifyConfigured()) {
+        console.warn('Amplify not configured, skipping session check');
+        dispatch({ type: 'AUTH_LOGOUT' });
+        return;
+      }
+      
       // Check if user is authenticated with Amplify
       const currentUser = await getCurrentUser();
       
@@ -135,6 +157,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
+      
+      // Ensure Amplify is configured before attempting to use it
+      if (!ensureAmplifyConfigured()) {
+        throw new Error('Auth UserPool not configured');
+      }
       
       // Sign in with Amplify
       const signInInput: SignInInput = {
