@@ -1,0 +1,328 @@
+[
+  {
+    "sku": "PW-HELMET-001",
+    "name": "Casco de Seguridad Industrial Blanco",
+    "description": "Casco de seguridad industrial con ajuste de 4 puntos, fabricado en polietileno de alta densidad. Cumple con normativas CE EN397.",
+    "price": 24.99,
+    "stock": 150,
+    "category": "Protección Cabeza",
+    "subcategory": "Cascos",
+    "brand": "Protex Safety",
+    "imageUrl": "https://example.com/images/helmet-white-001.jpg",
+    "imageUrls": [
+      "https://example.com/images/helmet-white-001.jpg",
+      "https://example.com/images/helmet-white-001-side.jpg",
+      "https://example.com/images/helmet-white-001-back.jpg"
+    ],
+    "specifications": {
+      "material": "Polietileno de alta densidad",
+      "peso": "350g",
+      "normativas": ["CE EN397", "ANSI Z89.1"],
+      "colores_disponibles": ["Blanco", "Amarillo", "Azul", "Rojo"],
+      "ajuste": "4 puntos con rueda de ajuste"
+    },
+    "isActive": true,
+    "weight": 0.35,
+    "dimensions": {
+      "length": 28,
+      "width": 22,
+      "height": 16
+    },
+    "tags": ["casco", "seguridad", "industrial", "construcción", "obra"]
+  },
+  {
+    "sku": "PW-VEST-HV-002",
+    "name": "Chaleco Reflectante Alta Visibilidad Clase 2",
+    "description": "Chaleco reflectante de alta visibilidad con bandas reflectantes de 5cm. Ideal para trabajos en carretera y construcción.",
+    "price": 18.50,
+    "stock": 200,
+    "category": "Alta Visibilidad",
+    "subcategory": "Chalecos",
+    "brand": "Protex Visibility",
+    "imageUrl": "https://example.com/images/vest-hv-yellow-002.jpg",
+    "imageUrls": [
+      "https://example.com/images/vest-hv-yellow-002.jpg",
+      "https://example.com/images/vest-hv-yellow-002-front.jpg",
+      "https://example.com/images/vest-hv-yellow-002-back.jpg"
+    ],
+    "specifications": {
+      "material": "100% Poliéster",
+      "clase_visibilidad": "Clase 2",
+      "bandas_reflectantes": "5cm de ancho",
+      "normativas": ["EN ISO 20471", "ANSI/ISEA 107"],
+      "tallas": ["S", "M", "L", "XL", "XXL"],
+      "cierre": "Velcro frontal"
+    },
+    "isActive": true,
+    "weight": 0.25,
+    "dimensions": {
+      "length": 65,
+      "width": 55,
+      "height": 2
+    },
+    "tags": ["chaleco", "reflectante", "alta visibilidad", "carretera", "construcción"]
+  },
+  {
+    "sku": "PW-GLOVES-003",
+    "name": "Guantes de Trabajo Mecánico Antideslizantes",
+    "description": "Guantes de trabajo con palma de cuero sintético y dorso transpirable. Excelente agarre y resistencia al desgaste.",
+    "price": 12.75,
+    "stock": 300,
+    "category": "Protección Manos",
+    "subcategory": "Guantes",
+    "brand": "Protex Grip",
+    "imageUrl": "https://example.com/images/gloves-mechanic-003.jpg",
+    "imageUrls": [
+      "https://example.com/images/gloves-mechanic-003.jpg",
+      "https://example.com/images/gloves-mechanic-003-palm.jpg",
+      "https://example.com/images/gloves-mechanic-003-pair.jpg"
+    ],
+    "specifications": {
+      "material_palma": "Cuero sintético",
+      "material_dorso": "Nylon transpirable",
+      "nivel_corte": "Nivel 1",
+      "normativas": ["EN388", "CE"],
+      "tallas": ["7", "8", "9", "10", "11"],
+      "caracteristicas": ["Antideslizante", "Transpirable", "Lavable"]
+    },
+    "isActive": true,
+    "weight": 0.15,
+    "dimensions": {
+      "length": 25,
+      "width": 12,
+      "height": 3
+    },
+    "tags": ["guantes", "mecánico", "antideslizante", "trabajo", "protección"]
+  },
+  {
+    "sku": "PW-BOOTS-004",
+    "name": "Botas de Seguridad S3 Punta de Acero",
+    "description": "Botas de seguridad con punta de acero, plantilla antiperforación y suela antideslizante. Categoría S3 para uso industrial.",
+    "price": 89.99,
+    "stock": 75,
+    "category": "Calzado Seguridad",
+    "subcategory": "Botas",
+    "brand": "Protex Steel",
+    "imageUrl": "https://example.com/images/boots-steel-004.jpg",
+    "imageUrls": [
+      "https://example.com/images/boots-steel-004.jpg",
+      "https://example.com/images/boots-steel-004-side.jpg",
+      "https://example.com/images/boots-steel-004-sole.jpg"
+    ],
+    "specifications": {
+      "categoria": "S3",
+      "punta": "Acero 200 Joules",
+      "plantilla": "Antiperforación 1100 Newton",
+      "suela": "PU/TPU antideslizante",
+      "material_superior": "Cuero flor hidrofugado",
+      "normativas": ["EN ISO 20345", "CE"],
+      "tallas": ["38", "39", "40", "41", "42", "43", "44", "45", "46", "47"]
+    },
+    "isActive": true,
+    "weight": 1.2,
+    "dimensions": {
+      "length": 32,
+      "width": 12,
+      "height": 15
+    },
+    "tags": ["botas", "seguridad", "punta acero", "S3", "industrial", "antiperforación"]
+  },
+  {
+    "sku": "PW-MASK-FFP2-005",
+    "name": "Mascarilla FFP2 Autofiltrante Plegable",
+    "description": "Mascarilla autofiltrante FFP2 con válvula de exhalación. Protección contra partículas sólidas y líquidas no tóxicas.",
+    "price": 3.25,
+    "stock": 1000,
+    "category": "Protección Respiratoria",
+    "subcategory": "Mascarillas",
+    "brand": "Protex Air",
+    "imageUrl": "https://example.com/images/mask-ffp2-005.jpg",
+    "imageUrls": [
+      "https://example.com/images/mask-ffp2-005.jpg",
+      "https://example.com/images/mask-ffp2-005-folded.jpg",
+      "https://example.com/images/mask-ffp2-005-valve.jpg"
+    ],
+    "specifications": {
+      "tipo": "FFP2",
+      "eficiencia_filtrado": "94%",
+      "valvula_exhalacion": "Sí",
+      "normativas": ["EN 149:2001+A1:2009", "CE"],
+      "material": "Polipropileno no tejido",
+      "uso": "Desechable",
+      "empaquetado": "Individual"
+    },
+    "isActive": true,
+    "weight": 0.02,
+    "dimensions": {
+      "length": 16,
+      "width": 11,
+      "height": 1
+    },
+    "tags": ["mascarilla", "FFP2", "autofiltrante", "válvula", "desechable", "respiratoria"]
+  },
+  {
+    "sku": "PW-GLASSES-006",
+    "name": "Gafas de Protección Transparentes Antiempañantes",
+    "description": "Gafas de protección con lentes transparentes, tratamiento antiempañante y protección UV. Patillas ajustables.",
+    "price": 15.99,
+    "stock": 180,
+    "category": "Protección Ocular",
+    "subcategory": "Gafas",
+    "brand": "Protex Vision",
+    "imageUrl": "https://example.com/images/glasses-clear-006.jpg",
+    "imageUrls": [
+      "https://example.com/images/glasses-clear-006.jpg",
+      "https://example.com/images/glasses-clear-006-side.jpg",
+      "https://example.com/images/glasses-clear-006-case.jpg"
+    ],
+    "specifications": {
+      "material_lente": "Policarbonato",
+      "tratamiento": "Antiempañante y anti-rayado",
+      "proteccion_uv": "99.9%",
+      "normativas": ["EN 166", "ANSI Z87.1", "CE"],
+      "patillas": "Ajustables en longitud",
+      "peso": "28g",
+      "incluye": "Funda protectora"
+    },
+    "isActive": true,
+    "weight": 0.028,
+    "dimensions": {
+      "length": 15,
+      "width": 14,
+      "height": 5
+    },
+    "tags": ["gafas", "protección", "transparente", "antiempañante", "UV", "ajustable"]
+  },
+  {
+    "sku": "PW-COVERALL-007",
+    "name": "Mono de Trabajo Tipo 5/6 Desechable",
+    "description": "Mono de trabajo desechable con capucha, protección química limitada. Ideal para trabajos con riesgo de salpicaduras.",
+    "price": 8.90,
+    "stock": 250,
+    "category": "Ropa Protección",
+    "subcategory": "Monos",
+    "brand": "Protex Chem",
+    "imageUrl": "https://example.com/images/coverall-white-007.jpg",
+    "imageUrls": [
+      "https://example.com/images/coverall-white-007.jpg",
+      "https://example.com/images/coverall-white-007-hood.jpg",
+      "https://example.com/images/coverall-white-007-zipper.jpg"
+    ],
+    "specifications": {
+      "tipo": "5/6",
+      "material": "SMS (Spunbond-Meltblown-Spunbond)",
+      "gramaje": "65 g/m²",
+      "normativas": ["EN 14126", "EN ISO 13982-1", "EN 13034", "CE"],
+      "caracteristicas": ["Capucha", "Cremallera frontal", "Elásticos en muñecas y tobillos"],
+      "tallas": ["M", "L", "XL", "XXL"],
+      "color": "Blanco"
+    },
+    "isActive": true,
+    "weight": 0.35,
+    "dimensions": {
+      "length": 30,
+      "width": 25,
+      "height": 5
+    },
+    "tags": ["mono", "desechable", "químico", "capucha", "tipo 5", "tipo 6"]
+  },
+  {
+    "sku": "PW-HARNESS-008",
+    "name": "Arnés Anticaídas Dorsal con Anillas Laterales",
+    "description": "Arnés de seguridad anticaídas con punto de anclaje dorsal y anillas laterales. Hebillas de ajuste rápido.",
+    "price": 125.00,
+    "stock": 45,
+    "category": "Anticaídas",
+    "subcategory": "Arneses",
+    "brand": "Protex Height",
+    "imageUrl": "https://example.com/images/harness-008.jpg",
+    "imageUrls": [
+      "https://example.com/images/harness-008.jpg",
+      "https://example.com/images/harness-008-back.jpg",
+      "https://example.com/images/harness-008-buckles.jpg"
+    ],
+    "specifications": {
+      "puntos_anclaje": "1 dorsal + 2 laterales",
+      "material_cintas": "Poliéster 45mm",
+      "hebillas": "Ajuste rápido automático",
+      "normativas": ["EN 361", "EN 358", "CE"],
+      "peso_maximo": "140 kg",
+      "tallas": ["M/L", "XL/XXL"],
+      "incluye": "Bolsa de transporte"
+    },
+    "isActive": true,
+    "weight": 1.8,
+    "dimensions": {
+      "length": 35,
+      "width": 30,
+      "height": 8
+    },
+    "tags": ["arnés", "anticaídas", "altura", "anclaje", "hebillas", "seguridad"]
+  },
+  {
+    "sku": "PW-EARPLUGS-009",
+    "name": "Tapones Auditivos Espuma Desechables",
+    "description": "Tapones auditivos de espuma de poliuretano, desechables. Reducción de ruido SNR 37dB. Caja de 200 pares.",
+    "price": 45.00,
+    "stock": 80,
+    "category": "Protección Auditiva",
+    "subcategory": "Tapones",
+    "brand": "Protex Sound",
+    "imageUrl": "https://example.com/images/earplugs-foam-009.jpg",
+    "imageUrls": [
+      "https://example.com/images/earplugs-foam-009.jpg",
+      "https://example.com/images/earplugs-foam-009-box.jpg",
+      "https://example.com/images/earplugs-foam-009-pair.jpg"
+    ],
+    "specifications": {
+      "material": "Espuma de poliuretano",
+      "reduccion_ruido": "SNR 37dB",
+      "normativas": ["EN 352-2", "CE"],
+      "tipo": "Desechable",
+      "color": "Naranja",
+      "cantidad": "200 pares por caja",
+      "empaquetado": "Individual en bolsitas"
+    },
+    "isActive": true,
+    "weight": 2.5,
+    "dimensions": {
+      "length": 25,
+      "width": 20,
+      "height": 15
+    },
+    "tags": ["tapones", "auditivos", "espuma", "desechable", "ruido", "SNR 37"]
+  },
+  {
+    "sku": "PW-KNEE-PADS-010",
+    "name": "Rodilleras Profesionales Gel Ajustables",
+    "description": "Rodilleras profesionales con almohadillas de gel, correas ajustables y carcasa resistente. Para trabajos de rodillas prolongados.",
+    "price": 32.50,
+    "stock": 120,
+    "category": "Protección Rodillas",
+    "subcategory": "Rodilleras",
+    "brand": "Protex Comfort",
+    "imageUrl": "https://example.com/images/knee-pads-gel-010.jpg",
+    "imageUrls": [
+      "https://example.com/images/knee-pads-gel-010.jpg",
+      "https://example.com/images/knee-pads-gel-010-side.jpg",
+      "https://example.com/images/knee-pads-gel-010-straps.jpg"
+    ],
+    "specifications": {
+      "material_carcasa": "Polipropileno resistente",
+      "almohadilla": "Gel viscoelástico",
+      "correas": "Neopreno ajustable",
+      "normativas": ["EN 14404", "CE"],
+      "talla": "Universal ajustable",
+      "peso_par": "650g",
+      "uso": "Profesional intensivo"
+    },
+    "isActive": true,
+    "weight": 0.65,
+    "dimensions": {
+      "length": 20,
+      "width": 15,
+      "height": 8
+    },
+    "tags": ["rodilleras", "gel", "profesional", "ajustable", "cómodo", "resistente"]
+  }
+]

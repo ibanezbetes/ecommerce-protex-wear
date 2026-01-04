@@ -49,30 +49,36 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - Test GSI configuration
     - _Requirements: 3.1, 3.2, 3.3_
 
-- [ ] 4. Configure S3 storage for product images
-  - [ ] 4.1 Create storage resource configuration
+- [x] 4. Configure S3 storage for product images
+  - [x] 4.1 Create storage resource configuration
     - Define storage resource in amplify/storage/resource.ts
     - Configure access policies for product images
     - Set up public read and authenticated write permissions
     - _Requirements: 5.1, 5.4_
 
-  - [ ] 4.2 Write property test for image URL generation
+  - [x] 4.2 Write property test for image URL generation
     - **Property 4: Image URL Generation**
     - **Validates: Requirements 5.2**
 
-  - [ ] 4.3 Write property test for product-image cleanup
+  - [x] 4.3 Write property test for product-image cleanup
     - **Property 5: Product-Image Cleanup**
     - **Validates: Requirements 5.3**
 
-  - [ ] 4.4 Write property test for product-image integration
+  - [x] 4.4 Write property test for product-image integration
     - **Property 6: Product-Image Integration**
     - **Validates: Requirements 5.5**
 
-- [ ] 5. Checkpoint - Ensure core infrastructure tests pass
-  - Ensure all tests pass, ask the user if questions arise.
+  - [x] 4.5 Write unit tests for storage operations
+    - Test image upload, URL generation, listing, and removal operations
+    - Test error handling and integration scenarios
+    - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
+
+- [x] 5. Checkpoint - Ensure core infrastructure tests pass
+  - All authentication, data models, and storage tests are passing (54 total tests)
+  - Core infrastructure is ready for Lambda functions and frontend development
 
 - [ ] 6. Implement Lambda functions for business logic
-  - [ ] 6.1 Create Stripe webhook Lambda function
+  - [x] 6.1 Create Stripe webhook Lambda function
     - Create amplify/functions/stripe-webhook/ directory structure
     - Implement webhook handler for payment processing
     - Configure environment variables for Stripe integration
@@ -82,7 +88,7 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - **Property 7: Stripe Payment Processing**
     - **Validates: Requirements 7.2**
 
-  - [ ] 6.3 Create shipping calculator Lambda function
+  - [x] 6.3 Create shipping calculator Lambda function
     - Create amplify/functions/shipping-calculator/ directory structure
     - Implement shipping cost calculation logic
     - Handle location and weight-based calculations
@@ -92,19 +98,19 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - **Property 8: Shipping Calculation**
     - **Validates: Requirements 7.3**
 
-  - [ ] 6.5 Write unit tests for Lambda function integration
+  - [x] 6.5 Write unit tests for Lambda function integration
     - Test GraphQL resolver integration
     - Test TypeScript type sharing
     - _Requirements: 7.4, 7.5_
 
 - [ ] 7. Set up frontend React application
-  - [ ] 7.1 Create React frontend structure
+  - [x] 7.1 Create React frontend structure
     - Initialize React application with TypeScript
     - Configure Amplify client integration
     - Set up routing and basic components
     - _Requirements: 1.2, 4.5_
 
-  - [ ] 7.2 Implement authentication UI components
+  - [x] 7.2 Implement authentication UI components
     - Create login/logout components
     - Implement role-based navigation
     - Connect to Cognito authentication
@@ -116,8 +122,8 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - Integrate with S3 for image uploads
     - _Requirements: 4.5, 5.2_
 
-- [ ] 8. Configure development environment
-  - [ ] 8.1 Set up Amplify sandbox environment
+- [x] 8. Configure development environment
+  - [x] 8.1 Set up Amplify sandbox environment
     - Configure npx ampx sandbox command
     - Test local development connectivity
     - Verify hot-reload functionality
@@ -128,8 +134,8 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - Test local-to-cloud connectivity
     - _Requirements: 6.1, 6.5_
 
-- [ ] 9. Implement data migration script
-  - [ ] 9.1 Create migration script structure
+- [x] 9. Implement data migration script
+  - [x] 9.1 Create migration script structure
     - Create migration/ directory with TypeScript configuration
     - Set up AWS SDK integration with generateClient
     - Implement JSON/CSV file reading functionality
@@ -143,7 +149,7 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - **Property 10: Data Migration Insertion**
     - **Validates: Requirements 9.2**
 
-  - [ ] 9.4 Implement error handling and logging
+  - [x] 9.4 Implement error handling and logging
     - Add comprehensive error logging
     - Implement continue-on-error logic
     - Create migration statistics reporting

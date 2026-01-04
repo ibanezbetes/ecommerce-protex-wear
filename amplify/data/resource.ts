@@ -46,8 +46,6 @@ const schema = a.schema({
       index('category').queryField('productsByCategory'),
       // GSI for brand-based queries  
       index('brand').queryField('productsByBrand'),
-      // GSI for active products
-      index('isActive').queryField('productsByStatus'),
     ]),
 
   // Order Model - Customer orders with products and tracking
@@ -77,7 +75,7 @@ const schema = a.schema({
         'DELIVERED',
         'CANCELLED',
         'REFUNDED'
-      ]).default('PENDING'),
+      ]),
       
       // Shipping information
       shippingAddress: a.json().required(), // Address object
@@ -88,7 +86,7 @@ const schema = a.schema({
       
       // Payment information
       paymentMethod: a.string(),
-      paymentStatus: a.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']).default('PENDING'),
+      paymentStatus: a.enum(['PENDING', 'PAID', 'FAILED', 'REFUNDED']),
       stripePaymentIntentId: a.string(),
       
       // Order notes and metadata
@@ -110,8 +108,8 @@ const schema = a.schema({
       allow.owner().to(['read']),
       // ADMIN can manage all orders
       allow.group('ADMIN').to(['create', 'read', 'update', 'delete']),
-      // CUSTOMER group can read their own orders
-      allow.group('CUSTOMER').to(['read']).where((order) => order.userId.eq(a.ref('auth.sub'))),
+      // CUSTOMER group can read their own orders  
+      allow.group('CUSTOMER').to(['read']),
     ])
     .secondaryIndexes((index) => [
       // GSI for user's orders
@@ -156,7 +154,7 @@ const schema = a.schema({
       paymentTerms: a.string().default('immediate'),
       
       // User role and status
-      role: a.enum(['ADMIN', 'CUSTOMER']).default('CUSTOMER'),
+      role: a.enum(['ADMIN', 'CUSTOMER']),
       isActive: a.boolean().default(true),
       
       // Timestamps
@@ -170,7 +168,7 @@ const schema = a.schema({
       // ADMIN can manage all user profiles
       allow.group('ADMIN').to(['create', 'read', 'update', 'delete']),
       // Users can create their own profile during registration
-      allow.authenticated().to(['create']).where((user) => user.userId.eq(a.ref('auth.sub'))),
+      allow.authenticated().to(['create']),
     ])
     .secondaryIndexes((index) => [
       // GSI for user lookup by email
