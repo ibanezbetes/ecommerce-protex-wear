@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "dev": "npx ampx sandbox",
-    "build": "npx ampx build",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
     "deploy": "npx ampx deploy",
     "test": "jest",
     "test:watch": "jest --watch",
