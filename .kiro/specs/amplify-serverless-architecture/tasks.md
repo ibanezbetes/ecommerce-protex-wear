@@ -33,18 +33,18 @@ Plan de implementación para crear la arquitectura serverless completa de Protex
     - Test role-based access
     - _Requirements: 2.4_
 
-- [ ] 3. Define data models and GraphQL schema
-  - [ ] 3.1 Create data resource with DynamoDB models
+- [x] 3. Define data models and GraphQL schema
+  - [x] 3.1 Create data resource with DynamoDB models
     - Define Product, Order, and User models in amplify/data/resource.ts
     - Configure authorization rules for each model
     - Set up Global Secondary Indexes for efficient queries
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
-  - [ ] 3.2 Write property test for GraphQL authorization rules
+  - [x] 3.2 Write property test for GraphQL authorization rules
     - **Property 3: GraphQL Authorization Rules**
     - **Validates: Requirements 4.2, 4.3, 4.4, 8.4**
 
-  - [ ] 3.3 Write unit tests for data model structure
+  - [x] 3.3 Write unit tests for data model structure
     - Test model field validation
     - Test GSI configuration
     - _Requirements: 3.1, 3.2, 3.3_
