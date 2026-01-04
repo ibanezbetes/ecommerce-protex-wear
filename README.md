@@ -1,296 +1,119 @@
-# E‑commerce Protex Wear - Infraestructura Desplegada ✅
+# Protex Wear - Serverless E-commerce Platform
 
-**Estado**: INFRAESTRUCTURA DESPLEGADA Y FUNCIONANDO  
-**Fecha**: 2 de Enero 2026  
-**Responsable**: Kiro (Infraestructura CDK)  
+**Estado**: 🚀 ARQUITECTURA SERVERLESS EN DESARROLLO  
+**Fecha**: 4 de Enero 2026  
+**Responsable**: Kiro (DevOps & IaaC Lead)  
 **Coordinador**: Daniel Jesús Ibáñez Betés  
 
-## 🎯 Resumen Ejecutivo
+## 🏗️ Arquitectura
 
-La infraestructura AWS para la tienda online Protex Wear ha sido **desplegada exitosamente** usando AWS CDK. El sistema está optimizado para costes (~$5 USD/mes) y preparado para soportar catálogo masivo con lógica B2B.
+Plataforma e-commerce 100% serverless usando AWS Amplify Gen 2 (code-first) para distribuidor de ropa laboral y EPIs.
 
-## 📊 Información Crítica del Despliegue
+### Stack Tecnológico
 
-### 🌐 Datos de Acceso
-- **IP Estática**: `52.17.117.128`
-- **URL WordPress**: `http://52.17.117.128`
-- **Región AWS**: `eu-west-1` (Irlanda)
-- **Zona Disponibilidad**: `eu-west-1a`
-- **Cuenta AWS**: `670441837703` (Cuenta oficial Protex Wear)
-- **Stack ARN**: `arn:aws:cloudformation:eu-west-1:670441837703:stack/ProtexWearInfraStack/0c78b680-e80a-11f0-b29c-06ccc2f013b9`
+- **Framework**: AWS Amplify Gen 2
+- **Frontend**: React (TypeScript)
+- **Auth**: Amazon Cognito (Multi-rol: ADMIN/CUSTOMER)
+- **Data**: Amazon DynamoDB (NoSQL)
+- **Storage**: Amazon S3 (Imágenes de productos)
+- **API**: AWS AppSync (GraphQL)
+- **Functions**: AWS Lambda (Stripe, Envíos)
+- **Admin**: Amplify Data Manager (Nativo)
 
-### 💰 Costes y Recursos
-- **Coste Mensual**: ~$5 USD/mes
-- **Instancia**: Lightsail nano_3_0 (1GB RAM)
-- **Almacenamiento**: SSD incluido en bundle
-- **IP Estática**: Gratuita (asociada)
-- **Transferencia**: 1TB incluida
+## 🚀 Comandos Rápidos
 
-## 🏗️ Arquitectura Desplegada
-
-### Componentes Principales
-```
-┌─────────────────────────────────────────────────────────┐
-│                    AWS eu-west-1                        │
-│  ┌─────────────────────────────────────────────────────┐│
-│  │              Lightsail Instance                     ││
-│  │  ┌─────────────────────────────────────────────────┐││
-│  │  │         protex-wear-wordpress                   │││
-│  │  │  • WordPress + WooCommerce (Bitnami)           │││
-│  │  │  • Nginx + PHP-FPM + MySQL                     │││
-│  │  │  • 1GB RAM + 2GB SWAP                          │││
-│  │  │  • Bundle: nano_3_0                             │││
-│  │  │  • Blueprint: wordpress                         │││
-│  │  └─────────────────────────────────────────────────┘││
-│  │                        │                            ││
-│  │  ┌─────────────────────────────────────────────────┐││
-│  │  │           Static IP                             │││
-│  │  │     protex-wear-static-ip                       │││
-│  │  │        52.17.117.128                            │││
-│  │  └─────────────────────────────────────────────────┘││
-│  └─────────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────┘
-                           │
-                           ▼
-                    Cloudflare CDN
-                   (Configurar DNS)
-```
-
-### 🔧 Configuración Automática Implementada
-
-#### Script de Datos de Usuario (UserData)
-**Ubicación**: Ejecutándose automáticamente en primera inicialización
-
-**SWAP Configuration (CRÍTICO)**:
 ```bash
-fallocate -l 2G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap sw 0 0' >> /etc/fstab
+# Desarrollo local con sandbox
+npm run dev
+
+# Build del proyecto
+npm run build
+
+# Deploy a producción
+npm run deploy
+
+# Tests
+npm test
+npm run test:watch
 ```
 
-**Permisos Bitnami**:
-```bash
-chown -R bitnami:daemon /opt/bitnami/wordpress/wp-content
-chmod -R g+w /opt/bitnami/wordpress/wp-content
-```
+## 👥 Equipo y Responsabilidades
 
-**Logging**: `/var/log/protex-wear-setup.log`  
-**Señal Completado**: `/tmp/protex-wear-setup-complete`
+### 1. Kiro (DevOps & IaaC Lead)
+- ✅ Inicialización Amplify Gen 2
+- 🔄 CI/CD y Amplify Hosting
+- 🔄 Configuración sandbox y entornos
 
-## 📋 Comandos de Acceso
+### 2. Ibañez (Data Architect)
+- 🔄 Modelos de datos en `amplify/data/resource.ts`
+- 🔄 Esquemas Product, Order, User
 
-### SSH y Credenciales
-```bash
-# Acceso SSH (reemplazar tu-clave.pem con tu clave real)
-ssh -i tu-clave.pem bitnami@52.17.117.128
+### 3. Yeray y Octavio (Frontend Developers)
+- 🔄 Aplicación React en `/src`
+- 🔄 Integración con Amplify Auth y API
 
-# Obtener credenciales WordPress
-ssh -i tu-clave.pem bitnami@52.17.117.128 "cat /home/bitnami/bitnami_credentials"
+### 4. Lazar (Data Migration Specialist)
+- 🔄 Script Node.js para migración JSON/CSV → DynamoDB
+- 🔄 Uso de AWS SDK con generateClient
 
-# Verificar SWAP activo
-ssh -i tu-clave.pem bitnami@52.17.117.128 "swapon --show"
+### 5. Mario y Jesús (Backend Developers)
+- 🔄 Funciones Lambda en `amplify/functions/`
+- 🔄 Integración Stripe y cálculo de envíos
 
-# Ver logs de configuración
-ssh -i tu-clave.pem bitnami@52.17.117.128 "tail -f /var/log/protex-wear-setup.log"
-```
-
-### Verificación del Sistema
-```bash
-# Verificar memoria total (RAM + SWAP)
-ssh -i tu-clave.pem bitnami@52.17.117.128 "free -h"
-
-# Verificar servicios web
-ssh -i tu-clave.pem bitnami@52.17.117.128 "systemctl status nginx"
-
-# Verificar permisos wp-content
-ssh -i tu-clave.pem bitnami@52.17.117.128 "ls -la /opt/bitnami/wordpress/wp-content"
-```
-
-## 🎯 Próximos Pasos Inmediatos
-
-### 1. 🌐 Configuración DNS (Ibañez - URGENTE)
-```
-Plataforma: Cloudflare
-Tipo: A
-Nombre: @
-Contenido: 52.17.117.128
-TTL: Auto
-Proxy: Activado (para CDN y SSL)
-```
-
-### 2. 🔐 Obtención de Credenciales (Ibañez)
-```bash
-ssh -i [TU-CLAVE].pem bitnami@52.17.117.128 "cat /home/bitnami/bitnami_credentials"
-```
-**Resultado esperado**:
-```
-Welcome to the Bitnami WordPress Stack
-******************************************************************************
-The default username and password is 'user' and '[PASSWORD-GENERADO]'.
-******************************************************************************
-```
-
-### 3. ✅ Verificación WordPress (Todo el equipo)
-- **URL Temporal**: `http://52.17.117.128`
-- **URL Final**: `https://[DOMINIO-PROTEX-WEAR]` (después de Cloudflare)
-- **Admin**: `http://52.17.117.128/wp-admin`
-
-## 👥 Asignaciones por Equipo
-
-### 🎨 Frontend y Diseño
-**Responsables**: Yeray Espinosa + Octavio Álvarez
-- **Acceso**: WordPress Admin con credenciales obtenidas
-- **Tareas**: Theme personalizado, CSS, paleta visual
-- **Directorio trabajo**: `/opt/bitnami/wordpress/wp-content/themes/`
-
-### 💳 WooCommerce y Pagos
-**Responsables**: Mario Cortés + Jesús Losadas
-- **Acceso**: WordPress Admin + WooCommerce
-- **Tareas**: Configuración tienda, pasarela pago, carrito
-- **Plugins**: WooCommerce ya instalado en Bitnami
-
-### 🗄️ Backend y Migración Datos
-**Responsable**: Daniel Lazar Badorrey
-- **Acceso**: SSH + MySQL local
-- **CRÍTICO**: SWAP de 2GB configurado para importación masiva
-- **Base datos**: MySQL local en `/opt/bitnami/mysql/`
-- **Comando MySQL**: `mysql -u root -p`
-
-### 🔐 Intranet y Autenticación
-**Responsable**: Daniel Lalanza Hernández
-- **Acceso**: WordPress Admin + desarrollo custom
-- **Tareas**: Panel cliente, autenticación, UX intranet
-- **Directorio**: `/opt/bitnami/wordpress/wp-content/plugins/`
-
-## 🔍 Información Técnica Detallada
-
-### Recursos AWS Creados
-```yaml
-Instancia Lightsail:
-  Nombre: protex-wear-wordpress
-  ID: [Generado por AWS]
-  Blueprint: wordpress
-  Bundle: nano_3_0
-  AZ: eu-west-1a
-  
-IP Estática:
-  Nombre: protex-wear-static-ip
-  IP: 52.17.117.128
-  Asociada: protex-wear-wordpress
-  
-Stack CloudFormation:
-  Nombre: ProtexWearInfraStack
-  Región: eu-west-1
-  Estado: CREATE_COMPLETE
-```
-
-### Exports CloudFormation
-```yaml
-ProtexWear-StaticIP: 52.17.117.128
-ProtexWear-WordPressURL: http://52.17.117.128
-ProtexWear-SSHCommand: ssh -i tu-clave.pem bitnami@52.17.117.128
-ProtexWear-CredentialsCommand: ssh -i tu-clave.pem bitnami@52.17.117.128 "cat /home/bitnami/bitnami_credentials"
-ProtexWear-NextSteps: 1. Configurar DNS en Cloudflare: A @ -> 52.17.117.128 | 2. Obtener credenciales WordPress | 3. Acceder vía SSH para configuración adicional
-```
-
-## 🧪 Validación y Testing
-
-### Tests Implementados (23 tests ✅)
-- **Configuración Lightsail**: Blueprint, bundle, zona AZ
-- **IP Estática**: Creación, asociación, dependencias
-- **Script SWAP**: Todos los comandos críticos validados
-- **Permisos Bitnami**: Propietario, grupo, verificación
-- **Outputs**: Información completa de acceso
-
-### Comando Testing
-```bash
-cd infra/
-npm test  # 23 tests pasan ✅
-```
-
-## 🚨 Troubleshooting
-
-### Problemas Comunes y Soluciones
-
-**WordPress no accesible**:
-```bash
-# Verificar servicios
-ssh -i tu-clave.pem bitnami@52.17.117.128 "sudo systemctl status nginx"
-ssh -i tu-clave.pem bitnami@52.17.117.128 "sudo systemctl status mysql"
-```
-
-**Memoria insuficiente**:
-```bash
-# Verificar SWAP activo
-ssh -i tu-clave.pem bitnami@52.17.117.128 "swapon --show"
-# Debe mostrar: /swapfile partition 2G
-```
-
-**Permisos de archivos**:
-```bash
-# Reconfigurar permisos Bitnami
-ssh -i tu-clave.pem bitnami@52.17.117.128 "sudo chown -R bitnami:daemon /opt/bitnami/wordpress/wp-content"
-```
-
-## 📞 Contactos y Responsabilidades
-
-### Infraestructura y DevOps
-- **Kiro**: Infraestructura CDK, despliegue, troubleshooting técnico
-- **Ibañez**: Coordinación, Cloudflare, DNS, arquitectura global
-
-### Desarrollo
-- **Mario**: Pasarela de pago, transacciones
-- **Jesús**: Carrito de compra, WooCommerce
-- **Lalanza**: Intranet, autenticación usuarios
-- **Octavio**: Interfaces, maquetación frontend
-- **Yeray**: UI/UX, paleta visual, estilo
-- **Lazar**: Backend, migración datos masiva
-
-## 📈 Métricas de Éxito
-
-### Despliegue Completado ✅
-- **Tiempo total**: 101.85 segundos
-- **Tests pasados**: 23/23 ✅
-- **Recursos creados**: 2/2 ✅
-- **IP asignada**: ✅ `52.17.117.128`
-- **WordPress funcionando**: ✅
-- **SWAP configurado**: ✅ 2GB
-- **Permisos Bitnami**: ✅
-- **Cuenta AWS**: ✅ `670441837703` (oficial)
-
-### Próximas Métricas
-- [ ] DNS Cloudflare configurado
-- [ ] SSL/HTTPS funcionando
-- [ ] WooCommerce configurado
-- [ ] Importación datos completada
-- [ ] Theme personalizado aplicado
-- [ ] Pasarela pago integrada
-
----
+### 6. Lalanza (QA & Admin Management)
+- 🔄 Testing del Amplify Data Manager
+- 🔄 Capacitación para gestión de productos
 
 ## 📁 Estructura del Proyecto
 
 ```
-ecommerce-protex-wear/
-├─ apps/
-│  ├─ frontend/      # Web (Yeray + Octavio)
-│  └─ backend/       # API (Lazar)
-├─ infra/            # ✅ CDK Infrastructure (DESPLEGADO)
-│  ├─ bin/           # CDK app entry point
-│  ├─ lib/           # Stack definitions
-│  ├─ test/          # 23 tests ✅
-│  └─ README.md      # Documentación técnica
-├─ .kiro/specs/      # Especificaciones y diseño
-├─ docs/             # Documentación del proyecto
-└─ README.md         # 📋 ESTE ARCHIVO
+protex-wear-serverless/
+├── amplify/                 # Configuración Amplify Gen 2
+│   ├── auth/               # Configuración Cognito
+│   ├── data/               # Modelos DynamoDB + GraphQL
+│   ├── storage/            # Configuración S3
+│   ├── functions/          # Funciones Lambda
+│   └── backend.ts          # Configuración principal
+├── src/                    # Frontend React
+├── migration/              # Scripts de migración de datos
+├── tests/                  # Tests unitarios y de propiedades
+└── .kiro/specs/           # Especificaciones del proyecto
 ```
 
----
+## 🔧 Configuración Inicial
 
-**🎉 ESTADO ACTUAL: INFRAESTRUCTURA LISTA - EQUIPO PUEDE CONTINUAR DESARROLLO**
+1. **Instalar dependencias**:
+   ```bash
+   npm install
+   ```
 
-**Última actualización**: 2 Enero 2026 - 19:38 UTC  
-**Próxima revisión**: Después de configuración Cloudflare DNS  
-**IP Actual**: `52.17.117.128` (Cuenta oficial 670441837703)
+2. **Configurar AWS CLI** (si no está configurado):
+   ```bash
+   aws configure
+   ```
+
+3. **Iniciar sandbox de desarrollo**:
+   ```bash
+   npm run dev
+   ```
+
+## 📋 Estado de Implementación
+
+Ver progreso detallado en: `.kiro/specs/amplify-serverless-architecture/tasks.md`
+
+- ✅ **Tarea 1**: Inicialización Amplify Gen 2
+- 🔄 **Tarea 2**: Configuración Cognito
+- ⏳ **Tarea 3**: Modelos DynamoDB
+- ⏳ **Tarea 4**: Storage S3
+- ⏳ **Tareas 5-14**: Funciones Lambda, Frontend, CI/CD, etc.
+
+## 🔗 Enlaces Importantes
+
+- **Repositorio**: https://github.com/ibanezbetes/protex-wear-serverless
+- **Documentación Amplify**: https://docs.amplify.aws/
+- **Especificaciones**: `.kiro/specs/amplify-serverless-architecture/`
+
+## 📞 Contacto
+
+**Coordinador del Proyecto**: Daniel Jesús Ibáñez Betés  
+**DevOps Lead**: Kiro AI Assistant

@@ -1,0 +1,37 @@
+{
+  "name": "protex-wear-serverless",
+  "version": "1.0.0",
+  "description": "Arquitectura serverless 100% Cloud Native para Protex Wear usando AWS Amplify Gen 2",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx ampx sandbox",
+    "build": "npx ampx build",
+    "deploy": "npx ampx deploy",
+    "test": "jest",
+    "test:watch": "jest --watch"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibanezbetes/protex-wear-serverless.git"
+  },
+  "keywords": ["amplify", "serverless", "ecommerce", "protex-wear", "aws"],
+  "author": "Protex Wear Team",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ibanezbetes/protex-wear-serverless/issues"
+  },
+  "homepage": "https://github.com/ibanezbetes/protex-wear-serverless#readme",
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.19.0",
+    "@aws-amplify/backend-cli": "^1.8.1",
+    "aws-cdk-lib": "^2.216.0",
+    "constructs": "^10.4.4",
+    "esbuild": "^0.27.2",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "aws-amplify": "^6.15.9"
+  }
+}
