@@ -18,7 +18,12 @@ frontend:
         - 'echo "/*    /index.html   200" > dist/_redirects'
         - echo "Copying amplify_outputs.json to build directory"
         - 'cp amplify_outputs.json dist/amplify_outputs.json || echo "Warning: amplify_outputs.json not found"'
-        - 'ls -la dist/ || echo "Cannot list dist directory"'
+        - echo "Listing build directory contents"
+        - 'ls -la dist/'
+        - echo "Listing assets directory"
+        - 'ls -la dist/assets/ || echo "No assets directory found"'
+        - echo "Checking for CSS files"
+        - 'find dist/ -name "*.css" -type f || echo "No CSS files found"'
   artifacts:
     baseDirectory: dist
     files:
