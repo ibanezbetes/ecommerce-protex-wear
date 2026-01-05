@@ -58,5 +58,8 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-router-dom": "^7.11.0"
+  },
+  "overrides": {
+    "@aws-sdk/types": "3.821.0"
   }
 }
