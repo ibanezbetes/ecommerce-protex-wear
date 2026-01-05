@@ -5,8 +5,7 @@ backend:
       commands:
         - npm install
         - npx ampx pipeline-deploy --branch $AWS_BRANCH --app-id $AWS_APP_ID
-        - echo "Copying amplify_outputs.json to build directory"
-        - cp amplify_outputs.json dist/ || echo "amplify_outputs.json not found, continuing..."
+        - echo "Backend deployment completed"
 frontend:
   phases:
     preBuild:
@@ -17,6 +16,9 @@ frontend:
         - npm run build
         - echo "Creating _redirects file for SPA routing"
         - echo "/*    /index.html   200" > dist/_redirects
+        - echo "Copying amplify_outputs.json to build directory"
+        - cp amplify_outputs.json dist/amplify_outputs.json || echo "Warning: amplify_outputs.json not found"
+        - ls -la dist/ || echo "Cannot list dist directory"
   artifacts:
     baseDirectory: dist
     files:
