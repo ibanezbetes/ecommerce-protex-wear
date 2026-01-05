@@ -1,4 +1,4 @@
-import { generateClient } from 'aws-amplify/data';
+import { generateClient } from 'aws-amplify/api';
 import type { Schema } from '../../amplify/data/resource';
 
 // Ya no configuramos Amplify aquí, se hace en main.tsx
