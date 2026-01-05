@@ -15,6 +15,8 @@ frontend:
     build:
       commands:
         - npm run build
+        - echo "Creating _redirects file for SPA routing"
+        - echo "/*    /index.html   200" > dist/_redirects
   artifacts:
     baseDirectory: dist
     files:
