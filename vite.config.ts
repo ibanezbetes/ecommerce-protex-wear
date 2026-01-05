@@ -37,5 +37,8 @@ export default defineConfig({
   base: './', // Use relative paths for assets
   define: {
     global: 'globalThis',
+    // Define process.env for compatibility
+    'process.env': {},
   },
+  envPrefix: 'VITE_', // Only expose env vars that start with VITE_
 });

@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { Amplify } from 'aws-amplify';
 import { 
   signIn, 
   signUp, 
@@ -122,12 +123,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // Check for existing session on mount
   useEffect(() => {
-    checkExistingSession();
+    // Set a timeout to prevent hanging indefinitely
+    const timeoutId = setTimeout(() => {
+      console.log('🔄 Auth session check timeout, proceeding without authentication...');
+      dispatch({ type: 'AUTH_LOGOUT' });
+    }, 5000); // 5 second timeout
+
+    checkExistingSession().finally(() => {
+      clearTimeout(timeoutId);
+    });
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const checkExistingSession = async () => {
     try {
       dispatch({ type: 'AUTH_START' });
+      
+      // Check if Amplify Auth is properly configured
+      const config = Amplify.getConfig();
+      if (!config.Auth) {
+        console.log('🔄 Amplify Auth not configured, skipping session check...');
+        dispatch({ type: 'AUTH_LOGOUT' });
+        return;
+      }
       
       // Check if user is authenticated with Amplify
       const currentUser = await getCurrentUser();

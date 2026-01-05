@@ -6,22 +6,69 @@ import { Link } from 'react-router-dom';
  * Landing page with hero section, featured products, and company info
  */
 function HomePage() {
+  console.log('🏠 HomePage se está renderizando...');
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-primary-color to-primary-dark text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">
+      <section style={{ 
+        background: 'linear-gradient(to right, #2563eb, #1d4ed8)', 
+        color: 'white', 
+        padding: '5rem 0' 
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 1rem', 
+          textAlign: 'center' 
+        }}>
+          <h1 style={{ 
+            fontSize: '3rem', 
+            fontWeight: 'bold', 
+            marginBottom: '1.5rem' 
+          }}>
             Protección Profesional
           </h1>
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
+          <p style={{ 
+            fontSize: '1.25rem', 
+            marginBottom: '2rem', 
+            maxWidth: '48rem', 
+            margin: '0 auto 2rem auto' 
+          }}>
             Equipos de protección individual de la más alta calidad para profesionales que no comprometen su seguridad
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/productos" className="btn-primary btn-lg">
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1rem', 
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <Link 
+              to="/productos" 
+              style={{
+                backgroundColor: '#2563eb',
+                color: 'white',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}
+            >
               Ver Productos
             </Link>
-            <Link to="/sobre-nosotros" className="btn-outline btn-lg">
+            <Link 
+              to="/sobre-nosotros" 
+              style={{
+                backgroundColor: 'transparent',
+                color: 'white',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: '500',
+                border: '1px solid white'
+              }}
+            >
               Conoce Más
             </Link>
           </div>
