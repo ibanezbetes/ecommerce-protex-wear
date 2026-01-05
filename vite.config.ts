@@ -37,5 +37,6 @@ export default defineConfig({
   base: './', // Use relative paths for assets
   define: {
     global: 'globalThis',
+    'process.env': {}, // <--- ESTA ES LA LÍNEA QUE HEMOS AÑADIDO PARA ARREGLAR LA PANTALLA BLANCA
   },
 });
