@@ -4,16 +4,15 @@ import { BrowserRouter } from 'react-router-dom';
 import App from './App';
 import './index.css';
 
-// Mueve la configuración lo más arriba posible
+// 1. Importaciones de Amplify
 import { Amplify } from 'aws-amplify';
 import outputs from '../amplify_outputs.json';
 
-// Configura ANTES de importar cualquier componente que use la API
+// 2. Configuración explícita (¡Con log de depuración!)
 Amplify.configure(outputs);
 
-// Si 'amplify-setup' solo tiene estilos o polyfills, déjalo aquí. 
-// Si tenía 'Amplify.configure' dentro, BORRA esa línea dentro de ese archivo.
-import './amplify-setup'; 
+// DEBUG: Vamos a ver qué está cargando realmente Amplify
+console.log('✅ Amplify Configurado con:', outputs.data.model_introspection?.models);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
