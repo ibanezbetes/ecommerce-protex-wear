@@ -5,6 +5,7 @@ import {
   signOut, 
   getCurrentUser, 
   confirmSignUp,
+  confirmSignIn,
   fetchUserAttributes,
   type SignInInput,
   type SignUpInput,
@@ -21,8 +22,10 @@ interface AuthContextType extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
   register: (data: RegisterData) => Promise<{ needsConfirmation: boolean; email: string }>;
   confirmRegistration: (email: string, code: string) => Promise<void>;
+  confirmNewPassword: (newPassword: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
+  clearPasswordChallenge: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +36,8 @@ type AuthAction =
   | { type: 'AUTH_SUCCESS'; payload: User }
   | { type: 'AUTH_ERROR'; payload: string }
   | { type: 'AUTH_LOGOUT' }
+  | { type: 'PASSWORD_CHALLENGE_REQUIRED'; payload: { challengeType: 'NEW_PASSWORD_REQUIRED' | 'FORCE_CHANGE_PASSWORD'; email: string } }
+  | { type: 'PASSWORD_CHALLENGE_CLEARED' }
   | { type: 'CLEAR_ERROR' };
 
 // Auth Reducer
@@ -52,6 +57,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isAuthenticated: true,
         isLoading: false,
         error: null,
+        passwordChallenge: undefined,
       };
     
     case 'AUTH_ERROR':
@@ -61,6 +67,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isAuthenticated: false,
         isLoading: false,
         error: action.payload,
+        passwordChallenge: undefined,
       };
     
     case 'AUTH_LOGOUT':
@@ -69,6 +76,25 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isAuthenticated: false,
         isLoading: false,
         error: null,
+        passwordChallenge: undefined,
+      };
+    
+    case 'PASSWORD_CHALLENGE_REQUIRED':
+      return {
+        ...state,
+        isLoading: false,
+        error: null,
+        passwordChallenge: {
+          isRequired: true,
+          challengeType: action.payload.challengeType,
+          email: action.payload.email,
+        },
+      };
+    
+    case 'PASSWORD_CHALLENGE_CLEARED':
+      return {
+        ...state,
+        passwordChallenge: undefined,
       };
     
     case 'CLEAR_ERROR':
@@ -142,10 +168,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: credentials.password,
       };
       
-      const { isSignedIn } = await signIn(signInInput);
+      const signInResult = await signIn(signInInput);
       
-      if (isSignedIn) {
-        // Get user information after successful sign in
+      // Check if sign in is complete or if there's a challenge
+      if (signInResult.isSignedIn) {
+        // User is fully signed in
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
         
@@ -162,6 +189,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         };
         
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
+      } else if (signInResult.nextStep) {
+        // Handle sign-in challenges
+        const { signInStep } = signInResult.nextStep;
+        
+        if (signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
+          // User needs to set a new password
+          dispatch({ 
+            type: 'PASSWORD_CHALLENGE_REQUIRED', 
+            payload: { 
+              challengeType: 'NEW_PASSWORD_REQUIRED',
+              email: credentials.email 
+            }
+          });
+        } else if (signInStep === 'FORCE_CHANGE_PASSWORD') {
+          // User is forced to change password
+          dispatch({ 
+            type: 'PASSWORD_CHALLENGE_REQUIRED', 
+            payload: { 
+              challengeType: 'FORCE_CHANGE_PASSWORD',
+              email: credentials.email 
+            }
+          });
+        } else {
+          throw new Error(`Challenge no soportado: ${signInStep}`);
+        }
       } else {
         throw new Error('Error en el inicio de sesión');
       }
@@ -284,6 +336,57 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const confirmNewPassword = async (newPassword: string) => {
+    try {
+      dispatch({ type: 'AUTH_START' });
+      
+      // Confirm the new password with Amplify
+      const confirmResult = await confirmSignIn({
+        challengeResponse: newPassword,
+      });
+      
+      if (confirmResult.isSignedIn) {
+        // Password change successful, get user information
+        const currentUser = await getCurrentUser();
+        const attributes = await fetchUserAttributes();
+        
+        const user: User = {
+          id: currentUser.userId,
+          email: attributes.email || state.passwordChallenge?.email || '',
+          role: (attributes['custom:role'] as 'ADMIN' | 'CUSTOMER') || 'CUSTOMER',
+          firstName: attributes.given_name || '',
+          lastName: attributes.family_name || '',
+          company: attributes['custom:company'] || undefined,
+          phone: attributes.phone_number || undefined,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        dispatch({ type: 'AUTH_SUCCESS', payload: user });
+      } else {
+        throw new Error('Error al confirmar la nueva contraseña');
+      }
+    } catch (error: any) {
+      console.error('Confirm new password error:', error);
+      let errorMessage = 'Error al cambiar la contraseña';
+      
+      if (error.name === 'InvalidPasswordException') {
+        errorMessage = 'La contraseña no cumple con los requisitos de seguridad';
+      } else if (error.name === 'NotAuthorizedException') {
+        errorMessage = 'No autorizado para cambiar la contraseña';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
+      throw new Error(errorMessage);
+    }
+  };
+
+  const clearPasswordChallenge = () => {
+    dispatch({ type: 'PASSWORD_CHALLENGE_CLEARED' });
+  };
+
   const logout = async () => {
     try {
       // Sign out with Amplify
@@ -328,8 +431,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     login,
     register,
     confirmRegistration,
+    confirmNewPassword,
     logout,
     refreshUser,
+    clearPasswordChallenge,
   };
 
   return (

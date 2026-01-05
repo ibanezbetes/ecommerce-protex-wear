@@ -194,6 +194,11 @@ export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
+  passwordChallenge?: {
+    isRequired: boolean;
+    challengeType: 'NEW_PASSWORD_REQUIRED' | 'FORCE_CHANGE_PASSWORD';
+    email: string;
+  };
 }
 
 export interface LoginCredentials {

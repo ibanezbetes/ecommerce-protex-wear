@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
+import NewPasswordModal from '../components/auth/NewPasswordModal';
 
 /**
  * Login Page - User authentication
@@ -10,7 +11,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login, isAuthenticated, isLoading, error } = useAuth();
+  const { login, isAuthenticated, isLoading, error, passwordChallenge, clearPasswordChallenge } = useAuth();
   
   const [formData, setFormData] = useState({
     email: location.state?.email || '',
@@ -236,6 +237,16 @@ function LoginPage() {
           </Link>
         </div>
       </div>
+
+      {/* New Password Modal */}
+      {passwordChallenge?.isRequired && (
+        <NewPasswordModal
+          isOpen={passwordChallenge.isRequired}
+          email={passwordChallenge.email}
+          challengeType={passwordChallenge.challengeType}
+          onClose={clearPasswordChallenge}
+        />
+      )}
     </div>
   );
 }
