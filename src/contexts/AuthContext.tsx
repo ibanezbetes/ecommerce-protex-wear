@@ -152,8 +152,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else {
         dispatch({ type: 'AUTH_LOGOUT' });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Session check failed:', error);
+      
+      // If Auth is not configured, force logout and clear any stored session
+      if (error.name === 'AuthUserPoolException' || error.message?.includes('Auth UserPool not configured')) {
+        console.log('🔄 Auth not configured, clearing stored session...');
+        try {
+          // Force clear any stored auth data
+          await signOut({ global: true });
+        } catch (signOutError) {
+          console.log('SignOut failed, continuing with logout...');
+        }
+      }
+      
       dispatch({ type: 'AUTH_LOGOUT' });
     }
   };

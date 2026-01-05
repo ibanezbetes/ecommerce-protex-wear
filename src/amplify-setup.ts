@@ -7,6 +7,25 @@ import { Amplify } from 'aws-amplify';
 
 console.log('🔧 Iniciando configuración de Amplify...');
 
+// Verificar que los estilos CSS se están cargando
+const checkCSSLoading = () => {
+  const stylesheets = document.querySelectorAll('link[rel="stylesheet"], style');
+  console.log(`🎨 CSS encontrado: ${stylesheets.length} hojas de estilo`);
+  
+  // Verificar si hay estilos inline o externos
+  const hasStyles = stylesheets.length > 0 || document.head.querySelector('style');
+  if (!hasStyles) {
+    console.warn('⚠️ No se detectaron hojas de estilo CSS');
+  }
+};
+
+// Verificar CSS después de que el DOM esté listo
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', checkCSSLoading);
+} else {
+  checkCSSLoading();
+}
+
 // Configuración de fallback (manual)
 const fallbackConfig = {
   auth: {
