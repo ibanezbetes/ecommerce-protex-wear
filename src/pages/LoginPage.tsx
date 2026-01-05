@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
-import NewPasswordModal from '../components/auth/NewPasswordModal';
+import NewPasswordModal from '../components/Auth/NewPasswordModal';
 
 /**
  * Login Page - User authentication
