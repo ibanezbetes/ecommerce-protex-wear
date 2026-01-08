@@ -1,0 +1,279 @@
+[
+  {
+    "sku": "130-B",
+    "name": "Guante Poliuretano Blanco",
+    "description": "Guante de soporte nylon blanco galga 13 recubierto de poliuretano blanco en palma. Dorso transpirable. Gran tacto y sensibilidad.",
+    "price": 0.95,
+    "stock": 1000,
+    "category": "Protección Manos",
+    "subcategory": "Riesgos Mecánicos",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/130-blanco.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/130-blanco.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 420", "Cat II"],
+      "materiales": ["Nylon", "Poliuretano (PU)"],
+      "tallas": ["6", "7", "8", "9", "10"],
+      "niveles_proteccion": {
+        "abrasion": 4,
+        "corte": 1,
+        "desgarro": 3,
+        "puncion": 1,
+        "cutTDM": "X"
+      },
+      "detalles_tecnicos": {
+        "galga": "13",
+        "uso_recomendado": ["Electrónica", "Automoción", "Montaje preciso", "Inspección de calidad"]
+      },
+      "empaquetado": "12 pares/bolsa"
+    },
+    "isActive": true,
+    "tags": ["guante", "poliuretano", "blanco", "precisión", "EN388"]
+  },
+  {
+    "sku": "130-G",
+    "name": "Guante Poliuretano Gris",
+    "description": "Guante de soporte nylon gris recubierto de poliuretano gris en palma. Excelente para trabajos sucios que requieren tacto.",
+    "price": 0.95,
+    "stock": 1000,
+    "category": "Protección Manos",
+    "subcategory": "Riesgos Mecánicos",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/130-gris.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/130-gris.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 420", "Cat II"],
+      "materiales": ["Nylon", "Poliuretano (PU)"],
+      "tallas": ["6", "7", "8", "9", "10"],
+      "niveles_proteccion": {
+        "abrasion": 4,
+        "corte": 1,
+        "desgarro": 3,
+        "puncion": 1,
+        "cutTDM": "X"
+      },
+      "empaquetado": "12 pares/bolsa"
+    },
+    "isActive": true,
+    "tags": ["guante", "poliuretano", "gris", "montaje"]
+  },
+  {
+    "sku": "NI-150",
+    "name": "Guante Nitrilo Foam Gris/Blanco",
+    "description": "Guante soporte nylon spandex galga 15. Recubrimiento nitrilo foam en palma. Tecnología transpirable. Máximo confort.",
+    "price": 2.45,
+    "stock": 500,
+    "category": "Protección Manos",
+    "subcategory": "Riesgos Mecánicos",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/ni-150-nitrilo.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/ni-150-nitrilo.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 420", "Cat II"],
+      "materiales": ["Nylon Spandex", "Nitrilo Foam"],
+      "tallas": ["7", "8", "9", "10", "11"],
+      "niveles_proteccion": {
+        "abrasion": 4,
+        "corte": 1,
+        "desgarro": 3,
+        "puncion": 1,
+        "cutTDM": "X"
+      },
+      "detalles_tecnicos": {
+        "galga": "15",
+        "caracteristicas": ["Transpirable", "Tacto segunda piel", "Agarre en seco y aceitoso"]
+      }
+    },
+    "isActive": true,
+    "tags": ["nitrilo", "foam", "transpirable", "aceite", "mecánico"]
+  },
+  {
+    "sku": "100-CF",
+    "name": "Guante Piel Flor Vacuno Gris",
+    "description": "Guante conductor piel flor vacuno gris. Ribeteado en muñeca. Pulgar plano. Muy suave y flexible.",
+    "price": 3.90,
+    "stock": 300,
+    "category": "Protección Manos",
+    "subcategory": "Riesgos Mecánicos",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/100-cf-piel.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/100-cf-piel.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 420", "Cat II"],
+      "materiales": ["Piel Flor Vacuno"],
+      "tallas": ["8", "9", "10"],
+      "niveles_proteccion": {
+        "abrasion": 2,
+        "corte": 1,
+        "desgarro": 2,
+        "puncion": 2,
+        "cutTDM": "X"
+      },
+      "uso_recomendado": ["Conducción", "Carga y descarga", "Agricultura", "Jardinería"]
+    },
+    "isActive": true,
+    "tags": ["piel", "conductor", "flor vacuno", "trabajo general"]
+  },
+  {
+    "sku": "404-S",
+    "name": "Guante Soldador Rojo",
+    "description": "Guante soldador piel serraje crupón rojo. Forrado interior. Costuras reforzadas e ignífugas (Kevlar). Longitud 35cm.",
+    "price": 5.50,
+    "stock": 150,
+    "category": "Protección Manos",
+    "subcategory": "Soldadura y Calor",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/404-soldador.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/404-soldador.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 407", "EN 12477", "Type A", "Cat II"],
+      "materiales": ["Piel Serraje Crupón", "Hilo Kevlar", "Forro Algodón"],
+      "tallas": ["10"],
+      "niveles_proteccion": {
+        "abrasion": 3,
+        "corte": 1,
+        "desgarro": 3,
+        "puncion": 3,
+        "calor_inflamabilidad": 4,
+        "calor_contacto": 1,
+        "calor_convectivo": 3,
+        "calor_radiante": "X",
+        "salpicaduras_pequeñas": 4,
+        "salpicaduras_grandes": "X"
+      },
+      "detalles_tecnicos": {
+        "longitud": "35 cm",
+        "tipo_soldadura": "MIG/MAG, Electrodo"
+      }
+    },
+    "isActive": true,
+    "tags": ["soldador", "calor", "serraje", "rojo", "ignifugo"]
+  },
+  {
+    "sku": "BOTA-S3",
+    "name": "Bota Seguridad S3 SRC Metal Free",
+    "description": "Bota de seguridad S3 negra. Puntera composite y plantilla textil antiperforación. Hidrófuga y transpirable.",
+    "price": 35.00,
+    "stock": 200,
+    "category": "Calzado Seguridad",
+    "subcategory": "Botas",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-pies/bota-s3.jpg",
+    "imageUrls": ["/images/products/proteccion-pies/bota-s3.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345", "S3", "SRC"],
+      "materiales": ["Piel Grabada", "Suela PU/PU"],
+      "tallas": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47"],
+      "niveles_proteccion": {
+        "categoria_calzado": "S3",
+        "energia_impacto": 200,
+        "resistencia_perforacion": 1100,
+        "resistencia_agua": true,
+        "antideslizante": "SRC",
+        "metal_free": true
+      },
+      "detalles_tecnicos": {
+        "puntera": "Composite (No metálica)",
+        "plantilla": "Textil Antiperforación",
+        "suela": "Doble densidad PU/PU"
+      }
+    },
+    "isActive": true,
+    "tags": ["bota", "S3", "composite", "seguridad", "sin metal"]
+  },
+  {
+    "sku": "CH-AV-AM",
+    "name": "Chaleco Alta Visibilidad Amarillo",
+    "description": "Chaleco reflectante homologado Clase 2. Cierre velcro. Bandas reflectantes cosidas.",
+    "price": 3.50,
+    "stock": 2000,
+    "category": "Vestuario",
+    "subcategory": "Alta Visibilidad",
+    "brand": "Protex",
+    "imageUrl": "/images/products/vestuario/chaleco-av-amarillo.jpg",
+    "imageUrls": ["/images/products/vestuario/chaleco-av-amarillo.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471", "Clase 2", "CE"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["M", "L", "XL", "XXL", "3XL"],
+      "niveles_proteccion": {
+        "clase_visibilidad": "2"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "alta visibilidad", "amarillo", "reflectante"]
+  },
+  {
+    "sku": "CH-AV-NA",
+    "name": "Chaleco Alta Visibilidad Naranja",
+    "description": "Chaleco reflectante homologado Clase 2. Cierre velcro. Color naranja flúor.",
+    "price": 3.50,
+    "stock": 1500,
+    "category": "Vestuario",
+    "subcategory": "Alta Visibilidad",
+    "brand": "Protex",
+    "imageUrl": "/images/products/vestuario/chaleco-av-naranja.jpg",
+    "imageUrls": ["/images/products/vestuario/chaleco-av-naranja.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471", "Clase 2", "CE"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["M", "L", "XL", "XXL", "3XL"],
+      "niveles_proteccion": {
+        "clase_visibilidad": "2"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "alta visibilidad", "naranja", "reflectante"]
+  },
+  {
+    "sku": "PANT-MULTI",
+    "name": "Pantalón Multibolsillos Gris/Negro",
+    "description": "Pantalón de trabajo reforzado. 6 bolsillos. Cintura elástica. Tejido resistente 240g.",
+    "price": 18.90,
+    "stock": 400,
+    "category": "Vestuario",
+    "subcategory": "Ropa Trabajo",
+    "brand": "Protex",
+    "imageUrl": "/images/products/vestuario/pantalon-multi.jpg",
+    "imageUrls": ["/images/products/vestuario/pantalon-multi.jpg"],
+    "specifications": {
+      "normativas": ["EN 13688", "Riesgos Mínimos"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m2",
+        "bolsillos": 6,
+        "refuerzos": "Rodillas y culera"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalon", "trabajo", "multibolsillos", "gris"]
+  },
+  {
+    "sku": "350-LATEX",
+    "name": "Guante Látex Rugoso Verde",
+    "description": "Guante soporte algodón/poliéster con recubrimiento látex rugoso verde en palma. Excelente agarre.",
+    "price": 1.95,
+    "stock": 600,
+    "category": "Protección Manos",
+    "subcategory": "Riesgos Mecánicos",
+    "brand": "Protex",
+    "imageUrl": "/images/products/proteccion-manos/350-latex.jpg",
+    "imageUrls": ["/images/products/proteccion-manos/350-latex.jpg"],
+    "specifications": {
+      "normativas": ["EN 388", "EN 420", "Cat II"],
+      "materiales": ["Algodón/Poliéster", "Látex Rugoso"],
+      "tallas": ["8", "9", "10"],
+      "niveles_proteccion": {
+        "abrasion": 2,
+        "corte": 1,
+        "desgarro": 4,
+        "puncion": 1,
+        "cutTDM": "X"
+      },
+      "uso_recomendado": ["Construcción", "Manipulación de vidrio", "Recogida de residuos", "Jardinería"]
+    },
+    "isActive": true,
+    "tags": ["latex", "verde", "agarre", "construccion"]
+  }
+]

@@ -1,0 +1,21 @@
+{
+  "name": "stripe-webhook",
+  "version": "1.0.0",
+  "description": "Stripe webhook handler for Protex Wear payment processing",
+  "main": "handler.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {
+    "stripe": "^14.21.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/node": "^20.11.17",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

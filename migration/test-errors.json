@@ -1,0 +1,49 @@
+[
+  {
+    "sku": "ERROR-GLOVE-001",
+    "name": "Guante con Errores",
+    "price": 15.99,
+    "stock": 100,
+    "category": "Protección Manos",
+    "safetyCategory": "EPI",
+    "complianceRequired": true,
+    "specifications": {
+      "normativas": ["EN 388"],
+      "materiales": "Nitrilo",
+      "tallas": ["8", "9"],
+      "niveles_proteccion": {}
+    }
+  },
+  {
+    "sku": "ERROR-SHOE-001", 
+    "name": "Zapato con Errores",
+    "price": 89.99,
+    "stock": 50,
+    "category": "Calzado Seguridad",
+    "safetyCategory": "EPI",
+    "complianceRequired": true,
+    "specifications": {
+      "normativas": ["S3"],
+      "materiales": "Cuero",
+      "tallas": ["42", "43"],
+      "niveles_proteccion": {
+        "abrasion": 10
+      }
+    }
+  },
+  {
+    "sku": "ERROR-VEST-001",
+    "name": "Chaleco con Errores",
+    "price": 24.99,
+    "stock": 200,
+    "category": "Alta Visibilidad",
+    "safetyCategory": "EPI", 
+    "complianceRequired": true,
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": "Poliéster",
+      "tallas": ["M", "L"],
+      "niveles_proteccion": {}
+    }
+  }
+]
