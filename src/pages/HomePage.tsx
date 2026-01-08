@@ -12,7 +12,7 @@ function HomePage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section style={{ 
-        background: 'linear-gradient(to right, #2563eb, #1d4ed8)', 
+        background: 'linear-gradient(to right, #2e559e, #1f3c73)', 
         color: 'white', 
         padding: '5rem 0' 
       }}>
@@ -47,7 +47,7 @@ function HomePage() {
             <Link 
               to="/productos" 
               style={{
-                backgroundColor: '#2563eb',
+                backgroundColor: '#2e559e',
                 color: 'white',
                 padding: '1rem 2rem',
                 borderRadius: '0.5rem',
