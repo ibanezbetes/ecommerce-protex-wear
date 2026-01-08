@@ -34,27 +34,31 @@ function Header() {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/productos" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
+            <Link
+              to="/productos"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
             >
               Productos
             </Link>
-            <Link 
-              to="/categorias" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
+            <Link
+              to="/categorias"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
             >
               Categorías
             </Link>
-            <Link 
-              to="/sobre-nosotros" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
+            <Link
+              to="/sobre-nosotros"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
             >
               Sobre Nosotros
             </Link>
-            <Link 
-              to="/contacto" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
+            <Link
+              to="/contacto"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
             >
               Contacto
             </Link>
@@ -79,8 +83,8 @@ function Header() {
             </div>
 
             {/* Cart */}
-            <Link 
-              to="/carrito" 
+            <Link
+              to="/carrito"
               className="relative p-2 text-gray-700 hover:text-primary-color transition-colors"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -187,35 +191,35 @@ function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-2">
-              <Link 
-                to="/productos" 
+              <Link
+                to="/productos"
                 className="text-gray-700 hover:text-primary-color py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Productos
               </Link>
-              <Link 
-                to="/categorias" 
+              <Link
+                to="/categorias"
                 className="text-gray-700 hover:text-primary-color py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Categorías
               </Link>
-              <Link 
-                to="/sobre-nosotros" 
+              <Link
+                to="/sobre-nosotros"
                 className="text-gray-700 hover:text-primary-color py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre Nosotros
               </Link>
-              <Link 
-                to="/contacto" 
+              <Link
+                to="/contacto"
                 className="text-gray-700 hover:text-primary-color py-2"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
-              
+
               {/* Mobile Search */}
               <div className="pt-4">
                 <input
