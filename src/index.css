@@ -1,12 +1,12 @@
 /* Protex Wear - Global Styles */
 
 :root {
-  /* Color Palette */
+  /* Color Palette Protex Wear */
   --primary-color: #2e559e;
   --primary-dark: #1f3c73;
   --primary-light: #3f72c2;
   --secondary-color: #000000;
-  --accent-color: #2e559e;
+  --accent-color: #2e559e; 
   
   /* Neutral Colors */
   --gray-50: #ffffff;
