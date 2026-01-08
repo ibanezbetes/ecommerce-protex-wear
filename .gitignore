@@ -16,3 +16,8 @@ terraform.tfstate*
 # Editor
 .vscode/
 .idea/
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*

@@ -1,0 +1,68 @@
+{
+  "name": "protex-wear-serverless",
+  "version": "1.0.0",
+  "description": "Arquitectura serverless 100% Cloud Native para Protex Wear usando AWS Amplify Gen 2",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx ampx sandbox",
+    "dev:frontend": "vite --port 3000",
+    "dev:full": "concurrently \"npm run dev\" \"npm run dev:frontend\"",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "deploy": "npx ampx deploy",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "seed": "tsx migration/seed.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ibanezbetes/protex-wear-serverless.git"
+  },
+  "keywords": [
+    "amplify",
+    "serverless",
+    "ecommerce",
+    "protex-wear",
+    "aws"
+  ],
+  "author": "Protex Wear Team",
+  "license": "MIT",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/ibanezbetes/protex-wear-serverless/issues"
+  },
+  "homepage": "https://github.com/ibanezbetes/protex-wear-serverless#readme",
+  "devDependencies": {
+    "@aws-amplify/backend": "^1.19.0",
+    "@aws-amplify/backend-cli": "^1.8.1",
+    "@aws-sdk/client-cognito-identity-provider": "^3.962.0",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.0.3",
+    "@types/stripe": "^8.0.416",
+    "@vitejs/plugin-react": "^5.1.2",
+    "aws-cdk-lib": "^2.216.0",
+    "concurrently": "^9.1.0",
+    "constructs": "^10.4.4",
+    "esbuild": "^0.27.2",
+    "fast-check": "^4.5.3",
+    "jest": "^30.2.0",
+    "stripe": "^20.1.0",
+    "ts-jest": "^29.4.6",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.0"
+  },
+  "dependencies": {
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@types/react-router-dom": "^5.3.3",
+    "aws-amplify": "^6.15.9",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0"
+  },
+  "overrides": {
+    "@aws-sdk/types": "3.821.0"
+  }
+}
