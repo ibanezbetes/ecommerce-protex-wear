@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/ContactPage.css';
-import contactSquare from '../assets/Contactos-cuadrado.jpg';
+
 
 const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -43,27 +43,17 @@ const ContactPage: React.FC = () => {
       </div>
 
       <div className="page-content">
-        {/* Intro Section: Text Box (Left) + Image (Right) */}
-        <section className="intro-section">
-          <div className="intro-box">
-            <p className="intro-text">
+
+
+        <div className="contact-grid">
+          {/* Left Side: Contact Form */}
+          <div className="contact-form-section">
+            <h2 className="contact-form-title">¿Cómo podemos ayudarte?</h2>
+            <p className="intro-text" style={{ marginBottom: '2rem' }}>
               Si tienes alguna pregunta sobre nuestros productos y servicios, o si deseas obtener más información sobre cómo podemos colaborar, no dudes en ponerte en contacto con nosotros rellenando el siguiente formulario o mediante nuestros datos de contacto habituales.
               <br /><br />
               Nuestro equipo se pondrá en contacto contigo para resolver tu consulta con la mayor celeridad posible.
             </p>
-          </div>
-          <div className="intro-image-container">
-            <img 
-              src={contactSquare} 
-              alt="Uniforme de constructor sobre fondo de madera - Ropa Laboral" 
-            />
-          </div>
-        </section>
-
-        <div className="contact-grid">
-          {/* Left Side: Contact Form */}
-          <div className="contact-box contact-form-section">
-            <h2 className="contact-form-title">¿Cómo podemos ayudarte?</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
                 <label htmlFor="nombre" className="form-label">Nombre (*)</label>
@@ -143,9 +133,9 @@ const ContactPage: React.FC = () => {
           </div>
 
           {/* Right Side: Contact Info */}
-          <div className="contact-box contact-info-section">
-            <h2 className="contact-form-title" style={{ width: '100%', marginBottom: '1.5rem' }}>Datos de Contacto</h2>
-            
+          <div className="contact-info-section">
+            <h2 className="contact-form-title">Datos de Contacto</h2>
+
             <div className="info-cards">
               <div className="info-card">
                 <div className="info-icon-wrapper">
@@ -189,13 +179,13 @@ const ContactPage: React.FC = () => {
             </div>
 
             <div className="map-container">
-              <iframe 
-                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2980.96198887354!2d-0.794688223926731!3d41.656563271266975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDM5JzIzLjYiTiAwwrA0NyczMS42Ilc!5e0!3m2!1ses!2ses!4v1764322231677!5m2!1ses!2ses" 
-                width="600" 
-                height="450" 
-                style={{ border: 0 }} 
-                allowFullScreen={true} 
-                loading="lazy" 
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2980.96198887354!2d-0.794688223926731!3d41.656563271266975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDM5JzIzLjYiTiAwwrA0NyczMS42Ilc!5e0!3m2!1ses!2ses!4v1764322231677!5m2!1ses!2ses"
+                width="600"
+                height="450"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 className="map-iframe"
                 title="Ubicación Protexwear"
