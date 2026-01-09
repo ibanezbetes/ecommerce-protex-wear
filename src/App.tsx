@@ -6,6 +6,7 @@ import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ContactPage from './pages/ContactPage';
+import SobreNosotrosPage from './pages/SobreNosotrosPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -62,12 +63,13 @@ function AppContent() {
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/contacto" element={<ContactPage />} />
+        <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/productos/:id" element={<ProductDetailPage />} />
         <Route path="/carrito" element={<CartPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegisterPage />} />
-        
+
         {/* Protected Routes - Require Authentication */}
         <Route path="/checkout" element={
           <ProtectedRoute>
@@ -79,18 +81,18 @@ function AppContent() {
             <ProfilePage />
           </ProtectedRoute>
         } />
-        
+
         {/* Admin Routes - Require Admin Role */}
         <Route path="/admin/*" element={
           <ProtectedRoute requiredRole="ADMIN">
             <AdminDashboard />
           </ProtectedRoute>
         } />
-        
+
         {/* 404 Page */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
-      
+
       {/* Development Auth Configuration Panel */}
       <DevAuthConfig />
     </Layout>
