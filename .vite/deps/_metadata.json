@@ -1,8 +1,67 @@
 {
-  "hash": "4dab8572",
-  "configHash": "2a7f9d88",
-  "lockfileHash": "797a6bc9",
-  "browserHash": "af6bf674",
-  "optimized": {},
-  "chunks": {}
+  "hash": "523fc8fc",
+  "configHash": "f8a615b8",
+  "lockfileHash": "60fa2c68",
+  "browserHash": "51d200a4",
+  "optimized": {
+    "react/jsx-dev-runtime": {
+      "src": "../../node_modules/react/jsx-dev-runtime.js",
+      "file": "react_jsx-dev-runtime.js",
+      "fileHash": "0497a5a7",
+      "needsInterop": true
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "de0ea6de",
+      "needsInterop": true
+    },
+    "react-dom/client": {
+      "src": "../../node_modules/react-dom/client.js",
+      "file": "react-dom_client.js",
+      "fileHash": "1266d636",
+      "needsInterop": true
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "6d9818d9",
+      "needsInterop": false
+    },
+    "aws-amplify": {
+      "src": "../../node_modules/aws-amplify/dist/esm/index.mjs",
+      "file": "aws-amplify.js",
+      "fileHash": "f3bacc09",
+      "needsInterop": false
+    },
+    "aws-amplify/auth": {
+      "src": "../../node_modules/aws-amplify/dist/esm/auth/index.mjs",
+      "file": "aws-amplify_auth.js",
+      "fileHash": "0e98287b",
+      "needsInterop": false
+    },
+    "aws-amplify/api": {
+      "src": "../../node_modules/aws-amplify/dist/esm/api/index.mjs",
+      "file": "aws-amplify_api.js",
+      "fileHash": "ba5afac0",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "chunk-R3E4LXVO": {
+      "file": "chunk-R3E4LXVO.js"
+    },
+    "chunk-P6RTVJOB": {
+      "file": "chunk-P6RTVJOB.js"
+    },
+    "chunk-DSJGNS2U": {
+      "file": "chunk-DSJGNS2U.js"
+    },
+    "chunk-T75SV4OQ": {
+      "file": "chunk-T75SV4OQ.js"
+    },
+    "chunk-G3PMV62Z": {
+      "file": "chunk-G3PMV62Z.js"
+    }
+  }
 }

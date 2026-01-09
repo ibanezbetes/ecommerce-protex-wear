@@ -31,7 +31,7 @@ import {
   signRequest,
   signingMiddlewareFactory,
   userAgentMiddlewareFactory
-} from "./chunk-QN4WK3QF.js";
+} from "./chunk-T75SV4OQ.js";
 import {
   __export
 } from "./chunk-G3PMV62Z.js";

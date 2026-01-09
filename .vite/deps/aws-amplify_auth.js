@@ -44,7 +44,7 @@ import {
   updateUserAttribute,
   updateUserAttributes,
   verifyTOTPSetup
-} from "./chunk-PEFKEJ7U.js";
+} from "./chunk-DSJGNS2U.js";
 import {
   Amplify,
   AuthAction,
@@ -52,7 +52,7 @@ import {
   composeServiceApi,
   decodeJWT,
   fetchAuthSession2 as fetchAuthSession
-} from "./chunk-QN4WK3QF.js";
+} from "./chunk-T75SV4OQ.js";
 import "./chunk-G3PMV62Z.js";
 
 // node_modules/@aws-amplify/auth/dist/esm/client/utils/passkey/errors/handlePasskeyRegistrationError.mjs

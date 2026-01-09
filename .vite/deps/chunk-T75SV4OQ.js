@@ -179,6 +179,40 @@ function decodeJWT(token) {
   }
 }
 
+// node_modules/@aws-amplify/core/dist/esm/errors/APIError.mjs
+var ApiError = class _ApiError extends AmplifyError {
+  /**
+   * The unwrapped HTTP response causing the given API error.
+   */
+  get response() {
+    return this._response ? replicateApiErrorResponse(this._response) : void 0;
+  }
+  constructor(params) {
+    super(params);
+    this.constructor = _ApiError;
+    Object.setPrototypeOf(this, _ApiError.prototype);
+    if (params.response) {
+      this._response = params.response;
+    }
+  }
+};
+var replicateApiErrorResponse = (response) => ({
+  ...response,
+  headers: { ...response.headers }
+});
+
+// node_modules/@aws-amplify/core/dist/esm/utils/generateRandomString.mjs
+var generateRandomString = (length) => {
+  const STATE_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const result = [];
+  const randomNums = new Uint8Array(length);
+  getCrypto().getRandomValues(randomNums);
+  for (const num of randomNums) {
+    result.push(STATE_CHARSET[num % STATE_CHARSET.length]);
+  }
+  return result.join("");
+};
+
 // node_modules/@aws-amplify/core/dist/esm/constants.mjs
 var AWS_CLOUDWATCH_CATEGORY = "Logging";
 var USER_AGENT_HEADER = "x-amz-user-agent";
@@ -353,103 +387,28 @@ var ConsoleLogger = class _ConsoleLogger {
 ConsoleLogger.LOG_LEVEL = null;
 ConsoleLogger.BIND_ALL_LOG_LEVELS = false;
 
-// node_modules/@aws-amplify/core/dist/esm/Hub/index.mjs
-var AMPLIFY_SYMBOL = typeof Symbol !== "undefined" ? /* @__PURE__ */ Symbol("amplify_default") : "@@amplify_default";
-var logger = new ConsoleLogger("Hub");
-var HubClass = class {
-  constructor(name) {
-    this.listeners = /* @__PURE__ */ new Map();
-    this.protectedChannels = [
-      "core",
-      "auth",
-      "api",
-      "analytics",
-      "interactions",
-      "pubsub",
-      "storage",
-      "ui",
-      "xr"
-    ];
-    this.name = name;
+// node_modules/@aws-amplify/core/dist/esm/utils/getClientInfo/getClientInfo.mjs
+var logger = new ConsoleLogger("getClientInfo");
+
+// node_modules/@aws-amplify/core/dist/esm/utils/isBrowser.mjs
+var isBrowser = () => typeof window !== "undefined" && typeof window.document !== "undefined";
+
+// node_modules/@aws-amplify/core/dist/esm/utils/isWebWorker.mjs
+var isWebWorker = () => {
+  if (typeof self === "undefined") {
+    return false;
   }
-  /**
-   * Used internally to remove a Hub listener.
-   *
-   * @remarks
-   * This private method is for internal use only. Instead of calling Hub.remove, call the result of Hub.listen.
-   */
-  _remove(channel, listener) {
-    const holder = this.listeners.get(channel);
-    if (!holder) {
-      logger.warn(`No listeners for ${channel}`);
-      return;
-    }
-    this.listeners.set(channel, [
-      ...holder.filter(({ callback }) => callback !== listener)
-    ]);
-  }
-  dispatch(channel, payload, source, ampSymbol) {
-    if (typeof channel === "string" && this.protectedChannels.indexOf(channel) > -1) {
-      const hasAccess = ampSymbol === AMPLIFY_SYMBOL;
-      if (!hasAccess) {
-        logger.warn(`WARNING: ${channel} is protected and dispatching on it can have unintended consequences`);
-      }
-    }
-    const capsule = {
-      channel,
-      payload: { ...payload },
-      source,
-      patternInfo: []
-    };
-    try {
-      this._toListeners(capsule);
-    } catch (e) {
-      logger.error(e);
-    }
-  }
-  listen(channel, callback, listenerName = "noname") {
-    let cb;
-    if (typeof callback !== "function") {
-      throw new AmplifyError({
-        name: NO_HUBCALLBACK_PROVIDED_EXCEPTION,
-        message: "No callback supplied to Hub"
-      });
-    } else {
-      cb = callback;
-    }
-    let holder = this.listeners.get(channel);
-    if (!holder) {
-      holder = [];
-      this.listeners.set(channel, holder);
-    }
-    holder.push({
-      name: listenerName,
-      callback: cb
-    });
-    return () => {
-      this._remove(channel, cb);
-    };
-  }
-  _toListeners(capsule) {
-    const { channel, payload } = capsule;
-    const holder = this.listeners.get(channel);
-    if (holder) {
-      holder.forEach((listener) => {
-        logger.debug(`Dispatching to ${channel} with `, payload);
-        try {
-          listener.callback(capsule);
-        } catch (e) {
-          logger.error(e);
-        }
-      });
-    }
+  const selfContext = self;
+  return typeof selfContext.WorkerGlobalScope !== "undefined" && self instanceof selfContext.WorkerGlobalScope;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/utils/retry/NonRetryableError.mjs
+var NonRetryableError = class extends Error {
+  constructor() {
+    super(...arguments);
+    this.nonRetryable = true;
   }
 };
-var Hub = new HubClass("__default__");
-var HubInternal = new HubClass("internal-hub");
-
-// node_modules/@aws-amplify/core/dist/esm/utils/getClientInfo/getClientInfo.mjs
-var logger2 = new ConsoleLogger("getClientInfo");
 
 // node_modules/@aws-amplify/core/dist/esm/utils/retry/isNonRetryableError.mjs
 var isNonRetryableError = (obj) => {
@@ -457,8 +416,21 @@ var isNonRetryableError = (obj) => {
   return obj && obj[key];
 };
 
+// node_modules/@aws-amplify/core/dist/esm/utils/retry/constants.mjs
+var MAX_DELAY_MS = 5 * 60 * 1e3;
+
+// node_modules/@aws-amplify/core/dist/esm/utils/retry/jitteredBackoff.mjs
+function jitteredBackoff(maxDelayMs = MAX_DELAY_MS) {
+  const BASE_TIME_MS = 100;
+  const JITTER_FACTOR = 100;
+  return (attempt) => {
+    const delay2 = 2 ** attempt * BASE_TIME_MS + JITTER_FACTOR * Math.random();
+    return delay2 > maxDelayMs ? false : delay2;
+  };
+}
+
 // node_modules/@aws-amplify/core/dist/esm/utils/retry/retry.mjs
-var logger3 = new ConsoleLogger("retryUtil");
+var logger2 = new ConsoleLogger("retryUtil");
 async function retry(functionToRetry, args, delayFn, onTerminate) {
   if (typeof functionToRetry !== "function") {
     throw Error("functionToRetry must be a function");
@@ -477,20 +449,20 @@ async function retry(functionToRetry, args, delayFn, onTerminate) {
     });
     while (!terminated) {
       attempt++;
-      logger3.debug(`${functionToRetry.name} attempt #${attempt} with this vars: ${JSON.stringify(args)}`);
+      logger2.debug(`${functionToRetry.name} attempt #${attempt} with this vars: ${JSON.stringify(args)}`);
       try {
         resolve(await functionToRetry(...args));
         return;
       } catch (err) {
         lastError = err;
-        logger3.debug(`error on ${functionToRetry.name}`, err);
+        logger2.debug(`error on ${functionToRetry.name}`, err);
         if (isNonRetryableError(err)) {
-          logger3.debug(`${functionToRetry.name} non retryable error`, err);
+          logger2.debug(`${functionToRetry.name} non retryable error`, err);
           reject(err);
           return;
         }
         const retryIn = delayFn(attempt, args, err);
-        logger3.debug(`${functionToRetry.name} retrying in ${retryIn} ms`);
+        logger2.debug(`${functionToRetry.name} retrying in ${retryIn} ms`);
         if (retryIn === false || terminated) {
           reject(err);
           return;
@@ -506,20 +478,47 @@ async function retry(functionToRetry, args, delayFn, onTerminate) {
   });
 }
 
-// node_modules/@aws-amplify/core/dist/esm/utils/deepFreeze.mjs
-var deepFreeze = (object) => {
-  const propNames = Reflect.ownKeys(object);
-  for (const name of propNames) {
-    const value = object[name];
-    if (value && typeof value === "object" || typeof value === "function") {
-      deepFreeze(value);
-    }
-  }
-  return Object.freeze(object);
+// node_modules/@aws-amplify/core/dist/esm/utils/retry/jitteredExponentialRetry.mjs
+var jitteredExponentialRetry = (functionToRetry, args, maxDelayMs = MAX_DELAY_MS, onTerminate) => retry(functionToRetry, args, jitteredBackoff(maxDelayMs), onTerminate);
+
+// node_modules/@aws-amplify/core/dist/esm/utils/urlSafeDecode.mjs
+function urlSafeDecode(hex) {
+  const matchArr = hex.match(/.{2}/g) || [];
+  return matchArr.map((char) => String.fromCharCode(parseInt(char, 16))).join("");
+}
+
+// node_modules/@aws-amplify/core/dist/esm/utils/urlSafeEncode.mjs
+function urlSafeEncode(str) {
+  return str.split("").map((char) => char.charCodeAt(0).toString(16).padStart(2, "0")).join("");
+}
+
+// node_modules/@aws-amplify/core/dist/esm/utils/deDupeAsyncFunction.mjs
+var deDupeAsyncFunction = (asyncFunction) => {
+  let inflightPromise;
+  return async (...args) => {
+    if (inflightPromise)
+      return inflightPromise;
+    inflightPromise = new Promise((resolve, reject) => {
+      asyncFunction(...args).then((result) => {
+        resolve(result);
+      }).catch((error) => {
+        reject(error);
+      }).finally(() => {
+        inflightPromise = void 0;
+      });
+    });
+    return inflightPromise;
+  };
 };
 
+// node_modules/@aws-amplify/core/dist/esm/utils/isTokenExpired.mjs
+function isTokenExpired({ expiresAt, clockDrift, tolerance = 5e3 }) {
+  const currentTime = Date.now();
+  return currentTime + clockDrift + tolerance > expiresAt;
+}
+
 // node_modules/@aws-amplify/core/dist/esm/parseAWSExports.mjs
-var logger4 = new ConsoleLogger("parseAWSExports");
+var logger3 = new ConsoleLogger("parseAWSExports");
 var authTypeMapping = {
   API_KEY: "apiKey",
   AWS_IAM: "iam",
@@ -586,7 +585,7 @@ var parseAWSExports = (config2 = {}) => {
   if (aws_appsync_graphqlEndpoint) {
     const defaultAuthMode = authTypeMapping[aws_appsync_authenticationType];
     if (!defaultAuthMode) {
-      logger4.debug(`Invalid authentication type ${aws_appsync_authenticationType}. Falling back to IAM.`);
+      logger3.debug(`Invalid authentication type ${aws_appsync_authenticationType}. Falling back to IAM.`);
     }
     amplifyConfig.API = {
       GraphQL: {
@@ -720,6 +719,256 @@ var parseSocialProviders = (aws_cognito_social_providers) => {
     return updatedProvider.charAt(0).toUpperCase() + updatedProvider.slice(1);
   });
 };
+
+// node_modules/@aws-amplify/core/dist/esm/parseAmplifyOutputs.mjs
+function isAmplifyOutputs(config2) {
+  const { version: version2 } = config2;
+  if (!version2) {
+    return false;
+  }
+  return version2.startsWith("1");
+}
+function parseStorage(amplifyOutputsStorageProperties) {
+  if (!amplifyOutputsStorageProperties) {
+    return void 0;
+  }
+  const { bucket_name, aws_region, buckets } = amplifyOutputsStorageProperties;
+  return {
+    S3: {
+      bucket: bucket_name,
+      region: aws_region,
+      buckets: buckets && createBucketInfoMap(buckets)
+    }
+  };
+}
+function parseAuth(amplifyOutputsAuthProperties) {
+  if (!amplifyOutputsAuthProperties) {
+    return void 0;
+  }
+  const { user_pool_id, user_pool_client_id, identity_pool_id, password_policy, mfa_configuration, mfa_methods, unauthenticated_identities_enabled, oauth, username_attributes, standard_required_attributes, groups } = amplifyOutputsAuthProperties;
+  const authConfig = {
+    Cognito: {
+      userPoolId: user_pool_id,
+      userPoolClientId: user_pool_client_id,
+      groups
+    }
+  };
+  if (identity_pool_id) {
+    authConfig.Cognito = {
+      ...authConfig.Cognito,
+      identityPoolId: identity_pool_id
+    };
+  }
+  if (password_policy) {
+    authConfig.Cognito.passwordFormat = {
+      requireLowercase: password_policy.require_lowercase,
+      requireNumbers: password_policy.require_numbers,
+      requireUppercase: password_policy.require_uppercase,
+      requireSpecialCharacters: password_policy.require_symbols,
+      minLength: password_policy.min_length ?? 6
+    };
+  }
+  if (mfa_configuration) {
+    authConfig.Cognito.mfa = {
+      status: getMfaStatus(mfa_configuration),
+      smsEnabled: mfa_methods?.includes("SMS"),
+      totpEnabled: mfa_methods?.includes("TOTP")
+    };
+  }
+  if (unauthenticated_identities_enabled) {
+    authConfig.Cognito.allowGuestAccess = unauthenticated_identities_enabled;
+  }
+  if (oauth) {
+    authConfig.Cognito.loginWith = {
+      oauth: {
+        domain: oauth.domain,
+        redirectSignIn: oauth.redirect_sign_in_uri,
+        redirectSignOut: oauth.redirect_sign_out_uri,
+        responseType: oauth.response_type === "token" ? "token" : "code",
+        scopes: oauth.scopes,
+        providers: getOAuthProviders(oauth.identity_providers)
+      }
+    };
+  }
+  if (username_attributes) {
+    authConfig.Cognito.loginWith = {
+      ...authConfig.Cognito.loginWith,
+      email: username_attributes.includes("email"),
+      phone: username_attributes.includes("phone_number"),
+      // Signing in with a username is not currently supported in Gen2, this should always evaluate to false
+      username: username_attributes.includes("username")
+    };
+  }
+  if (standard_required_attributes) {
+    authConfig.Cognito.userAttributes = standard_required_attributes.reduce((acc, curr) => ({ ...acc, [curr]: { required: true } }), {});
+  }
+  return authConfig;
+}
+function parseAnalytics(amplifyOutputsAnalyticsProperties) {
+  if (!amplifyOutputsAnalyticsProperties?.amazon_pinpoint) {
+    return void 0;
+  }
+  const { amazon_pinpoint } = amplifyOutputsAnalyticsProperties;
+  return {
+    Pinpoint: {
+      appId: amazon_pinpoint.app_id,
+      region: amazon_pinpoint.aws_region
+    }
+  };
+}
+function parseGeo(amplifyOutputsAnalyticsProperties) {
+  if (!amplifyOutputsAnalyticsProperties) {
+    return void 0;
+  }
+  const { aws_region, geofence_collections, maps, search_indices } = amplifyOutputsAnalyticsProperties;
+  return {
+    LocationService: {
+      region: aws_region,
+      searchIndices: search_indices,
+      geofenceCollections: geofence_collections,
+      maps
+    }
+  };
+}
+function parseData(amplifyOutputsDataProperties) {
+  if (!amplifyOutputsDataProperties) {
+    return void 0;
+  }
+  const { aws_region, default_authorization_type, url, api_key, model_introspection } = amplifyOutputsDataProperties;
+  const GraphQL = {
+    endpoint: url,
+    defaultAuthMode: getGraphQLAuthMode(default_authorization_type),
+    region: aws_region,
+    apiKey: api_key,
+    modelIntrospection: model_introspection
+  };
+  return {
+    GraphQL
+  };
+}
+function parseCustom(amplifyOutputsCustomProperties) {
+  if (!amplifyOutputsCustomProperties?.events) {
+    return void 0;
+  }
+  const { url, aws_region, api_key, default_authorization_type } = amplifyOutputsCustomProperties.events;
+  const Events = {
+    endpoint: url,
+    defaultAuthMode: getGraphQLAuthMode(default_authorization_type),
+    region: aws_region,
+    apiKey: api_key
+  };
+  return {
+    Events
+  };
+}
+function parseNotifications(amplifyOutputsNotificationsProperties) {
+  if (!amplifyOutputsNotificationsProperties) {
+    return void 0;
+  }
+  const { aws_region, channels, amazon_pinpoint_app_id } = amplifyOutputsNotificationsProperties;
+  const hasInAppMessaging = channels.includes("IN_APP_MESSAGING");
+  const hasPushNotification = channels.includes("APNS") || channels.includes("FCM");
+  if (!(hasInAppMessaging || hasPushNotification)) {
+    return void 0;
+  }
+  const notificationsConfig = {};
+  if (hasInAppMessaging) {
+    notificationsConfig.InAppMessaging = {
+      Pinpoint: {
+        appId: amazon_pinpoint_app_id,
+        region: aws_region
+      }
+    };
+  }
+  if (hasPushNotification) {
+    notificationsConfig.PushNotification = {
+      Pinpoint: {
+        appId: amazon_pinpoint_app_id,
+        region: aws_region
+      }
+    };
+  }
+  return notificationsConfig;
+}
+function parseAmplifyOutputs(amplifyOutputs) {
+  const resourcesConfig = {};
+  if (amplifyOutputs.storage) {
+    resourcesConfig.Storage = parseStorage(amplifyOutputs.storage);
+  }
+  if (amplifyOutputs.auth) {
+    resourcesConfig.Auth = parseAuth(amplifyOutputs.auth);
+  }
+  if (amplifyOutputs.analytics) {
+    resourcesConfig.Analytics = parseAnalytics(amplifyOutputs.analytics);
+  }
+  if (amplifyOutputs.geo) {
+    resourcesConfig.Geo = parseGeo(amplifyOutputs.geo);
+  }
+  if (amplifyOutputs.data) {
+    resourcesConfig.API = parseData(amplifyOutputs.data);
+  }
+  if (amplifyOutputs.custom) {
+    const customConfig = parseCustom(amplifyOutputs.custom);
+    if (customConfig && "Events" in customConfig) {
+      resourcesConfig.API = { ...resourcesConfig.API, ...customConfig };
+    }
+  }
+  if (amplifyOutputs.notifications) {
+    resourcesConfig.Notifications = parseNotifications(amplifyOutputs.notifications);
+  }
+  return resourcesConfig;
+}
+var authModeNames = {
+  AMAZON_COGNITO_USER_POOLS: "userPool",
+  API_KEY: "apiKey",
+  AWS_IAM: "iam",
+  AWS_LAMBDA: "lambda",
+  OPENID_CONNECT: "oidc"
+};
+function getGraphQLAuthMode(authType) {
+  return authModeNames[authType];
+}
+var providerNames = {
+  GOOGLE: "Google",
+  LOGIN_WITH_AMAZON: "Amazon",
+  FACEBOOK: "Facebook",
+  SIGN_IN_WITH_APPLE: "Apple"
+};
+function getOAuthProviders(providers = []) {
+  return providers.reduce((oAuthProviders, provider) => {
+    if (providerNames[provider] !== void 0) {
+      oAuthProviders.push(providerNames[provider]);
+    }
+    return oAuthProviders;
+  }, []);
+}
+function getMfaStatus(mfaConfiguration) {
+  if (mfaConfiguration === "OPTIONAL")
+    return "optional";
+  if (mfaConfiguration === "REQUIRED")
+    return "on";
+  return "off";
+}
+function createBucketInfoMap(buckets) {
+  const mappedBuckets = {};
+  buckets.forEach(({ name, bucket_name: bucketName, aws_region: region, paths }) => {
+    if (name in mappedBuckets) {
+      throw new Error(`Duplicate friendly name found: ${name}. Name must be unique.`);
+    }
+    const sanitizedPaths = paths ? Object.entries(paths).reduce((acc, [key, value]) => {
+      if (value !== void 0) {
+        acc[key] = value;
+      }
+      return acc;
+    }, {}) : void 0;
+    mappedBuckets[name] = {
+      bucketName,
+      region,
+      paths: sanitizedPaths
+    };
+  });
+  return mappedBuckets;
+}
 
 // node_modules/@aws-amplify/core/dist/esm/singleton/constants.mjs
 var ADD_OAUTH_LISTENER = /* @__PURE__ */ Symbol("oauth-listener");
@@ -1050,255 +1299,12 @@ function v5(value, namespace, buf, offset) {
 v5.DNS = DNS;
 v5.URL = URL2;
 
-// node_modules/@aws-amplify/core/dist/esm/parseAmplifyOutputs.mjs
-function isAmplifyOutputs(config2) {
-  const { version: version2 } = config2;
-  if (!version2) {
-    return false;
-  }
-  return version2.startsWith("1");
-}
-function parseStorage(amplifyOutputsStorageProperties) {
-  if (!amplifyOutputsStorageProperties) {
-    return void 0;
-  }
-  const { bucket_name, aws_region, buckets } = amplifyOutputsStorageProperties;
-  return {
-    S3: {
-      bucket: bucket_name,
-      region: aws_region,
-      buckets: buckets && createBucketInfoMap(buckets)
-    }
-  };
-}
-function parseAuth(amplifyOutputsAuthProperties) {
-  if (!amplifyOutputsAuthProperties) {
-    return void 0;
-  }
-  const { user_pool_id, user_pool_client_id, identity_pool_id, password_policy, mfa_configuration, mfa_methods, unauthenticated_identities_enabled, oauth, username_attributes, standard_required_attributes, groups } = amplifyOutputsAuthProperties;
-  const authConfig = {
-    Cognito: {
-      userPoolId: user_pool_id,
-      userPoolClientId: user_pool_client_id,
-      groups
-    }
-  };
-  if (identity_pool_id) {
-    authConfig.Cognito = {
-      ...authConfig.Cognito,
-      identityPoolId: identity_pool_id
-    };
-  }
-  if (password_policy) {
-    authConfig.Cognito.passwordFormat = {
-      requireLowercase: password_policy.require_lowercase,
-      requireNumbers: password_policy.require_numbers,
-      requireUppercase: password_policy.require_uppercase,
-      requireSpecialCharacters: password_policy.require_symbols,
-      minLength: password_policy.min_length ?? 6
-    };
-  }
-  if (mfa_configuration) {
-    authConfig.Cognito.mfa = {
-      status: getMfaStatus(mfa_configuration),
-      smsEnabled: mfa_methods?.includes("SMS"),
-      totpEnabled: mfa_methods?.includes("TOTP")
-    };
-  }
-  if (unauthenticated_identities_enabled) {
-    authConfig.Cognito.allowGuestAccess = unauthenticated_identities_enabled;
-  }
-  if (oauth) {
-    authConfig.Cognito.loginWith = {
-      oauth: {
-        domain: oauth.domain,
-        redirectSignIn: oauth.redirect_sign_in_uri,
-        redirectSignOut: oauth.redirect_sign_out_uri,
-        responseType: oauth.response_type === "token" ? "token" : "code",
-        scopes: oauth.scopes,
-        providers: getOAuthProviders(oauth.identity_providers)
-      }
-    };
-  }
-  if (username_attributes) {
-    authConfig.Cognito.loginWith = {
-      ...authConfig.Cognito.loginWith,
-      email: username_attributes.includes("email"),
-      phone: username_attributes.includes("phone_number"),
-      // Signing in with a username is not currently supported in Gen2, this should always evaluate to false
-      username: username_attributes.includes("username")
-    };
-  }
-  if (standard_required_attributes) {
-    authConfig.Cognito.userAttributes = standard_required_attributes.reduce((acc, curr) => ({ ...acc, [curr]: { required: true } }), {});
-  }
-  return authConfig;
-}
-function parseAnalytics(amplifyOutputsAnalyticsProperties) {
-  if (!amplifyOutputsAnalyticsProperties?.amazon_pinpoint) {
-    return void 0;
-  }
-  const { amazon_pinpoint } = amplifyOutputsAnalyticsProperties;
-  return {
-    Pinpoint: {
-      appId: amazon_pinpoint.app_id,
-      region: amazon_pinpoint.aws_region
-    }
-  };
-}
-function parseGeo(amplifyOutputsAnalyticsProperties) {
-  if (!amplifyOutputsAnalyticsProperties) {
-    return void 0;
-  }
-  const { aws_region, geofence_collections, maps, search_indices } = amplifyOutputsAnalyticsProperties;
-  return {
-    LocationService: {
-      region: aws_region,
-      searchIndices: search_indices,
-      geofenceCollections: geofence_collections,
-      maps
-    }
-  };
-}
-function parseData(amplifyOutputsDataProperties) {
-  if (!amplifyOutputsDataProperties) {
-    return void 0;
-  }
-  const { aws_region, default_authorization_type, url, api_key, model_introspection } = amplifyOutputsDataProperties;
-  const GraphQL = {
-    endpoint: url,
-    defaultAuthMode: getGraphQLAuthMode(default_authorization_type),
-    region: aws_region,
-    apiKey: api_key,
-    modelIntrospection: model_introspection
-  };
-  return {
-    GraphQL
-  };
-}
-function parseCustom(amplifyOutputsCustomProperties) {
-  if (!amplifyOutputsCustomProperties?.events) {
-    return void 0;
-  }
-  const { url, aws_region, api_key, default_authorization_type } = amplifyOutputsCustomProperties.events;
-  const Events = {
-    endpoint: url,
-    defaultAuthMode: getGraphQLAuthMode(default_authorization_type),
-    region: aws_region,
-    apiKey: api_key
-  };
-  return {
-    Events
-  };
-}
-function parseNotifications(amplifyOutputsNotificationsProperties) {
-  if (!amplifyOutputsNotificationsProperties) {
-    return void 0;
-  }
-  const { aws_region, channels, amazon_pinpoint_app_id } = amplifyOutputsNotificationsProperties;
-  const hasInAppMessaging = channels.includes("IN_APP_MESSAGING");
-  const hasPushNotification = channels.includes("APNS") || channels.includes("FCM");
-  if (!(hasInAppMessaging || hasPushNotification)) {
-    return void 0;
-  }
-  const notificationsConfig = {};
-  if (hasInAppMessaging) {
-    notificationsConfig.InAppMessaging = {
-      Pinpoint: {
-        appId: amazon_pinpoint_app_id,
-        region: aws_region
-      }
-    };
-  }
-  if (hasPushNotification) {
-    notificationsConfig.PushNotification = {
-      Pinpoint: {
-        appId: amazon_pinpoint_app_id,
-        region: aws_region
-      }
-    };
-  }
-  return notificationsConfig;
-}
-function parseAmplifyOutputs(amplifyOutputs) {
-  const resourcesConfig = {};
-  if (amplifyOutputs.storage) {
-    resourcesConfig.Storage = parseStorage(amplifyOutputs.storage);
-  }
-  if (amplifyOutputs.auth) {
-    resourcesConfig.Auth = parseAuth(amplifyOutputs.auth);
-  }
-  if (amplifyOutputs.analytics) {
-    resourcesConfig.Analytics = parseAnalytics(amplifyOutputs.analytics);
-  }
-  if (amplifyOutputs.geo) {
-    resourcesConfig.Geo = parseGeo(amplifyOutputs.geo);
-  }
-  if (amplifyOutputs.data) {
-    resourcesConfig.API = parseData(amplifyOutputs.data);
-  }
-  if (amplifyOutputs.custom) {
-    const customConfig = parseCustom(amplifyOutputs.custom);
-    if (customConfig && "Events" in customConfig) {
-      resourcesConfig.API = { ...resourcesConfig.API, ...customConfig };
-    }
-  }
-  if (amplifyOutputs.notifications) {
-    resourcesConfig.Notifications = parseNotifications(amplifyOutputs.notifications);
-  }
-  return resourcesConfig;
-}
-var authModeNames = {
-  AMAZON_COGNITO_USER_POOLS: "userPool",
-  API_KEY: "apiKey",
-  AWS_IAM: "iam",
-  AWS_LAMBDA: "lambda",
-  OPENID_CONNECT: "oidc"
-};
-function getGraphQLAuthMode(authType) {
-  return authModeNames[authType];
-}
-var providerNames = {
-  GOOGLE: "Google",
-  LOGIN_WITH_AMAZON: "Amazon",
-  FACEBOOK: "Facebook",
-  SIGN_IN_WITH_APPLE: "Apple"
-};
-function getOAuthProviders(providers = []) {
-  return providers.reduce((oAuthProviders, provider) => {
-    if (providerNames[provider] !== void 0) {
-      oAuthProviders.push(providerNames[provider]);
-    }
-    return oAuthProviders;
-  }, []);
-}
-function getMfaStatus(mfaConfiguration) {
-  if (mfaConfiguration === "OPTIONAL")
-    return "optional";
-  if (mfaConfiguration === "REQUIRED")
-    return "on";
-  return "off";
-}
-function createBucketInfoMap(buckets) {
-  const mappedBuckets = {};
-  buckets.forEach(({ name, bucket_name: bucketName, aws_region: region, paths }) => {
-    if (name in mappedBuckets) {
-      throw new Error(`Duplicate friendly name found: ${name}. Name must be unique.`);
-    }
-    const sanitizedPaths = paths ? Object.entries(paths).reduce((acc, [key, value]) => {
-      if (value !== void 0) {
-        acc[key] = value;
-      }
-      return acc;
-    }, {}) : void 0;
-    mappedBuckets[name] = {
-      bucketName,
-      region,
-      paths: sanitizedPaths
-    };
-  });
-  return mappedBuckets;
-}
+// node_modules/@aws-amplify/core/dist/esm/utils/amplifyUuid/index.mjs
+var amplifyUuid = v4_default;
+
+// node_modules/@aws-amplify/core/dist/esm/utils/amplifyUrl/index.mjs
+var AmplifyUrl = URL;
+var AmplifyUrlSearchParams = URLSearchParams;
 
 // node_modules/@aws-amplify/core/dist/esm/utils/parseAmplifyConfig.mjs
 var parseAmplifyConfig = (amplifyConfig) => {
@@ -1309,6 +1315,76 @@ var parseAmplifyConfig = (amplifyConfig) => {
   } else {
     return amplifyConfig;
   }
+};
+
+// node_modules/@aws-amplify/core/dist/esm/utils/deviceName/getDeviceName.mjs
+var getDeviceName = async () => {
+  const { userAgentData } = navigator;
+  if (!userAgentData)
+    return navigator.userAgent;
+  const { platform = "", platformVersion = "", model = "", architecture = "", fullVersionList = [] } = await userAgentData.getHighEntropyValues([
+    "platform",
+    "platformVersion",
+    "architecture",
+    "model",
+    "fullVersionList"
+  ]);
+  const versionList = fullVersionList.map((v) => `${v.brand}/${v.version}`).join(";");
+  const deviceName = [
+    platform,
+    platformVersion,
+    architecture,
+    model,
+    platform,
+    versionList
+  ].filter((value) => value).join(" ");
+  return deviceName || navigator.userAgent;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSignedHeaders.mjs
+var getSignedHeaders = (headers) => Object.keys(headers).map((key) => key.toLowerCase()).sort().join(";");
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/constants.mjs
+var AMZ_DATE_QUERY_PARAM = "X-Amz-Date";
+var TOKEN_QUERY_PARAM = "X-Amz-Security-Token";
+var AUTH_HEADER = "authorization";
+var HOST_HEADER = "host";
+var AMZ_DATE_HEADER = AMZ_DATE_QUERY_PARAM.toLowerCase();
+var TOKEN_HEADER = TOKEN_QUERY_PARAM.toLowerCase();
+var KEY_TYPE_IDENTIFIER = "aws4_request";
+var SHA256_ALGORITHM_IDENTIFIER = "AWS4-HMAC-SHA256";
+var SIGNATURE_IDENTIFIER = "AWS4";
+var EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+var UNSIGNED_PAYLOAD = "UNSIGNED-PAYLOAD";
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCredentialScope.mjs
+var getCredentialScope = (date, region, service) => `${date}/${region}/${service}/${KEY_TYPE_IDENTIFIER}`;
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getFormattedDates.mjs
+var getFormattedDates = (date) => {
+  const longDate = date.toISOString().replace(/[:-]|\.\d{3}/g, "");
+  return {
+    longDate,
+    shortDate: longDate.slice(0, 8)
+  };
+};
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSigningValues.mjs
+var getSigningValues = ({ credentials, signingDate = /* @__PURE__ */ new Date(), signingRegion, signingService, uriEscapePath = true }) => {
+  const { accessKeyId, secretAccessKey, sessionToken } = credentials;
+  const { longDate, shortDate } = getFormattedDates(signingDate);
+  const credentialScope = getCredentialScope(shortDate, signingRegion, signingService);
+  return {
+    accessKeyId,
+    credentialScope,
+    longDate,
+    secretAccessKey,
+    sessionToken,
+    shortDate,
+    signingRegion,
+    signingService,
+    uriEscapePath
+  };
 };
 
 // node_modules/tslib/tslib.es6.mjs
@@ -1822,6 +1898,109 @@ function toHex(bytes) {
   return out;
 }
 
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/dataHashHelpers.mjs
+var getHashedData = (key, data) => {
+  const sha256 = new Sha256(key ?? void 0);
+  sha256.update(data);
+  const hashedData = sha256.digestSync();
+  return hashedData;
+};
+var getHashedDataAsHex = (key, data) => {
+  const hashedData = getHashedData(key, data);
+  return toHex(hashedData);
+};
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalHeaders.mjs
+var getCanonicalHeaders = (headers) => Object.entries(headers).map(([key, value]) => ({
+  key: key.toLowerCase(),
+  value: value?.trim().replace(/\s+/g, " ") ?? ""
+})).sort((a, b) => a.key < b.key ? -1 : 1).map((entry) => `${entry.key}:${entry.value}
+`).join("");
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalQueryString.mjs
+var getCanonicalQueryString = (searchParams) => Array.from(searchParams).sort(([keyA, valA], [keyB, valB]) => {
+  if (keyA === keyB) {
+    return valA < valB ? -1 : 1;
+  }
+  return keyA < keyB ? -1 : 1;
+}).map(([key, val]) => `${escapeUri(key)}=${escapeUri(val)}`).join("&");
+var escapeUri = (uri) => encodeURIComponent(uri).replace(/[!'()*]/g, hexEncode);
+var hexEncode = (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`;
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalUri.mjs
+var getCanonicalUri = (pathname, uriEscapePath = true) => pathname ? uriEscapePath ? encodeURIComponent(pathname).replace(/%2F/g, "/") : pathname : "/";
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getHashedPayload.mjs
+var getHashedPayload = (body) => {
+  if (body == null) {
+    return EMPTY_HASH;
+  }
+  if (isSourceData(body)) {
+    const hashedData = getHashedDataAsHex(null, body);
+    return hashedData;
+  }
+  return UNSIGNED_PAYLOAD;
+};
+var isSourceData = (body) => (
+  // Exclude UNSIGNED_PAYLOAD constant to prevent it from being hashed as a string
+  body !== UNSIGNED_PAYLOAD && (typeof body === "string" || ArrayBuffer.isView(body) || isArrayBuffer(body))
+);
+var isArrayBuffer = (arg) => typeof ArrayBuffer === "function" && arg instanceof ArrayBuffer || Object.prototype.toString.call(arg) === "[object ArrayBuffer]";
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalRequest.mjs
+var getCanonicalRequest = ({ body, headers, method, url }, uriEscapePath = true) => [
+  method,
+  getCanonicalUri(url.pathname, uriEscapePath),
+  getCanonicalQueryString(url.searchParams),
+  getCanonicalHeaders(headers),
+  getSignedHeaders(headers),
+  getHashedPayload(body)
+].join("\n");
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSigningKey.mjs
+var getSigningKey = (secretAccessKey, date, region, service) => {
+  const key = `${SIGNATURE_IDENTIFIER}${secretAccessKey}`;
+  const dateKey = getHashedData(key, date);
+  const regionKey = getHashedData(dateKey, region);
+  const serviceKey = getHashedData(regionKey, service);
+  const signingKey = getHashedData(serviceKey, KEY_TYPE_IDENTIFIER);
+  return signingKey;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getStringToSign.mjs
+var getStringToSign = (date, credentialScope, hashedRequest) => [SHA256_ALGORITHM_IDENTIFIER, date, credentialScope, hashedRequest].join("\n");
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSignature.mjs
+var getSignature = (request, { credentialScope, longDate, secretAccessKey, shortDate, signingRegion, signingService, uriEscapePath }) => {
+  const canonicalRequest = getCanonicalRequest(request, uriEscapePath);
+  const hashedRequest = getHashedDataAsHex(null, canonicalRequest);
+  const stringToSign = getStringToSign(longDate, credentialScope, hashedRequest);
+  const signature = getHashedDataAsHex(getSigningKey(secretAccessKey, shortDate, signingRegion, signingService), stringToSign);
+  return signature;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/signRequest.mjs
+var signRequest = (request, options) => {
+  const signingValues = getSigningValues(options);
+  const { accessKeyId, credentialScope, longDate, sessionToken } = signingValues;
+  const headers = { ...request.headers };
+  headers[HOST_HEADER] = request.url.host;
+  headers[AMZ_DATE_HEADER] = longDate;
+  if (sessionToken) {
+    headers[TOKEN_HEADER] = sessionToken;
+  }
+  const requestToSign = { ...request, headers };
+  const signature = getSignature(requestToSign, signingValues);
+  const credentialEntry = `Credential=${accessKeyId}/${credentialScope}`;
+  const signedHeadersEntry = `SignedHeaders=${getSignedHeaders(headers)}`;
+  const signatureEntry = `Signature=${signature}`;
+  headers[AUTH_HEADER] = `${SHA256_ALGORITHM_IDENTIFIER} ${credentialEntry}, ${signedHeadersEntry}, ${signatureEntry}`;
+  return requestToSign;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/Signer/DateUtils.mjs
+var FIVE_MINUTES_IN_MS = 1e3 * 60 * 5;
+
 // node_modules/@aws-amplify/core/dist/esm/Platform/types.mjs
 var Framework;
 (function(Framework2) {
@@ -2173,6 +2352,16 @@ var getAmplifyUserAgent = (customUserAgentDetails) => {
   const userAgent = getAmplifyUserAgentObject(customUserAgentDetails);
   const userAgentString = userAgent.map(([agentKey, agentValue]) => agentKey && agentValue ? `${agentKey}/${agentValue}` : agentKey).join(" ");
   return userAgentString;
+};
+
+// node_modules/@aws-amplify/core/dist/esm/errors/PlatformNotSupportedError.mjs
+var PlatformNotSupportedError = class extends AmplifyError {
+  constructor() {
+    super({
+      name: AmplifyErrorCode.PlatformNotSupported,
+      message: "Function not supported on current platform"
+    });
+  }
 };
 
 // node_modules/@aws-amplify/core/dist/esm/BackgroundProcessManager/types.mjs
@@ -4373,15 +4562,6 @@ function catchError(selector) {
   });
 }
 
-// node_modules/@aws-amplify/core/dist/esm/utils/isWebWorker.mjs
-var isWebWorker = () => {
-  if (typeof self === "undefined") {
-    return false;
-  }
-  const selfContext = self;
-  return typeof selfContext.WorkerGlobalScope !== "undefined" && self instanceof selfContext.WorkerGlobalScope;
-};
-
 // node_modules/@aws-amplify/core/dist/esm/Reachability/Reachability.mjs
 var Reachability = class _Reachability {
   networkMonitor(_) {
@@ -4420,8 +4600,176 @@ var Reachability = class _Reachability {
 };
 Reachability._observers = [];
 
-// node_modules/@aws-amplify/core/dist/esm/utils/isBrowser.mjs
-var isBrowser = () => typeof window !== "undefined" && typeof window.document !== "undefined";
+// node_modules/@aws-amplify/core/dist/esm/singleton/apis/internal/fetchAuthSession.mjs
+var fetchAuthSession = (amplify, options) => {
+  return amplify.Auth.fetchAuthSession(options);
+};
+
+// node_modules/@aws-amplify/core/dist/esm/Hub/index.mjs
+var AMPLIFY_SYMBOL = typeof Symbol !== "undefined" ? /* @__PURE__ */ Symbol("amplify_default") : "@@amplify_default";
+var logger4 = new ConsoleLogger("Hub");
+var HubClass = class {
+  constructor(name) {
+    this.listeners = /* @__PURE__ */ new Map();
+    this.protectedChannels = [
+      "core",
+      "auth",
+      "api",
+      "analytics",
+      "interactions",
+      "pubsub",
+      "storage",
+      "ui",
+      "xr"
+    ];
+    this.name = name;
+  }
+  /**
+   * Used internally to remove a Hub listener.
+   *
+   * @remarks
+   * This private method is for internal use only. Instead of calling Hub.remove, call the result of Hub.listen.
+   */
+  _remove(channel, listener) {
+    const holder = this.listeners.get(channel);
+    if (!holder) {
+      logger4.warn(`No listeners for ${channel}`);
+      return;
+    }
+    this.listeners.set(channel, [
+      ...holder.filter(({ callback }) => callback !== listener)
+    ]);
+  }
+  dispatch(channel, payload, source, ampSymbol) {
+    if (typeof channel === "string" && this.protectedChannels.indexOf(channel) > -1) {
+      const hasAccess = ampSymbol === AMPLIFY_SYMBOL;
+      if (!hasAccess) {
+        logger4.warn(`WARNING: ${channel} is protected and dispatching on it can have unintended consequences`);
+      }
+    }
+    const capsule = {
+      channel,
+      payload: { ...payload },
+      source,
+      patternInfo: []
+    };
+    try {
+      this._toListeners(capsule);
+    } catch (e) {
+      logger4.error(e);
+    }
+  }
+  listen(channel, callback, listenerName = "noname") {
+    let cb;
+    if (typeof callback !== "function") {
+      throw new AmplifyError({
+        name: NO_HUBCALLBACK_PROVIDED_EXCEPTION,
+        message: "No callback supplied to Hub"
+      });
+    } else {
+      cb = callback;
+    }
+    let holder = this.listeners.get(channel);
+    if (!holder) {
+      holder = [];
+      this.listeners.set(channel, holder);
+    }
+    holder.push({
+      name: listenerName,
+      callback: cb
+    });
+    return () => {
+      this._remove(channel, cb);
+    };
+  }
+  _toListeners(capsule) {
+    const { channel, payload } = capsule;
+    const holder = this.listeners.get(channel);
+    if (holder) {
+      holder.forEach((listener) => {
+        logger4.debug(`Dispatching to ${channel} with `, payload);
+        try {
+          listener.callback(capsule);
+        } catch (e) {
+          logger4.error(e);
+        }
+      });
+    }
+  }
+};
+var Hub = new HubClass("__default__");
+var HubInternal = new HubClass("internal-hub");
+
+// node_modules/@aws-amplify/core/dist/esm/utils/convert/base64/bytesToString.mjs
+function bytesToString(input) {
+  return Array.from(input, (byte) => String.fromCodePoint(byte)).join("");
+}
+
+// node_modules/@aws-amplify/core/dist/esm/utils/convert/base64/base64Encoder.mjs
+var base64Encoder = {
+  /**
+   * Convert input to base64-encoded string
+   * @param input - string to convert to base64
+   * @param options - encoding options that can optionally produce a base64url string
+   * @returns base64-encoded string
+   */
+  convert(input, options = {
+    urlSafe: false,
+    skipPadding: false
+  }) {
+    const inputStr = typeof input === "string" ? input : bytesToString(input);
+    let encodedStr = getBtoa()(inputStr);
+    if (options.urlSafe) {
+      encodedStr = encodedStr.replace(/\+/g, "-").replace(/\//g, "_");
+    }
+    if (options.skipPadding) {
+      encodedStr = encodedStr.replace(/=/g, "");
+    }
+    return encodedStr;
+  }
+};
+
+// node_modules/@aws-amplify/core/dist/esm/utils/cryptoSecureRandomInt.mjs
+function cryptoSecureRandomInt() {
+  const crypto2 = getCrypto();
+  const randomResult = crypto2.getRandomValues(new Uint32Array(1))[0];
+  return randomResult;
+}
+
+// node_modules/@aws-amplify/core/dist/esm/utils/WordArray.mjs
+function hexStringify(wordArray) {
+  const { words } = wordArray;
+  const { sigBytes } = wordArray;
+  const hexChars = [];
+  for (let i = 0; i < sigBytes; i++) {
+    const bite = words[i >>> 2] >>> 24 - i % 4 * 8 & 255;
+    hexChars.push((bite >>> 4).toString(16));
+    hexChars.push((bite & 15).toString(16));
+  }
+  return hexChars.join("");
+}
+var WordArray = class _WordArray {
+  constructor(words, sigBytes) {
+    this.words = [];
+    let Words = words;
+    Words = this.words = Words || [];
+    if (sigBytes !== void 0) {
+      this.sigBytes = sigBytes;
+    } else {
+      this.sigBytes = Words.length * 4;
+    }
+  }
+  random(nBytes) {
+    const words = [];
+    for (let i = 0; i < nBytes; i += 4) {
+      words.push(cryptoSecureRandomInt());
+    }
+    return new _WordArray(words, nBytes);
+  }
+  toString() {
+    return hexStringify(this);
+  }
+};
 
 // node_modules/@aws-amplify/core/dist/esm/utils/sessionListener/SessionListener.mjs
 var stateChangeListeners = /* @__PURE__ */ new Set();
@@ -4468,6 +4816,18 @@ var SessionListener = class {
 
 // node_modules/@aws-amplify/core/dist/esm/utils/sessionListener/index.mjs
 var sessionListener = new SessionListener();
+
+// node_modules/@aws-amplify/core/dist/esm/utils/deepFreeze.mjs
+var deepFreeze = (object) => {
+  const propNames = Reflect.ownKeys(object);
+  for (const name of propNames) {
+    const value = object[name];
+    if (value && typeof value === "object" || typeof value === "function") {
+      deepFreeze(value);
+    }
+  }
+  return Object.freeze(object);
+};
 
 // node_modules/@aws-amplify/core/dist/esm/singleton/Auth/index.mjs
 var logger5 = new ConsoleLogger("Auth");
@@ -4602,11 +4962,6 @@ var AmplifyClass = class {
 };
 var Amplify = new AmplifyClass();
 
-// node_modules/@aws-amplify/core/dist/esm/singleton/apis/internal/fetchAuthSession.mjs
-var fetchAuthSession = (amplify, options) => {
-  return amplify.Auth.fetchAuthSession(options);
-};
-
 // node_modules/@aws-amplify/core/dist/esm/singleton/apis/fetchAuthSession.mjs
 var fetchAuthSession2 = (options) => {
   return fetchAuthSession(Amplify, options);
@@ -4676,19 +5031,6 @@ var composeServiceApi = (transferHandler, serializer, deserializer, defaultConfi
     return deserializer(response);
   };
 };
-
-// node_modules/@aws-amplify/core/dist/esm/utils/retry/constants.mjs
-var MAX_DELAY_MS = 5 * 60 * 1e3;
-
-// node_modules/@aws-amplify/core/dist/esm/utils/retry/jitteredBackoff.mjs
-function jitteredBackoff(maxDelayMs = MAX_DELAY_MS) {
-  const BASE_TIME_MS = 100;
-  const JITTER_FACTOR = 100;
-  return (attempt) => {
-    const delay2 = 2 ** attempt * BASE_TIME_MS + JITTER_FACTOR * Math.random();
-    return delay2 > maxDelayMs ? false : delay2;
-  };
-}
 
 // node_modules/@aws-amplify/core/dist/esm/clients/middleware/retry/constants.mjs
 var DEFAULT_RETRY_ATTEMPTS = 3;
@@ -4836,9 +5178,6 @@ var addOrIncrementMetadataAttempts = (nextHandlerOutput, attempts) => {
     attempts
   };
 };
-
-// node_modules/@aws-amplify/core/dist/esm/utils/amplifyUuid/index.mjs
-var amplifyUuid = v4_default;
 
 // node_modules/@aws-amplify/core/dist/esm/clients/middleware/retry/amzSdkInvocationIdHeaderMiddleware.mjs
 var amzSdkInvocationIdHeaderMiddlewareFactory = () => (next) => {
@@ -5050,24 +5389,10 @@ var getDnsSuffix = (region) => {
   return defaultPartition.outputs.dnsSuffix;
 };
 
-// node_modules/@aws-amplify/core/dist/esm/utils/amplifyUrl/index.mjs
-var AmplifyUrl = URL;
-var AmplifyUrlSearchParams = URLSearchParams;
-
 // node_modules/@aws-amplify/core/dist/esm/foundation/factories/serviceClients/cognitoIdentity/cognitoIdentityPoolEndpointResolver.mjs
 var cognitoIdentityPoolEndpointResolver = ({ region }) => ({
   url: new AmplifyUrl(`https://${COGNITO_IDENTITY_SERVICE_NAME}.${region}.${getDnsSuffix(region)}`)
 });
-
-// node_modules/@aws-amplify/core/dist/esm/errors/PlatformNotSupportedError.mjs
-var PlatformNotSupportedError = class extends AmplifyError {
-  constructor() {
-    super({
-      name: AmplifyErrorCode.PlatformNotSupported,
-      message: "Function not supported on current platform"
-    });
-  }
-};
 
 // node_modules/@aws-amplify/core/dist/esm/storage/KeyValueStorage.mjs
 var KeyValueStorage = class {
@@ -6114,152 +6439,6 @@ var pinpointValidationErrorMap = {
 };
 var assert5 = createAssertionFunction(pinpointValidationErrorMap);
 
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSignedHeaders.mjs
-var getSignedHeaders = (headers) => Object.keys(headers).map((key) => key.toLowerCase()).sort().join(";");
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/constants.mjs
-var AMZ_DATE_QUERY_PARAM = "X-Amz-Date";
-var TOKEN_QUERY_PARAM = "X-Amz-Security-Token";
-var AUTH_HEADER = "authorization";
-var HOST_HEADER = "host";
-var AMZ_DATE_HEADER = AMZ_DATE_QUERY_PARAM.toLowerCase();
-var TOKEN_HEADER = TOKEN_QUERY_PARAM.toLowerCase();
-var KEY_TYPE_IDENTIFIER = "aws4_request";
-var SHA256_ALGORITHM_IDENTIFIER = "AWS4-HMAC-SHA256";
-var SIGNATURE_IDENTIFIER = "AWS4";
-var EMPTY_HASH = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
-var UNSIGNED_PAYLOAD = "UNSIGNED-PAYLOAD";
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCredentialScope.mjs
-var getCredentialScope = (date, region, service) => `${date}/${region}/${service}/${KEY_TYPE_IDENTIFIER}`;
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getFormattedDates.mjs
-var getFormattedDates = (date) => {
-  const longDate = date.toISOString().replace(/[:-]|\.\d{3}/g, "");
-  return {
-    longDate,
-    shortDate: longDate.slice(0, 8)
-  };
-};
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSigningValues.mjs
-var getSigningValues = ({ credentials, signingDate = /* @__PURE__ */ new Date(), signingRegion, signingService, uriEscapePath = true }) => {
-  const { accessKeyId, secretAccessKey, sessionToken } = credentials;
-  const { longDate, shortDate } = getFormattedDates(signingDate);
-  const credentialScope = getCredentialScope(shortDate, signingRegion, signingService);
-  return {
-    accessKeyId,
-    credentialScope,
-    longDate,
-    secretAccessKey,
-    sessionToken,
-    shortDate,
-    signingRegion,
-    signingService,
-    uriEscapePath
-  };
-};
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/dataHashHelpers.mjs
-var getHashedData = (key, data) => {
-  const sha256 = new Sha256(key ?? void 0);
-  sha256.update(data);
-  const hashedData = sha256.digestSync();
-  return hashedData;
-};
-var getHashedDataAsHex = (key, data) => {
-  const hashedData = getHashedData(key, data);
-  return toHex(hashedData);
-};
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalHeaders.mjs
-var getCanonicalHeaders = (headers) => Object.entries(headers).map(([key, value]) => ({
-  key: key.toLowerCase(),
-  value: value?.trim().replace(/\s+/g, " ") ?? ""
-})).sort((a, b) => a.key < b.key ? -1 : 1).map((entry) => `${entry.key}:${entry.value}
-`).join("");
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalQueryString.mjs
-var getCanonicalQueryString = (searchParams) => Array.from(searchParams).sort(([keyA, valA], [keyB, valB]) => {
-  if (keyA === keyB) {
-    return valA < valB ? -1 : 1;
-  }
-  return keyA < keyB ? -1 : 1;
-}).map(([key, val]) => `${escapeUri(key)}=${escapeUri(val)}`).join("&");
-var escapeUri = (uri) => encodeURIComponent(uri).replace(/[!'()*]/g, hexEncode);
-var hexEncode = (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`;
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalUri.mjs
-var getCanonicalUri = (pathname, uriEscapePath = true) => pathname ? uriEscapePath ? encodeURIComponent(pathname).replace(/%2F/g, "/") : pathname : "/";
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getHashedPayload.mjs
-var getHashedPayload = (body) => {
-  if (body == null) {
-    return EMPTY_HASH;
-  }
-  if (isSourceData(body)) {
-    const hashedData = getHashedDataAsHex(null, body);
-    return hashedData;
-  }
-  return UNSIGNED_PAYLOAD;
-};
-var isSourceData = (body) => (
-  // Exclude UNSIGNED_PAYLOAD constant to prevent it from being hashed as a string
-  body !== UNSIGNED_PAYLOAD && (typeof body === "string" || ArrayBuffer.isView(body) || isArrayBuffer(body))
-);
-var isArrayBuffer = (arg) => typeof ArrayBuffer === "function" && arg instanceof ArrayBuffer || Object.prototype.toString.call(arg) === "[object ArrayBuffer]";
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getCanonicalRequest.mjs
-var getCanonicalRequest = ({ body, headers, method, url }, uriEscapePath = true) => [
-  method,
-  getCanonicalUri(url.pathname, uriEscapePath),
-  getCanonicalQueryString(url.searchParams),
-  getCanonicalHeaders(headers),
-  getSignedHeaders(headers),
-  getHashedPayload(body)
-].join("\n");
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSigningKey.mjs
-var getSigningKey = (secretAccessKey, date, region, service) => {
-  const key = `${SIGNATURE_IDENTIFIER}${secretAccessKey}`;
-  const dateKey = getHashedData(key, date);
-  const regionKey = getHashedData(dateKey, region);
-  const serviceKey = getHashedData(regionKey, service);
-  const signingKey = getHashedData(serviceKey, KEY_TYPE_IDENTIFIER);
-  return signingKey;
-};
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getStringToSign.mjs
-var getStringToSign = (date, credentialScope, hashedRequest) => [SHA256_ALGORITHM_IDENTIFIER, date, credentialScope, hashedRequest].join("\n");
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/utils/getSignature.mjs
-var getSignature = (request, { credentialScope, longDate, secretAccessKey, shortDate, signingRegion, signingService, uriEscapePath }) => {
-  const canonicalRequest = getCanonicalRequest(request, uriEscapePath);
-  const hashedRequest = getHashedDataAsHex(null, canonicalRequest);
-  const stringToSign = getStringToSign(longDate, credentialScope, hashedRequest);
-  const signature = getHashedDataAsHex(getSigningKey(secretAccessKey, shortDate, signingRegion, signingService), stringToSign);
-  return signature;
-};
-
-// node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/signer/signatureV4/signRequest.mjs
-var signRequest = (request, options) => {
-  const signingValues = getSigningValues(options);
-  const { accessKeyId, credentialScope, longDate, sessionToken } = signingValues;
-  const headers = { ...request.headers };
-  headers[HOST_HEADER] = request.url.host;
-  headers[AMZ_DATE_HEADER] = longDate;
-  if (sessionToken) {
-    headers[TOKEN_HEADER] = sessionToken;
-  }
-  const requestToSign = { ...request, headers };
-  const signature = getSignature(requestToSign, signingValues);
-  const credentialEntry = `Credential=${accessKeyId}/${credentialScope}`;
-  const signedHeadersEntry = `SignedHeaders=${getSignedHeaders(headers)}`;
-  const signatureEntry = `Signature=${signature}`;
-  headers[AUTH_HEADER] = `${SHA256_ALGORITHM_IDENTIFIER} ${credentialEntry}, ${signedHeadersEntry}, ${signatureEntry}`;
-  return requestToSign;
-};
-
 // node_modules/@aws-amplify/core/dist/esm/clients/middleware/signing/utils/getSkewCorrectedDate.mjs
 var getSkewCorrectedDate = (systemClockOffset) => new Date(Date.now() + systemClockOffset);
 
@@ -6420,216 +6599,52 @@ var serviceWorkerErrorMap = {
 };
 var assert6 = createAssertionFunction(serviceWorkerErrorMap);
 
-// node_modules/@aws-amplify/core/dist/esm/errors/APIError.mjs
-var ApiError = class _ApiError extends AmplifyError {
-  /**
-   * The unwrapped HTTP response causing the given API error.
-   */
-  get response() {
-    return this._response ? replicateApiErrorResponse(this._response) : void 0;
-  }
-  constructor(params) {
-    super(params);
-    this.constructor = _ApiError;
-    Object.setPrototypeOf(this, _ApiError.prototype);
-    if (params.response) {
-      this._response = params.response;
-    }
-  }
-};
-var replicateApiErrorResponse = (response) => ({
-  ...response,
-  headers: { ...response.headers }
-});
-
-// node_modules/@aws-amplify/core/dist/esm/utils/generateRandomString.mjs
-var generateRandomString = (length) => {
-  const STATE_CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const result = [];
-  const randomNums = new Uint8Array(length);
-  getCrypto().getRandomValues(randomNums);
-  for (const num of randomNums) {
-    result.push(STATE_CHARSET[num % STATE_CHARSET.length]);
-  }
-  return result.join("");
-};
-
-// node_modules/@aws-amplify/core/dist/esm/utils/retry/NonRetryableError.mjs
-var NonRetryableError = class extends Error {
-  constructor() {
-    super(...arguments);
-    this.nonRetryable = true;
-  }
-};
-
-// node_modules/@aws-amplify/core/dist/esm/utils/retry/jitteredExponentialRetry.mjs
-var jitteredExponentialRetry = (functionToRetry, args, maxDelayMs = MAX_DELAY_MS, onTerminate) => retry(functionToRetry, args, jitteredBackoff(maxDelayMs), onTerminate);
-
-// node_modules/@aws-amplify/core/dist/esm/utils/urlSafeDecode.mjs
-function urlSafeDecode(hex) {
-  const matchArr = hex.match(/.{2}/g) || [];
-  return matchArr.map((char) => String.fromCharCode(parseInt(char, 16))).join("");
-}
-
-// node_modules/@aws-amplify/core/dist/esm/utils/urlSafeEncode.mjs
-function urlSafeEncode(str) {
-  return str.split("").map((char) => char.charCodeAt(0).toString(16).padStart(2, "0")).join("");
-}
-
-// node_modules/@aws-amplify/core/dist/esm/utils/deDupeAsyncFunction.mjs
-var deDupeAsyncFunction = (asyncFunction) => {
-  let inflightPromise;
-  return async (...args) => {
-    if (inflightPromise)
-      return inflightPromise;
-    inflightPromise = new Promise((resolve, reject) => {
-      asyncFunction(...args).then((result) => {
-        resolve(result);
-      }).catch((error) => {
-        reject(error);
-      }).finally(() => {
-        inflightPromise = void 0;
-      });
-    });
-    return inflightPromise;
-  };
-};
-
-// node_modules/@aws-amplify/core/dist/esm/utils/isTokenExpired.mjs
-function isTokenExpired({ expiresAt, clockDrift, tolerance = 5e3 }) {
-  const currentTime = Date.now();
-  return currentTime + clockDrift + tolerance > expiresAt;
-}
-
-// node_modules/@aws-amplify/core/dist/esm/utils/deviceName/getDeviceName.mjs
-var getDeviceName = async () => {
-  const { userAgentData } = navigator;
-  if (!userAgentData)
-    return navigator.userAgent;
-  const { platform = "", platformVersion = "", model = "", architecture = "", fullVersionList = [] } = await userAgentData.getHighEntropyValues([
-    "platform",
-    "platformVersion",
-    "architecture",
-    "model",
-    "fullVersionList"
-  ]);
-  const versionList = fullVersionList.map((v) => `${v.brand}/${v.version}`).join(";");
-  const deviceName = [
-    platform,
-    platformVersion,
-    architecture,
-    model,
-    platform,
-    versionList
-  ].filter((value) => value).join(" ");
-  return deviceName || navigator.userAgent;
-};
-
-// node_modules/@aws-amplify/core/dist/esm/Signer/DateUtils.mjs
-var FIVE_MINUTES_IN_MS = 1e3 * 60 * 5;
-
-// node_modules/@aws-amplify/core/dist/esm/utils/convert/base64/bytesToString.mjs
-function bytesToString(input) {
-  return Array.from(input, (byte) => String.fromCodePoint(byte)).join("");
-}
-
-// node_modules/@aws-amplify/core/dist/esm/utils/convert/base64/base64Encoder.mjs
-var base64Encoder = {
-  /**
-   * Convert input to base64-encoded string
-   * @param input - string to convert to base64
-   * @param options - encoding options that can optionally produce a base64url string
-   * @returns base64-encoded string
-   */
-  convert(input, options = {
-    urlSafe: false,
-    skipPadding: false
-  }) {
-    const inputStr = typeof input === "string" ? input : bytesToString(input);
-    let encodedStr = getBtoa()(inputStr);
-    if (options.urlSafe) {
-      encodedStr = encodedStr.replace(/\+/g, "-").replace(/\//g, "_");
-    }
-    if (options.skipPadding) {
-      encodedStr = encodedStr.replace(/=/g, "");
-    }
-    return encodedStr;
-  }
-};
-
-// node_modules/@aws-amplify/core/dist/esm/utils/cryptoSecureRandomInt.mjs
-function cryptoSecureRandomInt() {
-  const crypto2 = getCrypto();
-  const randomResult = crypto2.getRandomValues(new Uint32Array(1))[0];
-  return randomResult;
-}
-
-// node_modules/@aws-amplify/core/dist/esm/utils/WordArray.mjs
-function hexStringify(wordArray) {
-  const { words } = wordArray;
-  const { sigBytes } = wordArray;
-  const hexChars = [];
-  for (let i = 0; i < sigBytes; i++) {
-    const bite = words[i >>> 2] >>> 24 - i % 4 * 8 & 255;
-    hexChars.push((bite >>> 4).toString(16));
-    hexChars.push((bite & 15).toString(16));
-  }
-  return hexChars.join("");
-}
-var WordArray = class _WordArray {
-  constructor(words, sigBytes) {
-    this.words = [];
-    let Words = words;
-    Words = this.words = Words || [];
-    if (sigBytes !== void 0) {
-      this.sigBytes = sigBytes;
-    } else {
-      this.sigBytes = Words.length * 4;
-    }
-  }
-  random(nBytes) {
-    const words = [];
-    for (let i = 0; i < nBytes; i += 4) {
-      words.push(cryptoSecureRandomInt());
-    }
-    return new _WordArray(words, nBytes);
-  }
-  toString() {
-    return hexStringify(this);
-  }
-};
-
 export {
-  USER_AGENT_HEADER,
-  ConsoleLogger,
+  Observable,
+  map,
+  filter,
+  catchError,
   AmplifyError,
   AmplifyErrorCode,
   createAssertionFunction,
-  AMPLIFY_SYMBOL,
-  Hub,
-  HubInternal,
   getCrypto,
+  generateRandomString,
+  USER_AGENT_HEADER,
+  ConsoleLogger,
+  isBrowser,
+  NonRetryableError,
+  isNonRetryableError,
+  jitteredExponentialRetry,
+  urlSafeDecode,
+  urlSafeEncode,
+  deDupeAsyncFunction,
+  isTokenExpired,
+  ADD_OAUTH_LISTENER,
+  amplifyUuid,
+  AmplifyUrl,
+  AmplifyUrlSearchParams,
+  parseAmplifyConfig,
+  getDeviceName,
   base64Decoder,
   assertTokenProviderConfig,
   assertOAuthConfig,
   assertIdentityPoolIdConfig,
   decodeJWT,
-  isNonRetryableError,
-  ADD_OAUTH_LISTENER,
-  parseAmplifyConfig,
   Sha256,
+  signRequest,
   Category,
   ApiAction,
   AuthAction,
   getAmplifyUserAgent,
-  Observable,
-  map,
-  filter,
-  catchError,
+  ApiError,
   Reachability,
-  isBrowser,
-  Amplify,
   fetchAuthSession,
+  AMPLIFY_SYMBOL,
+  Hub,
+  HubInternal,
+  base64Encoder,
+  WordArray,
+  Amplify,
   fetchAuthSession2,
   clearCredentials,
   parseJsonError,
@@ -6638,7 +6653,6 @@ export {
   jitteredBackoff2 as jitteredBackoff,
   getRetryDecider,
   retryMiddlewareFactory,
-  amplifyUuid,
   userAgentMiddlewareFactory,
   composeTransferHandler,
   fetchTransferHandler,
@@ -6646,24 +6660,10 @@ export {
   createGetCredentialsForIdentityClient,
   createGetIdClient,
   getDnsSuffix,
-  AmplifyUrl,
-  AmplifyUrlSearchParams,
   cognitoIdentityPoolEndpointResolver,
   CookieStorage,
   defaultStorage,
   syncSessionStorage,
-  signRequest,
-  signingMiddlewareFactory,
-  generateRandomString,
-  NonRetryableError,
-  jitteredExponentialRetry,
-  urlSafeDecode,
-  urlSafeEncode,
-  deDupeAsyncFunction,
-  isTokenExpired,
-  getDeviceName,
-  ApiError,
-  base64Encoder,
-  WordArray
+  signingMiddlewareFactory
 };
-//# sourceMappingURL=chunk-QN4WK3QF.js.map
+//# sourceMappingURL=chunk-T75SV4OQ.js.map
