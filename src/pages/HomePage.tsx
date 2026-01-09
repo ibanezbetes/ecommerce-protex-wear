@@ -1,5 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import heroBg from '../assets/img-home/carrusel.jpg';
+import featureBg from '../assets/img-home/home.jpg';
+import '../styles/HomePage.css';
 
 /**
  * Home Page Component
@@ -7,67 +10,33 @@ import { Link } from 'react-router-dom';
  */
 function HomePage() {
   console.log('🏠 HomePage se está renderizando...');
-  
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section style={{ 
-        background: 'linear-gradient(to right, #2e559e, #1f3c73)', 
-        color: 'white', 
-        padding: '5rem 0' 
-      }}>
-        <div style={{ 
-          maxWidth: '1200px', 
-          margin: '0 auto', 
-          padding: '0 1rem', 
-          textAlign: 'center' 
-        }}>
-          <h1 style={{ 
-            fontSize: '3rem', 
-            fontWeight: 'bold', 
-            marginBottom: '1.5rem' 
-          }}>
+      <section
+        className="hero-section"
+        style={{
+          backgroundImage: `linear-gradient(rgba(30, 60, 115, 0.29), rgba(30, 60, 115, 0.43)), url(${heroBg})`
+        }}
+      >
+        <div className="hero-content">
+          <h1 className="hero-title">
             Protección Profesional
           </h1>
-          <p style={{ 
-            fontSize: '1.25rem', 
-            marginBottom: '2rem', 
-            maxWidth: '48rem', 
-            margin: '0 auto 2rem auto' 
-          }}>
+          <p className="hero-description">
             Equipos de protección individual de la más alta calidad para profesionales que no comprometen su seguridad
           </p>
-          <div style={{ 
-            display: 'flex', 
-            flexDirection: 'column', 
-            gap: '1rem', 
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}>
-            <Link 
-              to="/productos" 
-              style={{
-                backgroundColor: '#2e559e',
-                color: 'white',
-                padding: '1rem 2rem',
-                borderRadius: '0.5rem',
-                textDecoration: 'none',
-                fontWeight: '500'
-              }}
+          <div className="hero-buttons">
+            <Link
+              to="/productos"
+              className="btn-hero-primary"
             >
               Ver Productos
             </Link>
-            <Link 
-              to="/sobre-nosotros" 
-              style={{
-                backgroundColor: 'transparent',
-                color: 'white',
-                padding: '1rem 2rem',
-                borderRadius: '0.5rem',
-                textDecoration: 'none',
-                fontWeight: '500',
-                border: '1px solid white'
-              }}
+            <Link
+              to="/sobre-nosotros"
+              className="btn-hero-outline"
             >
               Conoce Más
             </Link>
@@ -78,14 +47,23 @@ function HomePage() {
       {/* Features Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              ¿Por qué elegir Protex Wear?
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Más de 20 años de experiencia en equipos de protección individual, 
-              ofreciendo productos certificados y servicio especializado
-            </p>
+          <div className="features-intro">
+            <div className="features-intro-text">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                ¿Por qué elegir Protex Wear?
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Más de 20 años de experiencia en equipos de protección individual,
+                ofreciendo productos certificados y servicio especializado
+              </p>
+            </div>
+            <div className="features-intro-image-container">
+              <img
+                src={featureBg}
+                alt="Profesional con equipo de protección"
+                className="features-intro-image"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -198,7 +176,7 @@ function HomePage() {
             ¿Necesitas asesoramiento personalizado?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Nuestro equipo de expertos está aquí para ayudarte a encontrar 
+            Nuestro equipo de expertos está aquí para ayudarte a encontrar
             el equipo de protección perfecto para tu empresa
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
