@@ -1,0 +1,275 @@
+.sobre-nosotros-page {
+    font-family: var(--font-family, 'Nunito', sans-serif);
+    color: var(--gray-800, #333);
+}
+
+/* --- Hero Banner (Shared style with Contact) --- */
+.sobre-nosotros-hero {
+    position: relative;
+    width: 100vw;
+    height: 300px;
+    /* Fallback or reuse contact image, or a new one */
+    background-image: url('../assets/hero_corporate_building_blue.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    margin-bottom: 3rem;
+}
+
+.sobre-nosotros-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.hero-overlay {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    color: white;
+}
+
+.hero-overlay h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: #fff;
+}
+
+/* --- Content Sections --- */
+.page-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem 3rem 1rem;
+}
+
+.about-section {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+    align-items: center;
+    margin-bottom: 4rem;
+}
+
+.about-text {
+    flex: 1;
+    min-width: 300px;
+}
+
+.about-text h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color, #00258B);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.about-text p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: var(--gray-700, #555);
+    margin-bottom: 1rem;
+    text-align: justify;
+}
+
+.about-image {
+    flex: 1;
+    min-width: 300px;
+}
+
+.about-image img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Stats / Brands Section --- */
+.brands-section {
+    background-color: #f8f9fa;
+    padding: 4rem 1rem;
+    text-align: center;
+    margin-left: calc(-50vw + 50%);
+    margin-right: calc(-50vw + 50%);
+    margin-bottom: 4rem;
+}
+
+.brands-section h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color, #00258B);
+    margin-bottom: 2rem;
+    text-transform: uppercase;
+}
+
+.brands-grid {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    align-items: center;
+}
+
+.brand-logo {
+    height: 60px;
+    /* Uniform height */
+    width: auto;
+    object-fit: contain;
+    filter: grayscale(100%);
+    /* Elegant B&W look initially */
+    opacity: 0.7;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.brand-logo:hover {
+    filter: grayscale(0%);
+    /* Color on hover */
+    opacity: 1;
+    transform: scale(1.05);
+}
+
+.brand-logo-more {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--gray-600, #666);
+    padding: 1rem;
+}
+
+/* --- Features Section --- */
+.features-section {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.features-section h2 {
+    font-size: 1.8rem;
+    color: var(--primary-color, #00258B);
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 2rem;
+}
+
+.feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.feature-icon {
+    width: 100px;
+    height: 100px;
+    color: var(--primary-color, #00258B);
+    margin-bottom: 1rem;
+    border: 2px solid var(--primary-color, #00258B);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease;
+}
+
+.feature-icon:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.feature-item h3 {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--gray-800, #333);
+    text-transform: uppercase;
+}
+
+/* --- CTA Section --- */
+.cta-section {
+    background-image: linear-gradient(rgba(40, 84, 154, 0.6), rgba(0, 0, 0, 0.6)), url('../assets/nav_logistics_warehouse_blue.png');
+    /* Reuse hero or similar */
+    background-size: cover;
+    background-position: center;
+    padding: 5rem 1rem;
+    text-align: center;
+    color: white;
+    width: 100%;
+}
+
+.cta-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.cta-content h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    font-weight: 700;
+    background: none;
+    color: white;
+}
+
+.cta-content p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+    color: rgb(213, 212, 212);
+}
+
+.cta-button {
+    display: inline-block;
+    background-color: var(--primary-color, #00258B);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 700;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: var(--primary-light, #3359a2);
+}
+
+@media (max-width: 768px) {
+    .sobre-nosotros-hero h1 {
+        font-size: 2rem;
+    }
+
+    .about-section {
+        flex-direction: column;
+    }
+
+    .cta-content h2 {
+        font-size: 1.8rem;
+    }
+}
