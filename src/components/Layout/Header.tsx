@@ -56,6 +56,13 @@ function Header() {
               Sobre Nosotros
             </Link>
             <Link
+              to="/servicios"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
+            >
+              Servicios
+            </Link>
+            <Link
               to="/contacto"
               className="text-black hover:text-primary-color transition-colors font-normal"
               style={{ textDecoration: 'none' }}
