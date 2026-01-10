@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/ServicePage.css';
-import laundryHeroImg from '../../assets/laundry_service_modern.png';
+import merchandisingHeroImg from '../../assets/merchandising_corporate_professional.png';
 
-const LavanderiaPage = () => {
+const MerchandisingPage = () => {
     return (
         <div className="service-page">
             {/* Hero Banner */}
-            <div className="service-hero" style={{ backgroundImage: `url(${laundryHeroImg})` }}>
+            <div className="service-hero" style={{ backgroundImage: `url(${merchandisingHeroImg})` }}>
                 <div className="hero-overlay">
-                    <h1>LAVANDERÍA INDUSTRIAL</h1>
+                    <h1>MERCHANDISING CORPORATIVO</h1>
                 </div>
             </div>
 
@@ -18,72 +18,73 @@ const LavanderiaPage = () => {
                 {/* Intro Section */}
                 <section className="service-intro-section">
                     <div className="service-intro-text">
-                        <h2>HIGIENE CERTIFICADA Y CONTROLADA</h2>
+                        <h2>REGALOS QUE MARCAN LA DIFERENCIA</h2>
                         <p>
-                            Nuestro proceso de lavandería industrial va más allá de la limpieza convencional.
-                            Utilizamos protocolos estrictos para eliminar patógenos y contaminantes sin dañar los
-                            tejidos técnicos de sus Equipos de Protección Individual (EPIs).
+                            Más allá del vestuario laboral, ofrecemos una amplia gama de artículos publicitarios y
+                            regalos de empresa para potenciar su marca. Desde bolígrafos y libretas hasta tecnología
+                            y accesorios de viaje.
                         </p>
                         <p>
-                            Garantizamos la desinfección y el mantenimiento de las propiedades técnicas de cada prenda,
-                            cumpliendo con la normativa <strong>EN-14065 RABC</strong> de control de biocontaminación.
+                            Gestionamos todo el proceso, desde la selección del producto ideal hasta su personalización
+                            y entrega, asegurando que su merchandising transmita los valores de su empresa con la
+                            misma calidad que sus uniformes.
                         </p>
                     </div>
                     <div className="service-intro-image">
                         <img
-                            src={laundryHeroImg}
-                            alt="Lavandería industrial y procesos de higiene"
+                            src={merchandisingHeroImg}
+                            alt="Merchandising corporativo y regalos de empresa"
                         />
                     </div>
                 </section>
 
                 {/* Features Section */}
                 <section className="features-section">
-                    <h2>ESTÁNDARES DE CALIDAD</h2>
+                    <h2>CATÁLOGO DE OPORTUNIDADES</h2>
 
                     <div className="features-grid">
                         {/* Feature 1 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
                                 </svg>
                             </div>
-                            <h3>Certificación RABC</h3>
-                            <p>Cumplimiento de normativa EN-14065.</p>
+                            <h3>Variedad de Productos</h3>
+                            <p>Miles de referencias para todas las necesidades.</p>
                         </div>
 
                         {/* Feature 2 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
                                 </svg>
                             </div>
-                            <h3>Procesos Validados</h3>
-                            <p>Dosificación y temperatura controlada.</p>
+                            <h3>Branding Efectivo</h3>
+                            <p>Artículos que refuerzan su identidad de marca.</p>
                         </div>
 
                         {/* Feature 3 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
                                 </svg>
                             </div>
-                            <h3>Protección EPI</h3>
-                            <p>Cuidado de tejidos técnicos e ignífugos.</p>
+                            <h3>Eventos y Ferias</h3>
+                            <p>Material promocional para destacar en eventos.</p>
                         </div>
 
                         {/* Feature 4 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3>Puntualidad</h3>
-                            <p>Logística adaptada a sus turnos de trabajo.</p>
+                            <h3>Calidad Garantizada</h3>
+                            <p>Productos duraderos que representan bien a su empresa.</p>
                         </div>
                     </div>
                 </section>
@@ -93,12 +94,11 @@ const LavanderiaPage = () => {
             {/* CTA Section */}
             <section className="cta-section">
                 <div className="cta-content">
-                    <h2>¿NECESITA LIMPIEZA INDUSTRIAL?</h2>
+                    <h2>PROMOCIONE SU NEGOCIO</h2>
                     <p>
-                        Hablemos. Diseñaremos un plan de recogida y entrega a la medida de sus necesidades productivas.
-                        Contacte con nosotros hoy mismo.
+                        Desde bolígrafos económicos hasta regalos VIP. Encuentre el artículo perfecto para sus clientes.
                     </p>
-                    <Link to="/contacto" className="cta-button">CONTACTAR AHORA</Link>
+                    <Link to="/contacto" className="cta-button">VER CATÁLOGO</Link>
                 </div>
             </section>
 
@@ -106,4 +106,4 @@ const LavanderiaPage = () => {
     );
 };
 
-export default LavanderiaPage;
+export default MerchandisingPage;

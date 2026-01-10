@@ -10,6 +10,12 @@ import SobreNosotrosPage from './pages/SobreNosotrosPage';
 import RentingPage from './pages/Services/RentingPage';
 import LavanderiaPage from './pages/Services/LavanderiaPage';
 import MaquinasPage from './pages/Services/MaquinasPage';
+import StockSeguridadPage from './pages/Services/StockSeguridadPage';
+import EntregasNominativasPage from './pages/Services/EntregasNominativasPage';
+import PersonalizacionPage from './pages/Services/PersonalizacionPage';
+import MerchandisingPage from './pages/Services/MerchandisingPage';
+import CeePage from './pages/Services/CeePage';
+
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -67,11 +73,16 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
-        
+
         {/* Service Routes */}
         <Route path="/servicios/renting" element={<RentingPage />} />
         <Route path="/servicios/lavanderia" element={<LavanderiaPage />} />
         <Route path="/servicios/maquinas-expendedoras" element={<MaquinasPage />} />
+        <Route path="/servicios/stock-seguridad" element={<StockSeguridadPage />} />
+        <Route path="/servicios/entregas-nominativas" element={<EntregasNominativasPage />} />
+        <Route path="/servicios/personalizacion" element={<PersonalizacionPage />} />
+        <Route path="/servicios/merchandising" element={<MerchandisingPage />} />
+        <Route path="/servicios/cee" element={<CeePage />} />
 
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/productos/:id" element={<ProductDetailPage />} />
