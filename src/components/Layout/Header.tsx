@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCartItemCount } from '../../contexts/CartContext';
+import { useProducts } from '../../hooks/useProducts';
 import logo from '../../assets/logo.png';
 import './styles/Header.css';
 
@@ -18,6 +19,60 @@ function Header() {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
   const servicesMenuRef = React.useRef<HTMLDivElement>(null);
+
+  // Search State
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const searchRef = React.useRef<HTMLDivElement>(null);
+
+  // Real Product Filtering Hook
+  const {
+    products: searchResults,
+    searchProducts,
+    loading: isSearching
+  } = useProducts({
+    autoFetch: false,
+    limit: 5 // Limit suggestions for the dropdown
+  });
+
+  // Debounced Search Effect
+  React.useEffect(() => {
+    // If empty, clear results (locally managed by hook state essentially, but we can verify)
+    if (searchQuery.trim() === '') {
+      // Maybe we can clear results or just do nothing.
+      // useProducts doesn't have clearProducts, but we can search for empty to maybe reset?
+      // Actually, let's just not search if empty.
+      return;
+    }
+
+    const timeoutId = setTimeout(() => {
+      searchProducts(searchQuery);
+    }, 400); // 400ms debounce
+
+    return () => clearTimeout(timeoutId);
+  }, [searchQuery, searchProducts]);
+
+  // Navigate to full search on Enter
+  const handleSearchSubmit = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && searchQuery.trim()) {
+      setIsSearchOpen(false);
+      navigate(`/productos?search=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
+        setIsSearchOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -83,28 +138,28 @@ function Header() {
                   onMouseLeave={() => setIsServicesMenuOpen(false)}
                 >
                   <Link to="/servicios/renting" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🔄</span> <span className="ml-2">Servicios de renting</span>
+                    <span className="ml-2">Servicios de renting</span>
                   </Link>
                   <Link to="/servicios/lavanderia" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🧺</span> <span className="ml-2">Servicios de lavandería</span>
+                    <span className="ml-2">Servicios de lavandería</span>
                   </Link>
                   <Link to="/servicios/maquinas-expendedoras" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🤖</span> <span className="ml-2">Máquinas expendedoras de epis</span>
+                    <span className="ml-2">Máquinas expendedoras de epis</span>
                   </Link>
                   <Link to="/servicios/stock-seguridad" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🔒</span> <span className="ml-2">Stock de seguridad</span>
+                    <span className="ml-2">Stock de seguridad</span>
                   </Link>
                   <Link to="/servicios/entregas-nominativas" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>📦</span> <span className="ml-2">Entregas nominativas</span>
+                    <span className="ml-2">Entregas nominativas</span>
                   </Link>
                   <Link to="/servicios/personalizacion" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>👕</span> <span className="ml-2">Personalización ropa trabajo</span>
+                    <span className="ml-2">Personalización ropa trabajo</span>
                   </Link>
                   <Link to="/servicios/merchandising" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🎁</span> <span className="ml-2">Merchandising</span>
+                    <span className="ml-2">Merchandising</span>
                   </Link>
                   <Link to="/servicios/cee" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
-                    <span>🏢</span> <span className="ml-2">CEE</span>
+                    <span className="ml-2">CEE</span>
                   </Link>
                 </div>
               )}
@@ -116,21 +171,21 @@ function Header() {
 
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
-            {/* Search */}
-            <div className="hidden md:block">
-              <div className="search-input-container">
-                <input
-                  type="text"
-                  placeholder="Buscar productos..."
-                  className="search-input"
+            {/* Search Toggle Button */}
+            <button
+              onClick={() => setIsSearchOpen(prev => !prev)}
+              className="icon-btn p-2"
+              aria-label="Buscar"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
-                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
-                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-              </div>
-            </div>
+              </svg>
+            </button>
 
             {/* Cart */}
             <Link
@@ -297,6 +352,94 @@ function Header() {
           </div>
         )}
       </div>
+
+      {isSearchOpen && (
+        <div className="search-overlay" ref={searchRef}>
+          <div className="search-box">
+            <input
+              autoFocus
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={handleSearchSubmit}
+              placeholder="Buscar productos..."
+              className="search-overlay-input"
+            />
+          </div>
+
+          <div className="search-recent">
+            {searchQuery === '' ? (
+              <>
+                <span>Resultados de búsquedas recientes</span>
+                <button
+                  className="clear-search"
+                  onClick={() => setSearchQuery('')}
+                >
+                  Limpiar
+                </button>
+              </>
+            ) : (
+              <span>
+                {isSearching ? 'Buscando...' : `${searchResults.length} resultados encontrados`}
+              </span>
+            )}
+          </div>
+
+          {/* Search Results List */}
+          {searchQuery !== '' && (
+            <div className="max-w-[900px] mx-auto mt-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
+              {!isSearching && searchResults.length > 0 ? (
+                <div className="grid grid-cols-1 gap-2">
+                  {searchResults.map((product) => (
+                    <Link
+                      key={product.id}
+                      to={`/productos/${product.id}`}
+                      onClick={() => setIsSearchOpen(false)}
+                      className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors group"
+                    >
+                      <div className="h-12 w-12 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
+                        {product.imageUrl ? (
+                          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                          </svg>
+                        )}
+                      </div>
+                      <div className="ml-4 flex-grow">
+                        <p className="font-medium text-gray-900 group-hover:text-primary-color">{product.name}</p>
+                        <div className="flex items-center text-sm text-gray-500 mt-0.5">
+                          <span>{product.category}</span>
+                          <span className="mx-2">•</span>
+                          <span className="font-medium text-gray-700">€{product.price.toFixed(2)}</span>
+                        </div>
+                      </div>
+                      <svg className="ml-auto h-5 w-5 text-gray-300 group-hover:text-primary-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                !isSearching && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p>No se encontraron productos para "{searchQuery}"</p>
+                    <button
+                      onClick={() => {
+                        setIsSearchOpen(false);
+                        navigate(`/productos?search=${encodeURIComponent(searchQuery)}`);
+                      }}
+                      className="mt-2 text-primary-color hover:underline text-sm"
+                    >
+                      Ver todos los filtros en el catálogo
+                    </button>
+                  </div>
+                )
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </header>
   );
 }

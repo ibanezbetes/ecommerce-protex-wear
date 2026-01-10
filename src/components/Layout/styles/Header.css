@@ -92,10 +92,11 @@
     border: none;
     cursor: pointer;
     font-weight: 500;
+    border-radius: 0.5rem;
 }
 
 .user-menu-btn:hover {
-    background-color: #e3f1ff;
+    background-color: #f3f9ff;
     color: var(--primary-color);
 }
 
@@ -222,10 +223,7 @@
 .btn-login {
     padding: 0.5rem 1rem;
     color: #111827;
-    /* gray-900 */
     font-weight: 500;
-    border: 1px solid #d1d5db;
-    /* gray-300 */
     border-radius: 0.5rem;
     text-decoration: none;
     transition: all 0.2s;
@@ -234,9 +232,9 @@
 
 .btn-login:hover {
     border-color: var(--primary-color);
-    background-color: #f9fafb;
-    /* gray-50 */
+    background-color: #f3f9ff;
     color: var(--primary-color);
+    text-decoration: none;
 }
 
 .btn-register {
@@ -253,6 +251,8 @@
 .btn-register:hover {
     background-color: var(--primary-dark);
     border-color: var(--primary-dark);
+    color: white;
+    text-decoration: none;
 }
 
 /* Navigation Styles */
@@ -277,13 +277,9 @@
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    /* gap-1 */
     background: transparent !important;
-    /* Force transparent background */
     border: none !important;
-    /* Force no border */
     padding: 0 !important;
-    /* Force no padding unlike global buttons */
     margin: 0;
     cursor: pointer;
     font-family: inherit;
@@ -361,6 +357,110 @@
 @media (min-width: 1536px) {
     .header-wide-container {
         max-width: 1600px;
-        /* Much wider for 2xl screens */
+    }
+}
+
+/* ================= SEARCH BAR ================= */
+
+.search-overlay {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: rgb(255, 255, 255);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    padding: 2.5rem 1.5rem;
+    z-index: 40;
+    animation: slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    border-top: 1px solid var(--gray-100);
+    /* Centralize Content */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-box {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    /* Center input text if needed */
+}
+
+.search-overlay-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--gray-300);
+    border-radius: 0;
+    /* Reset global border-radius */
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 300;
+    color: var(--gray-900);
+    padding: 0.75rem 0;
+    letter-spacing: -0.02em;
+    transition: border-color 0.25s ease;
+    box-shadow: none !important;
+    text-align: center;
+    /* Explicitly center input text */
+    /* Force remove global shadow */
+}
+
+/* Placeholder neutro */
+.search-overlay-input::placeholder {
+    color: var(--gray-400);
+    font-weight: 300;
+}
+
+/* SOLO cambia el borde inferior al hacer focus */
+.search-overlay-input:focus {
+    outline: none;
+    border-bottom-color: var(--primary-color);
+    box-shadow: none !important;
+    /* Force remove global shadow on focus */
+}
+
+
+.search-recent {
+    width: 100%;
+    max-width: 900px;
+    margin: 1.75rem auto 0;
+    display: flex;
+    justify-content: center;
+    /* Changed from space-between to center */
+    align-items: center;
+    gap: 1.5rem;
+    /* Add gap since we're centering */
+    color: var(--gray-500);
+    font-size: 0.85rem;
+    letter-spacing: 0.02em;
+}
+
+.clear-search {
+    background: none;
+    border: none;
+    color: var(--gray-400);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 0.25rem 0.5rem;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.clear-search:hover {
+    color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+/* Animation */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }

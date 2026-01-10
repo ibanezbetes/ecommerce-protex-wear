@@ -21,7 +21,7 @@ interface UseProductsReturn {
   error: string | null;
   hasMore: boolean;
   nextToken: string | null;
-  
+
   // Actions
   fetchProducts: () => Promise<void>;
   loadMore: () => Promise<void>;
@@ -30,12 +30,12 @@ interface UseProductsReturn {
   updateProduct: (id: string, productData: Partial<Product>) => Promise<Product | null>;
   deleteProduct: (id: string) => Promise<boolean>;
   refreshProducts: () => Promise<void>;
-  
+
   // Filters and sorting
   setFilters: (filters: ProductFilters) => void;
   setSort: (sort: SortOption) => void;
   clearFilters: () => void;
-  
+
   // Current state
   filters: ProductFilters;
   sort: SortOption;
@@ -61,11 +61,11 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
   // Build GraphQL filter from ProductFilters
   const buildGraphQLFilter = useCallback((productFilters: ProductFilters) => {
     const filter: any = {};
-    
+
     if (productFilters.category) {
       filter.category = { eq: productFilters.category };
     }
-    
+
     if (productFilters.minPrice !== undefined || productFilters.maxPrice !== undefined) {
       filter.price = {};
       if (productFilters.minPrice !== undefined) {
@@ -75,18 +75,18 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
         filter.price.lte = productFilters.maxPrice;
       }
     }
-    
+
     if (productFilters.inStock) {
       filter.stock = { gt: 0 };
     }
-    
+
     if (productFilters.tags && productFilters.tags.length > 0) {
       filter.or = productFilters.tags.map(tag => ({ tags: { contains: tag } }));
     }
-    
+
     // Always filter for active products unless explicitly requested
     filter.isActive = { eq: true };
-    
+
     return Object.keys(filter).length > 0 ? filter : undefined;
   }, []);
 
@@ -95,13 +95,13 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     return [...productList].sort((a, b) => {
       let aValue: any = a[sortOption.field];
       let bValue: any = b[sortOption.field];
-      
+
       // Handle different data types
       if (typeof aValue === 'string') {
         aValue = aValue.toLowerCase();
         bValue = bValue?.toLowerCase() || '';
       }
-      
+
       if (aValue < bValue) {
         return sortOption.direction === 'asc' ? -1 : 1;
       }
@@ -117,22 +117,22 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     try {
       setLoading(true);
       setError(null);
-      
+
       const filter = buildGraphQLFilter(filters);
       const token = reset ? null : nextToken;
-      
+
       const response = await productOperations.listProducts(filter, limit, token || undefined);
-      
+
       if (response.data) {
         const newProducts = response.data as Product[];
         const sortedProducts = sortProducts(newProducts, sort);
-        
+
         if (reset) {
           setProducts(sortedProducts);
         } else {
           setProducts(prev => sortProducts([...prev, ...newProducts], sort));
         }
-        
+
         setNextToken(response.nextToken || null);
         setHasMore(!!response.nextToken);
       }
@@ -156,16 +156,29 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     try {
       setLoading(true);
       setError(null);
-      
+
       if (!searchTerm.trim()) {
         await fetchProducts(true);
         return;
       }
-      
-      const response = await productOperations.searchProducts(searchTerm, limit);
-      
+
+      // Perform client-side filtering for case-insensitive search
+      // Fetch a larger batch to filter from (since backend 'contains' is case-sensitive)
+      const response = await productOperations.listProducts(undefined, 500);
+
       if (response.data) {
-        const searchResults = response.data as Product[];
+        const allProducts = response.data as Product[];
+        const lowerTerm = searchTerm.toLowerCase();
+
+        const searchResults = allProducts.filter(product => {
+          const nameMatch = product.name && product.name.toLowerCase().includes(lowerTerm);
+          const descMatch = product.description && product.description.toLowerCase().includes(lowerTerm);
+          const catMatch = product.category && typeof product.category === 'string' && product.category.toLowerCase().includes(lowerTerm);
+          const tagsMatch = product.tags && product.tags.some(tag => tag && tag.toLowerCase().includes(lowerTerm));
+
+          return nameMatch || descMatch || catMatch || tagsMatch;
+        });
+
         const sortedResults = sortProducts(searchResults, sort);
         setProducts(sortedResults);
         setNextToken(null);
@@ -178,21 +191,21 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     } finally {
       setLoading(false);
     }
-  }, [limit, sort, sortProducts, fetchProducts]);
+  }, [sort, sortProducts, fetchProducts]);
 
   // Create product (Admin only)
   const createProduct = useCallback(async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>): Promise<Product | null> => {
     try {
       setError(null);
-      
+
       const response = await productOperations.createProduct(productData);
-      
+
       if (response.data) {
         const newProduct = response.data as Product;
         setProducts(prev => sortProducts([newProduct, ...prev], sort));
         return newProduct;
       }
-      
+
       return null;
     } catch (err) {
       const errorMessage = handleGraphQLError(err);
@@ -206,12 +219,12 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
   const updateProduct = useCallback(async (id: string, productData: Partial<Product>): Promise<Product | null> => {
     try {
       setError(null);
-      
-      const response = await productOperations.updateProduct({ id, ...productData });
-      
+
+      const response = await productOperations.updateProduct({ id, ...productData } as any);
+
       if (response.data) {
         const updatedProduct = response.data as Product;
-        setProducts(prev => 
+        setProducts(prev =>
           sortProducts(
             prev.map(p => p.id === id ? updatedProduct : p),
             sort
@@ -219,7 +232,7 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
         );
         return updatedProduct;
       }
-      
+
       return null;
     } catch (err) {
       const errorMessage = handleGraphQLError(err);
@@ -233,7 +246,7 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
   const deleteProduct = useCallback(async (id: string): Promise<boolean> => {
     try {
       setError(null);
-      
+
       await productOperations.deleteProduct(id);
       setProducts(prev => prev.filter(p => p.id !== id));
       return true;
@@ -285,7 +298,7 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     error,
     hasMore,
     nextToken,
-    
+
     // Actions
     fetchProducts: () => fetchProducts(true),
     loadMore,
@@ -294,12 +307,12 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
     updateProduct,
     deleteProduct,
     refreshProducts,
-    
+
     // Filters and sorting
     setFilters: updateFilters,
     setSort: updateSort,
     clearFilters,
-    
+
     // Current state
     filters,
     sort,
@@ -323,7 +336,7 @@ interface UseProductReturn {
 
 export function useProduct(id?: string, options: UseProductOptions = {}): UseProductReturn {
   const { autoFetch = true } = options;
-  
+
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -332,9 +345,9 @@ export function useProduct(id?: string, options: UseProductOptions = {}): UsePro
     try {
       setLoading(true);
       setError(null);
-      
+
       const response = await productOperations.getProduct(productId);
-      
+
       if (response.data) {
         setProduct(response.data as Product);
       } else {

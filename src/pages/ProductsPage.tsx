@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useProducts } from '../hooks/useProducts';
 import { ProductFilters, SortOption } from '../types';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
@@ -8,7 +9,10 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
  * Now connected to real GraphQL API
  */
 function ProductsPage() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get('search') || '';
+
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
   const [localFilters, setLocalFilters] = useState<ProductFilters>({});
   const [localSort, setLocalSort] = useState<SortOption>({ field: 'name', direction: 'asc' });
 
@@ -26,11 +30,18 @@ function ProductsPage() {
     filters,
     sort,
   } = useProducts({
-    autoFetch: true,
+    autoFetch: !initialSearch, // Only auto-fetch if no search term
     initialFilters: localFilters,
     initialSort: localSort,
     limit: 12, // Show 12 products per page
   });
+
+  // Initial search effect
+  useEffect(() => {
+    if (initialSearch) {
+      searchProducts(initialSearch);
+    }
+  }, [initialSearch]);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,8 +91,8 @@ function ProductsPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
           <p className="text-red-600">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 btn btn-primary"
           >
             Reintentar
@@ -189,8 +200,8 @@ function ProductsPage() {
             </svg>
             <div>
               <p className="text-sm text-red-600">{error}</p>
-              <button 
-                onClick={() => fetchProducts()} 
+              <button
+                onClick={() => fetchProducts()}
                 className="mt-2 text-sm text-red-700 hover:text-red-900 underline"
               >
                 Reintentar
@@ -231,11 +242,11 @@ function ProductsPage() {
                   </span>
                 )}
               </div>
-              
+
               <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                 {product.name}
               </h3>
-              
+
               {product.description && (
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {product.description}
