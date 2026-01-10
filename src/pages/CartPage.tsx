@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { CheckoutButton } from '../components/CheckoutButton';
 
 /**
  * Cart Page - Shopping cart with items management
@@ -8,7 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
  */
 function CartPage() {
   const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
+  const [guestEmail, setGuestEmail] = useState('');
 
   // Mock cart data - TODO: Replace with CartContext
   const mockCartItems = [
@@ -218,12 +220,12 @@ function CartPage() {
                 <span>Subtotal:</span>
                 <span>€{subtotal.toFixed(2)}</span>
               </div>
-              
+
               <div className="flex justify-between text-gray-600">
                 <span>IVA (21%):</span>
                 <span>€{tax.toFixed(2)}</span>
               </div>
-              
+
               <div className="flex justify-between text-gray-600">
                 <span>Envío:</span>
                 <span>
@@ -241,7 +243,7 @@ function CartPage() {
                   <p>Añade €{(100 - subtotal).toFixed(2)} más para obtener envío gratuito</p>
                 </div>
               )}
-              
+
               <div className="border-t border-gray-200 pt-3">
                 <div className="flex justify-between text-lg font-semibold text-gray-900">
                   <span>Total:</span>
@@ -250,12 +252,34 @@ function CartPage() {
               </div>
             </div>
 
-            <button
-              onClick={handleCheckout}
-              className="w-full btn btn-primary mb-4"
-            >
-              {isAuthenticated ? 'Proceder al Checkout' : 'Iniciar Sesión y Comprar'}
-            </button>
+            {/* Guest Email Input */}
+            {!isAuthenticated && (
+              <div className="mb-4">
+                <label htmlFor="guest-email" className="block text-sm font-medium text-gray-700 mb-1">
+                  Correo electrónico (para recibir confirmación):
+                </label>
+                <input
+                  type="email"
+                  id="guest-email"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  placeholder="ejemplo@correo.com"
+                  value={guestEmail}
+                  onChange={(e) => setGuestEmail(e.target.value)}
+                />
+              </div>
+            )}
+
+            {/* Checkout Button with mapped items */}
+            {(() => {
+              const billingItems = mockCartItems.map(item => ({
+                id: item.id,
+                name: item.product.name,
+                price: item.product.price,
+                quantity: item.quantity,
+                image: item.product.imageUrl
+              }));
+              return <CheckoutButton items={billingItems} customerEmail={isAuthenticated ? user?.email : guestEmail} />;
+            })()}
 
             {/* Security Info */}
             <div className="text-center text-sm text-gray-500">
