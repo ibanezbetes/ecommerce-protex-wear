@@ -7,6 +7,9 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ContactPage from './pages/ContactPage';
 import SobreNosotrosPage from './pages/SobreNosotrosPage';
+import RentingPage from './pages/Services/RentingPage';
+import LavanderiaPage from './pages/Services/LavanderiaPage';
+import MaquinasPage from './pages/Services/MaquinasPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -64,6 +67,12 @@ function AppContent() {
         <Route path="/" element={<HomePage />} />
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+        
+        {/* Service Routes */}
+        <Route path="/servicios/renting" element={<RentingPage />} />
+        <Route path="/servicios/lavanderia" element={<LavanderiaPage />} />
+        <Route path="/servicios/maquinas-expendedoras" element={<MaquinasPage />} />
+
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/productos/:id" element={<ProductDetailPage />} />
         <Route path="/carrito" element={<CartPage />} />
