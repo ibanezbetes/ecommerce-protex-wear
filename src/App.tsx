@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import Layout from './components/Layout/Layout';
@@ -64,10 +64,13 @@ function AppContent() {
     );
   }
 
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
+
   console.log('🏠 Mostrando contenido principal...');
 
   return (
-    <Layout>
+    <Layout showHeader={!isAuthPage} showFooter={!isAuthPage}>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />

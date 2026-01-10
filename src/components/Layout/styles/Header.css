@@ -50,16 +50,44 @@
     }
 }
 
+.icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    color: #374151;
+    /* gray-700 */
+    transition: all 0.2s ease;
+    border-radius: 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+}
+
+.icon-btn:hover {
+    color: var(--primary-color);
+    background-color: #f3f9ff;
+    transform: translateY(-1px);
+}
+
+.icon-btn:active {
+    transform: translateY(0);
+}
+
 .cart-icon-btn {
     position: relative;
     padding: 0.5rem;
     color: #374151;
     /* gray-700 */
     transition: color 0.2s;
+    border-radius: 0.5rem;
+    /* Ensure hover background looks good if added later */
 }
 
 .cart-icon-btn:hover {
     color: var(--primary-color);
+    background-color: #f3f9ff;
+    /* Match icon-btn hover */
 }
 
 .cart-badge {
@@ -384,7 +412,7 @@
     width: 100%;
     max-width: 900px;
     margin: 0 auto;
-    text-align: center;
+    text-align: left;
     /* Center input text if needed */
 }
 
@@ -402,7 +430,7 @@
     letter-spacing: -0.02em;
     transition: border-color 0.25s ease;
     box-shadow: none !important;
-    text-align: center;
+    text-align: left;
     /* Explicitly center input text */
     /* Force remove global shadow */
 }
@@ -449,6 +477,39 @@
 
 .clear-search:hover {
     color: var(--primary-color);
+    transform: translateY(-1px);
+}
+
+.search-no-results {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--gray-500);
+    animation: fadeIn 0.3s ease-out;
+}
+
+.search-no-results p {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.search-no-results-btn {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    padding: 0;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    margin-top: 0.5rem;
+    display: inline-block;
+}
+
+.search-no-results-btn:hover {
+    background-color: #c2ddff;
+    text-decoration: none;
+    border-radius: 0.5rem;
     transform: translateY(-1px);
 }
 

@@ -3,6 +3,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import ConfirmRegistration from '../components/Auth/ConfirmRegistration';
+import logo from '../assets/logo.png';
+import loginImage from '../assets/hero_corporate_building_blue.png';
+import '../styles/LoginPage.css'; // Reusing the same styles
 
 /**
  * Register Page - User registration with email confirmation
@@ -10,10 +13,10 @@ import ConfirmRegistration from '../components/Auth/ConfirmRegistration';
 function RegisterPage() {
   const navigate = useNavigate();
   const { register, isAuthenticated, isLoading, error } = useAuth();
-  
+
   const [currentStep, setCurrentStep] = useState<'register' | 'confirm'>('register');
   const [pendingEmail, setPendingEmail] = useState('');
-  
+
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -41,7 +44,7 @@ function RegisterPage() {
       ...prev,
       [name]: value,
     }));
-    
+
     // Clear field error when user starts typing
     if (formErrors[name]) {
       setFormErrors(prev => ({
@@ -96,7 +99,7 @@ function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
@@ -111,7 +114,7 @@ function RegisterPage() {
         company: formData.company || undefined,
         phone: formData.phone || undefined,
       });
-      
+
       if (result.needsConfirmation) {
         // User needs to confirm their email
         setPendingEmail(result.email);
@@ -130,11 +133,11 @@ function RegisterPage() {
 
   const handleConfirmationComplete = () => {
     // After successful confirmation, redirect to login
-    navigate('/login', { 
-      state: { 
+    navigate('/login', {
+      state: {
         message: 'Cuenta confirmada exitosamente. Por favor, inicia sesión.',
-        email: pendingEmail 
-      } 
+        email: pendingEmail
+      }
     });
   };
 
@@ -165,286 +168,305 @@ function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Crear Cuenta
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Únete a Protex Wear y accede a nuestro catálogo B2B
-          </p>
-        </div>
+    <div className="login-page">
+      {/* Left Side - Image */}
+      <div className="login-image-section">
+        <img src={loginImage} alt="Protex Wear Office" />
+        <div className="login-image-overlay"></div>
+      </div>
 
-        {/* Registration Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex">
-                <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="space-y-4">
-            {/* Name Fields */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Nombre *
-                </label>
-                <input
-                  id="firstName"
-                  name="firstName"
-                  type="text"
-                  required
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    formErrors.firstName ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="Juan"
-                />
-                {formErrors.firstName && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>
-                )}
-              </div>
-
-              <div>
-                <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                  Apellidos *
-                </label>
-                <input
-                  id="lastName"
-                  name="lastName"
-                  type="text"
-                  required
-                  value={formData.lastName}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    formErrors.lastName ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="Pérez"
-                />
-                {formErrors.lastName && (
-                  <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>
-                )}
-              </div>
-            </div>
-
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Correo Electrónico *
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                  formErrors.email ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="juan@empresa.com"
-              />
-              {formErrors.email && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
-              )}
-            </div>
-
-            {/* Company Field */}
-            <div>
-              <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-1">
-                Empresa
-              </label>
-              <input
-                id="company"
-                name="company"
-                type="text"
-                value={formData.company}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="Nombre de tu empresa"
-              />
-            </div>
-
-            {/* Phone Field */}
-            <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-1">
-                Teléfono
-              </label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={formData.phone}
-                onChange={handleInputChange}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                  formErrors.phone ? 'border-red-300' : 'border-gray-300'
-                }`}
-                placeholder="+34 600 123 456"
-              />
-              {formErrors.phone && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
-              )}
-            </div>
-
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Contraseña *
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    formErrors.password ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="Mínimo 8 caracteres"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {formErrors.password && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.password}</p>
-              )}
-              <p className="mt-1 text-xs text-gray-500">
-                Debe contener mayúsculas, minúsculas, números y símbolos
-              </p>
-            </div>
-
-            {/* Confirm Password Field */}
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirmar Contraseña *
-              </label>
-              <div className="relative">
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type={showConfirmPassword ? 'text' : 'password'}
-                  autoComplete="new-password"
-                  required
-                  value={formData.confirmPassword}
-                  onChange={handleInputChange}
-                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                    formErrors.confirmPassword ? 'border-red-300' : 'border-gray-300'
-                  }`}
-                  placeholder="Repite tu contraseña"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
-                >
-                  {showConfirmPassword ? (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
-                    </svg>
-                  ) : (
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
-              </div>
-              {formErrors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-600">{formErrors.confirmPassword}</p>
-              )}
-            </div>
+      {/* Right Side - Registration Form */}
+      <div className="login-form-section">
+        <div className="login-card">
+          {/* Header */}
+          <div className="login-header">
+            <Link to="/">
+              <img src={logo} alt="Protex Wear" className="login-logo" />
+            </Link>
+            <h2 className="login-title">
+              Crear Cuenta
+            </h2>
+            <p className="login-subtitle">
+              Únete a Protex Wear y accede a nuestro catálogo B2B
+            </p>
           </div>
 
-          {/* Terms and Conditions */}
-          <div className="flex items-start">
-            <input
-              id="terms"
-              name="terms"
-              type="checkbox"
-              required
-              className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded mt-1"
-            />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-              Acepto los{' '}
-              <a href="#" className="text-primary-600 hover:text-primary-500">
-                términos y condiciones
-              </a>{' '}
-              y la{' '}
-              <a href="#" className="text-primary-600 hover:text-primary-500">
-                política de privacidad
-              </a>
-            </label>
-          </div>
-
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner size="sm" />
-                <span className="ml-2">Creando cuenta...</span>
+          {/* Registration Form */}
+          <form onSubmit={handleSubmit}>
+            {/* Error Message */}
+            {error && (
+              <div className="alert alert-error mb-6">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm">{error}</p>
+                </div>
               </div>
-            ) : (
-              'Crear Cuenta'
             )}
-          </button>
-        </form>
 
-        {/* Login Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
+            <div className="space-y-4">
+              {/* Name Fields */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-group mb-0">
+                  <label htmlFor="firstName" className="form-label">
+                    Nombre *
+                  </label>
+                  <div className="form-input-container">
+                    <input
+                      id="firstName"
+                      name="firstName"
+                      type="text"
+                      required
+                      value={formData.firstName}
+                      onChange={handleInputChange}
+                      className={`form-input ${formErrors.firstName ? 'has-error' : ''
+                        }`}
+                      placeholder="Juan"
+                    />
+                  </div>
+                  {formErrors.firstName && (
+                    <p className="mt-1 text-xs text-red-600">{formErrors.firstName}</p>
+                  )}
+                </div>
+
+                <div className="form-group mb-0">
+                  <label htmlFor="lastName" className="form-label">
+                    Apellidos *
+                  </label>
+                  <div className="form-input-container">
+                    <input
+                      id="lastName"
+                      name="lastName"
+                      type="text"
+                      required
+                      value={formData.lastName}
+                      onChange={handleInputChange}
+                      className={`form-input ${formErrors.lastName ? 'has-error' : ''
+                        }`}
+                      placeholder="Pérez"
+                    />
+                  </div>
+                  {formErrors.lastName && (
+                    <p className="mt-1 text-xs text-red-600">{formErrors.lastName}</p>
+                  )}
+                </div>
+              </div>
+
+              {/* Email Field */}
+              <div className="form-group">
+                <label htmlFor="email" className="form-label">
+                  Correo Electrónico *
+                </label>
+                <div className="form-input-container">
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.email ? 'has-error' : ''
+                      }`}
+                    placeholder="juan@empresa.com"
+                  />
+                </div>
+                {formErrors.email && (
+                  <p className="mt-1 text-xs text-red-600">{formErrors.email}</p>
+                )}
+              </div>
+
+              {/* Company Field */}
+              <div className="form-group">
+                <label htmlFor="company" className="form-label">
+                  Empresa
+                </label>
+                <div className="form-input-container">
+                  <input
+                    id="company"
+                    name="company"
+                    type="text"
+                    value={formData.company}
+                    onChange={handleInputChange}
+                    className="form-input"
+                    placeholder="Nombre de tu empresa"
+                  />
+                </div>
+              </div>
+
+              {/* Phone Field */}
+              <div className="form-group">
+                <label htmlFor="phone" className="form-label">
+                  Teléfono
+                </label>
+                <div className="form-input-container">
+                  <input
+                    id="phone"
+                    name="phone"
+                    type="tel"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.phone ? 'has-error' : ''
+                      }`}
+                    placeholder="+34 600 123 456"
+                  />
+                </div>
+                {formErrors.phone && (
+                  <p className="mt-1 text-xs text-red-600">{formErrors.phone}</p>
+                )}
+              </div>
+
+              {/* Password Field */}
+              <div className="form-group">
+                <label htmlFor="password" className="form-label">
+                  Contraseña *
+                </label>
+                <div className="form-input-container">
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.password ? 'has-error' : ''
+                      }`}
+                    placeholder="Mínimo 8 caracteres"
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="password-toggle"
+                    aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showPassword ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {formErrors.password && (
+                  <p className="mt-1 text-xs text-red-600">{formErrors.password}</p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Debe contener mayúsculas, minúsculas, números y símbolos
+                </p>
+              </div>
+
+              {/* Confirm Password Field */}
+              <div className="form-group">
+                <label htmlFor="confirmPassword" className="form-label">
+                  Confirmar Contraseña *
+                </label>
+                <div className="form-input-container">
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    autoComplete="new-password"
+                    required
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className={`form-input ${formErrors.confirmPassword ? 'has-error' : ''
+                      }`}
+                    placeholder="Repite tu contraseña"
+                    style={{ paddingRight: '2.5rem' }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="password-toggle"
+                    aria-label={showConfirmPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                  >
+                    {showConfirmPassword ? (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+                      </svg>
+                    ) : (
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {formErrors.confirmPassword && (
+                  <p className="mt-1 text-xs text-red-600">{formErrors.confirmPassword}</p>
+                )}
+              </div>
+            </div>
+
+            {/* Terms and Conditions */}
+            <div className="login-options flex-start">
+              <div className="remember-me">
+                <input
+                  id="terms"
+                  name="terms"
+                  type="checkbox"
+                  required
+                />
+                <label htmlFor="terms" style={{ cursor: 'pointer', fontSize: '0.875rem' }}>
+                  Acepto los{' '}
+                  <a href="#" className="text-primary-600 hover:text-primary-500 font-medium">
+                    términos y condiciones
+                  </a>{' '}
+                  y la{' '}
+                  <a href="#" className="text-primary-600 hover:text-primary-500 font-medium">
+                    política de privacidad
+                  </a>
+                </label>
+              </div>
+            </div>
+
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="btn-login-submit"
+            >
+              {isSubmitting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span>Creando cuenta...</span>
+                </>
+              ) : (
+                'Crear Cuenta'
+              )}
+            </button>
+          </form>
+
+          {/* Login Link */}
+          <div className="register-link-container">
             ¿Ya tienes cuenta?{' '}
             <Link
               to="/login"
-              className="font-medium text-primary-600 hover:text-primary-500"
+              className="register-link-text"
             >
               Inicia sesión aquí
             </Link>
-          </p>
-        </div>
+          </div>
 
-        {/* Back to Home */}
-        <div className="text-center">
-          <Link
-            to="/"
-            className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Volver al inicio
-          </Link>
+          {/* Back to Home */}
+          <div className="back-home-container">
+            <Link
+              to="/"
+              className="back-home-link"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </div>
     </div>

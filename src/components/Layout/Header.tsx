@@ -174,7 +174,7 @@ function Header() {
             {/* Search Toggle Button */}
             <button
               onClick={() => setIsSearchOpen(prev => !prev)}
-              className="icon-btn p-2"
+              className="icon-btn"
               aria-label="Buscar"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -291,7 +291,7 @@ function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden icon-btn p-2"
+              className="md:hidden icon-btn"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -422,14 +422,14 @@ function Header() {
                 </div>
               ) : (
                 !isSearching && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="search-no-results">
                     <p>No se encontraron productos para "{searchQuery}"</p>
                     <button
                       onClick={() => {
                         setIsSearchOpen(false);
                         navigate(`/productos?search=${encodeURIComponent(searchQuery)}`);
                       }}
-                      className="mt-2 text-primary-color hover:underline text-sm"
+                      className="search-no-results-btn"
                     >
                       Ver todos los filtros en el catálogo
                     </button>
