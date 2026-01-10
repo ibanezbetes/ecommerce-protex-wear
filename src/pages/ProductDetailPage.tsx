@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
+import IndustrialSpecifications from '../components/Product/IndustrialSpecifications';
 
 /**
  * Product Detail Page - Individual product view with full details
@@ -264,16 +265,7 @@ function ProductDetailPage() {
           {product.specifications && (
             <div className="mb-8">
               <h3 className="text-lg font-semibold text-gray-900 mb-3">Especificaciones Técnicas</h3>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <dl className="grid grid-cols-1 gap-3">
-                  {Object.entries(product.specifications).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 border-b border-gray-200 last:border-b-0">
-                      <dt className="font-medium text-gray-700">{key}:</dt>
-                      <dd className="text-gray-900">{value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
+              <IndustrialSpecifications specifications={product.specifications} />
             </div>
           )}
 

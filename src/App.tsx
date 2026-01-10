@@ -1,10 +1,12 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { AuthProvider } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
+import ContactPage from './pages/ContactPage';
+import SobreNosotrosPage from './pages/SobreNosotrosPage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
@@ -24,44 +26,76 @@ function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Layout>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<HomePage />} />
-            <Route path="/productos" element={<ProductsPage />} />
-            <Route path="/productos/:id" element={<ProductDetailPage />} />
-            <Route path="/carrito" element={<CartPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/registro" element={<RegisterPage />} />
-            
-            {/* Protected Routes - Require Authentication */}
-            <Route path="/checkout" element={
-              <ProtectedRoute>
-                <CheckoutPage />
-              </ProtectedRoute>
-            } />
-            <Route path="/perfil" element={
-              <ProtectedRoute>
-                <ProfilePage />
-              </ProtectedRoute>
-            } />
-            
-            {/* Admin Routes - Require Admin Role */}
-            <Route path="/admin/*" element={
-              <ProtectedRoute requiredRole="ADMIN">
-                <AdminDashboard />
-              </ProtectedRoute>
-            } />
-            
-            {/* 404 Page */}
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
-        </Layout>
-        
-        {/* Development Auth Configuration Panel */}
-        <DevAuthConfig />
+        <AppContent />
       </CartProvider>
     </AuthProvider>
+  );
+}
+
+/**
+ * App Content Component
+ * Handles routing and layout after auth is initialized
+ */
+function AppContent() {
+  const { isLoading, isAuthenticated, user } = useAuth();
+
+  // Debug logging
+  console.log('🔍 AppContent Debug:', { isLoading, isAuthenticated, user });
+
+  // Show loading spinner while auth is initializing
+  if (isLoading) {
+    console.log('📱 Mostrando pantalla de carga...');
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <div className="loading mb-4"></div>
+          <p className="text-gray-600">Cargando Protex Wear...</p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('🏠 Mostrando contenido principal...');
+
+  return (
+    <Layout>
+      <Routes>
+        {/* Public Routes */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/contacto" element={<ContactPage />} />
+        <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+        <Route path="/productos" element={<ProductsPage />} />
+        <Route path="/productos/:id" element={<ProductDetailPage />} />
+        <Route path="/carrito" element={<CartPage />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/registro" element={<RegisterPage />} />
+
+        {/* Protected Routes - Require Authentication */}
+        <Route path="/checkout" element={
+          <ProtectedRoute>
+            <CheckoutPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/perfil" element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        } />
+
+        {/* Admin Routes - Require Admin Role */}
+        <Route path="/admin/*" element={
+          <ProtectedRoute requiredRole="ADMIN">
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+
+        {/* 404 Page */}
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+
+      {/* Development Auth Configuration Panel */}
+      <DevAuthConfig />
+    </Layout>
   );
 }
 

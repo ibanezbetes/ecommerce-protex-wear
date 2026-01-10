@@ -5,6 +5,17 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import type { Schema } from '../amplify/data/resource';
 
+import { 
+  ProductSource, 
+  IndustrialProductSource, 
+  IndustrialSpecifications,
+  MigrationStats,
+  ValidationError,
+  isIndustrialProduct 
+} from './types';
+import { SpecificationParser } from './specification-parser';
+import { SafetyValidator } from './safety-validator';
+
 // Import Amplify configuration
 import amplifyOutputs from '../amplify_outputs.json';
 
@@ -34,37 +45,11 @@ const client = generateClient<Schema>({
   authMode: 'apiKey'
 });
 
-interface ProductSource {
-  sku: string;
-  name: string;
-  description?: string;
-  price: number;
-  stock: number;
-  category?: string;
-  subcategory?: string;
-  brand?: string;
-  imageUrl?: string;
-  imageUrls?: string[];
-  specifications?: Record<string, any>;
-  isActive?: boolean;
-  weight?: number;
-  dimensions?: {
-    length?: number;
-    width?: number;
-    height?: number;
-  };
-  tags?: string[];
-}
+// Initialize specification parser and safety validator
+const specificationParser = new SpecificationParser();
+const safetyValidator = new SafetyValidator();
 
-interface MigrationStats {
-  totalProducts: number;
-  successfulInserts: number;
-  failedInserts: number;
-  errors: Array<{
-    sku: string;
-    error: string;
-  }>;
-}
+// Note: ProductSource and MigrationStats interfaces are now imported from types.ts
 
 /**
  * Read products data from JSON file
@@ -88,7 +73,7 @@ function readProductsData(): ProductSource[] {
 }
 
 /**
- * Validate product data
+ * Enhanced product validation with industrial specifications support and safety validation
  */
 function validateProduct(product: ProductSource): string[] {
   const errors: string[] = [];
@@ -108,12 +93,43 @@ function validateProduct(product: ProductSource): string[] {
   if (typeof product.stock !== 'number' || product.stock < 0) {
     errors.push('Stock is required and must be a non-negative number');
   }
+
+  // Enhanced validation for industrial products with safety validation
+  if (isIndustrialProduct(product)) {
+    if (!product.safetyCategory) {
+      errors.push('Safety category is required for industrial products');
+    }
+    
+    if (product.complianceRequired && product.specifications) {
+      // Parse specifications first
+      const parsedSpecs = specificationParser.parseSpecifications(product.specifications);
+      if (!parsedSpecs.isValid) {
+        const criticalErrors = parsedSpecs.errors.filter(e => e.severity === 'critical' || e.severity === 'error');
+        errors.push(...criticalErrors.map(e => e.message));
+      }
+      
+      // Perform comprehensive safety validation
+      const safetyValidation = safetyValidator.validateIndustrialProduct(product);
+      if (!safetyValidation.isValid) {
+        // Add friendly error messages for better user experience
+        errors.push(...safetyValidation.friendlyErrors);
+      }
+      
+      // Log warnings for user awareness (but don't fail validation)
+      if (safetyValidation.friendlyWarnings.length > 0) {
+        console.warn(`⚠️  Safety warnings for ${product.sku}:`);
+        safetyValidation.friendlyWarnings.forEach(warning => {
+          console.warn(`   ${warning}`);
+        });
+      }
+    }
+  }
   
   return errors;
 }
 
 /**
- * Insert a single product into the database
+ * Enhanced product insertion with specification parsing
  */
 async function insertProduct(product: ProductSource): Promise<boolean> {
   try {
@@ -121,6 +137,32 @@ async function insertProduct(product: ProductSource): Promise<boolean> {
     const validationErrors = validateProduct(product);
     if (validationErrors.length > 0) {
       throw new Error(`Validation failed: ${validationErrors.join(', ')}`);
+    }
+    
+    // Parse and enhance specifications for industrial products
+    let processedSpecifications = product.specifications;
+    
+    if (isIndustrialProduct(product) && product.specifications) {
+      const parsedSpecs = specificationParser.parseSpecifications(product.specifications);
+      
+      // Log warnings but continue processing
+      if (parsedSpecs.errors.length > 0) {
+        const warnings = parsedSpecs.errors.filter(e => e.severity === 'warning');
+        if (warnings.length > 0) {
+          console.warn(`⚠️  Warnings for product ${product.sku}:`, warnings.map(w => w.message).join(', '));
+        }
+      }
+      
+      // Enhance specifications with parsed data
+      processedSpecifications = {
+        ...product.specifications,
+        _parsed: {
+          safetyStandards: parsedSpecs.safetyStandards,
+          sizeInformation: parsedSpecs.sizeInformation,
+          protectionLevels: parsedSpecs.protectionLevels,
+          technicalDetails: parsedSpecs.technicalDetails
+        }
+      };
     }
     
     // Create product in database
@@ -135,7 +177,7 @@ async function insertProduct(product: ProductSource): Promise<boolean> {
       brand: product.brand,
       imageUrl: product.imageUrl,
       imageUrls: product.imageUrls,
-      specifications: product.specifications ? JSON.stringify(product.specifications) : undefined,
+      specifications: processedSpecifications ? JSON.stringify(processedSpecifications) : undefined,
       isActive: product.isActive ?? true,
       weight: product.weight,
       dimensions: product.dimensions ? JSON.stringify(product.dimensions) : undefined,
@@ -148,7 +190,13 @@ async function insertProduct(product: ProductSource): Promise<boolean> {
       throw new Error(`GraphQL errors: ${result.errors.map(e => e.message).join(', ')}`);
     }
     
-    console.log(`✅ Successfully inserted product: ${product.sku} - ${product.name}`);
+    // Enhanced logging for industrial products
+    if (isIndustrialProduct(product)) {
+      console.log(`✅ Successfully inserted EPI product: ${product.sku} - ${product.name} (${product.safetyCategory})`);
+    } else {
+      console.log(`✅ Successfully inserted product: ${product.sku} - ${product.name}`);
+    }
+    
     return true;
   } catch (error) {
     console.error(`❌ Failed to insert product ${product.sku}:`, error);
@@ -157,17 +205,29 @@ async function insertProduct(product: ProductSource): Promise<boolean> {
 }
 
 /**
- * Bulk insert products with error handling and progress reporting
+ * Enhanced bulk insert with improved error handling and progress reporting
  */
 async function bulkInsertProducts(products: ProductSource[]): Promise<MigrationStats> {
+  const startTime = Date.now();
   const stats: MigrationStats = {
     totalProducts: products.length,
     successfulInserts: 0,
     failedInserts: 0,
-    errors: []
+    errors: [],
+    warnings: [],
+    processingTime: 0
   };
   
   console.log(`🚀 Starting bulk insert of ${products.length} products...`);
+  
+  // Count industrial vs standard products
+  const industrialCount = products.filter(p => isIndustrialProduct(p)).length;
+  const standardCount = products.length - industrialCount;
+  
+  if (industrialCount > 0) {
+    console.log(`📋 Product breakdown: ${industrialCount} EPI products, ${standardCount} standard products`);
+  }
+  
   console.log('📊 Progress:');
   
   for (let i = 0; i < products.length; i++) {
@@ -182,32 +242,37 @@ async function bulkInsertProducts(products: ProductSource[]): Promise<MigrationS
         stats.failedInserts++;
         stats.errors.push({
           sku: product.sku,
-          error: 'Insert operation failed'
+          error: 'Insert operation failed',
+          category: isIndustrialProduct(product) ? product.safetyCategory : undefined
         });
       }
     } catch (error) {
       stats.failedInserts++;
       stats.errors.push({
         sku: product.sku,
-        error: error instanceof Error ? error.message : 'Unknown error'
+        error: error instanceof Error ? error.message : 'Unknown error',
+        category: isIndustrialProduct(product) ? product.safetyCategory : undefined
       });
     }
     
-    // Progress reporting
+    // Enhanced progress reporting
     const progress = Math.round(((i + 1) / products.length) * 100);
     if ((i + 1) % 10 === 0 || i === products.length - 1) {
-      console.log(`   ${progress}% complete (${i + 1}/${products.length})`);
+      const elapsed = Date.now() - startTime;
+      const rate = (i + 1) / (elapsed / 1000);
+      console.log(`   ${progress}% complete (${i + 1}/${products.length}) - ${rate.toFixed(1)} products/sec`);
     }
     
     // Small delay to avoid overwhelming the API
     await new Promise(resolve => setTimeout(resolve, 100));
   }
   
+  stats.processingTime = Date.now() - startTime;
   return stats;
 }
 
 /**
- * Print migration statistics
+ * Enhanced statistics printing with industrial product details
  */
 function printStats(stats: MigrationStats): void {
   console.log('\n📈 Migration Statistics:');
@@ -216,21 +281,36 @@ function printStats(stats: MigrationStats): void {
   console.log(`   ❌ Failed inserts: ${stats.failedInserts}`);
   console.log(`   📊 Success rate: ${Math.round((stats.successfulInserts / stats.totalProducts) * 100)}%`);
   
+  if (stats.processingTime) {
+    console.log(`   ⏱️  Processing time: ${stats.processingTime}ms`);
+  }
+  
   if (stats.errors.length > 0) {
     console.log('\n❌ Errors:');
     stats.errors.forEach(error => {
-      console.log(`   ${error.sku}: ${error.error}`);
+      const categoryInfo = error.category ? ` (${error.category})` : '';
+      console.log(`   ${error.sku}${categoryInfo}: ${error.error}`);
+    });
+  }
+  
+  if (stats.warnings && stats.warnings.length > 0) {
+    console.log('\n⚠️  Warnings:');
+    stats.warnings.forEach(warning => {
+      console.log(`   ${warning.sku}: ${warning.warning}`);
     });
   }
 }
 
 /**
- * Main migration function
+ * Enhanced main migration function with comprehensive safety validation
  */
 async function main(): Promise<void> {
   try {
-    console.log('🌟 Protex Wear - Data Migration Script');
-    console.log('=====================================\n');
+    console.log('🌟 Protex Wear - Enhanced Data Migration Script');
+    console.log('===============================================');
+    console.log('🔧 Industrial EPIs & Safety Equipment Support');
+    console.log('🛡️  Quality Guardian: Cross-Validation Active');
+    console.log('===============================================\n');
     
     // Read products data
     const products = readProductsData();
@@ -238,6 +318,62 @@ async function main(): Promise<void> {
     if (products.length === 0) {
       console.log('⚠️  No products found in source file. Exiting.');
       return;
+    }
+    
+    // Analyze product types and perform batch safety validation
+    const industrialProducts = products.filter(p => isIndustrialProduct(p)) as IndustrialProductSource[];
+    
+    if (industrialProducts.length > 0) {
+      console.log(`🛡️  Detected ${industrialProducts.length} industrial safety products (EPIs)`);
+      
+      // Perform comprehensive batch validation
+      console.log('🔍 Running Quality Guardian validation...\n');
+      const batchValidation = safetyValidator.validateProductBatch(industrialProducts);
+      
+      // Report validation results
+      console.log('📊 Quality Guardian Report:');
+      console.log(`   Total products analyzed: ${batchValidation.totalProducts}`);
+      console.log(`   ✅ Valid products: ${batchValidation.validProducts}`);
+      console.log(`   ❌ Products with errors: ${batchValidation.productsWithErrors}`);
+      console.log(`   ⚠️  Products with warnings: ${batchValidation.productsWithWarnings}`);
+      
+      // Show detailed errors if any
+      if (batchValidation.allErrors.length > 0) {
+        console.log('\n❌ Quality Guardian - Errors Found:');
+        batchValidation.allErrors.forEach(error => {
+          console.log(`   ${error}`);
+        });
+      }
+      
+      // Show warnings if any
+      if (batchValidation.allWarnings.length > 0) {
+        console.log('\n⚠️  Quality Guardian - Warnings:');
+        batchValidation.allWarnings.forEach(warning => {
+          console.log(`   ${warning}`);
+        });
+      }
+      
+      // Show safety categories breakdown
+      const categoryBreakdown = industrialProducts.reduce((acc, p) => {
+        const category = p.safetyCategory;
+        acc[category] = (acc[category] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      console.log('\n📋 Safety categories breakdown:');
+      Object.entries(categoryBreakdown).forEach(([category, count]) => {
+        console.log(`   ${category}: ${count} products`);
+      });
+      
+      // Stop migration if there are critical errors
+      if (batchValidation.productsWithErrors > 0) {
+        console.log('\n🚫 Migration stopped due to validation errors.');
+        console.log('💡 Please fix the errors above and try again.');
+        console.log('🔧 The Quality Guardian ensures data integrity for your industrial catalog.');
+        process.exit(1);
+      }
+      
+      console.log('\n✅ Quality Guardian validation passed! Proceeding with migration...\n');
     }
     
     // Perform bulk insert
@@ -248,14 +384,18 @@ async function main(): Promise<void> {
     
     if (stats.failedInserts === 0) {
       console.log('\n🎉 Migration completed successfully!');
+      console.log('✅ All products have been migrated to the database.');
+      console.log('🛡️  Quality Guardian ensured data integrity throughout the process.');
       process.exit(0);
     } else {
       console.log('\n⚠️  Migration completed with errors. Please review the error log above.');
+      console.log('💡 Consider fixing the errors and re-running the migration for failed products.');
       process.exit(1);
     }
     
   } catch (error) {
     console.error('\n💥 Migration failed:', error);
+    console.error('🔍 Please check your configuration and try again.');
     process.exit(1);
   }
 }
@@ -263,4 +403,13 @@ async function main(): Promise<void> {
 // Run the migration
 main();
 
-export { main, insertProduct, validateProduct, readProductsData };
+export { 
+  main, 
+  insertProduct, 
+  validateProduct, 
+  readProductsData, 
+  bulkInsertProducts,
+  printStats,
+  specificationParser,
+  safetyValidator 
+};

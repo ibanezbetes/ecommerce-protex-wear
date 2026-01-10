@@ -37,6 +37,8 @@ export default defineConfig({
   base: './', // Use relative paths for assets
   define: {
     global: 'globalThis',
-    'process.env': {}, // <--- ESTA ES LA LÍNEA QUE HEMOS AÑADIDO PARA ARREGLAR LA PANTALLA BLANCA
+    // Define process.env for compatibility
+    'process.env': {},
   },
+  envPrefix: 'VITE_', // Only expose env vars that start with VITE_
 });

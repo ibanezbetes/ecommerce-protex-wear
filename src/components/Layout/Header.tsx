@@ -2,16 +2,38 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCartItemCount } from '../../contexts/CartContext';
+import logo from '../../assets/logo.png';
+import './styles/Header.css';
 
 /**
  * Header Component
  * Navigation, user menu, and cart indicator
  */
 function Header() {
+
   const { user, isAuthenticated, logout } = useAuth();
   const cartItemCount = useCartItemCount();
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = React.useRef<HTMLDivElement>(null);
+  const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
+  const servicesMenuRef = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+      if (servicesMenuRef.current && !servicesMenuRef.current.contains(event.target as Node)) {
+        setIsServicesMenuOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [menuRef]);
 
   const handleLogout = async () => {
     try {
@@ -23,41 +45,71 @@ function Header() {
   };
 
   return (
-    <header className="bg-white shadow-md sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
+    <header className="header-main">
+      <div className="header-wide-container">
+        <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary-color rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">PW</span>
-            </div>
-            <span className="text-xl font-bold text-gray-900">Protex Wear</span>
+            <img src={logo} alt="Protex Wear" className="h-12 w-auto" />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/productos" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
-            >
+          <nav className="header-nav">
+            <Link to="/productos" className="header-nav-link">
               Productos
             </Link>
-            <Link 
-              to="/categorias" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
-            >
+            <Link to="/categorias" className="header-nav-link">
               Categorías
             </Link>
-            <Link 
-              to="/sobre-nosotros" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
-            >
+            <Link to="/sobre-nosotros" className="header-nav-link">
               Sobre Nosotros
             </Link>
-            <Link 
-              to="/contacto" 
-              className="text-gray-700 hover:text-primary-color transition-colors"
-            >
+            {/* Servicios Dropdown */}
+            <div className="services-menu-container" ref={servicesMenuRef}>
+              <button
+                className="header-nav-link services-menu-btn"
+                onClick={() => setIsServicesMenuOpen(!isServicesMenuOpen)}
+                onMouseEnter={() => setIsServicesMenuOpen(true)}
+              >
+                Servicios
+                <svg className={`dropdown-icon ${isServicesMenuOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+
+              {isServicesMenuOpen && (
+                <div
+                  className="dropdown-menu dropdown-left w-64"
+                  onMouseLeave={() => setIsServicesMenuOpen(false)}
+                >
+                  <Link to="/servicios/renting" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🔄</span> <span className="ml-2">Servicios de renting</span>
+                  </Link>
+                  <Link to="/servicios/lavanderia" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🧺</span> <span className="ml-2">Servicios de lavandería</span>
+                  </Link>
+                  <Link to="/servicios/maquinas-expendedoras" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🤖</span> <span className="ml-2">Máquinas expendedoras de epis</span>
+                  </Link>
+                  <Link to="/servicios/stock-seguridad" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🔒</span> <span className="ml-2">Stock de seguridad</span>
+                  </Link>
+                  <Link to="/servicios/entregas-nominativas" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>📦</span> <span className="ml-2">Entregas nominativas</span>
+                  </Link>
+                  <Link to="/servicios/personalizacion" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>👕</span> <span className="ml-2">Personalización ropa trabajo</span>
+                  </Link>
+                  <Link to="/servicios/merchandising" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🎁</span> <span className="ml-2">Merchandising</span>
+                  </Link>
+                  <Link to="/servicios/cee" className="dropdown-item" onClick={() => setIsServicesMenuOpen(false)}>
+                    <span>🏢</span> <span className="ml-2">CEE</span>
+                  </Link>
+                </div>
+              )}
+            </div>
+            <Link to="/contacto" className="header-nav-link">
               Contacto
             </Link>
           </nav>
@@ -65,14 +117,14 @@ function Header() {
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
             {/* Search */}
-            <div className="hidden lg:block">
-              <div className="relative">
+            <div className="hidden md:block">
+              <div className="search-input-container">
                 <input
                   type="text"
                   placeholder="Buscar productos..."
-                  className="w-64 pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-transparent"
+                  className="search-input"
                 />
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
@@ -81,15 +133,15 @@ function Header() {
             </div>
 
             {/* Cart */}
-            <Link 
-              to="/carrito" 
-              className="relative p-2 text-gray-700 hover:text-primary-color transition-colors"
+            <Link
+              to="/carrito"
+              className="cart-icon-btn"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 11-4 0v-6m4 0V9a2 2 0 10-4 0v4.01" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 21a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m-8 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3M3.71 5.4h15.214c1.378 0 2.373 1.27 1.995 2.548l-1.654 5.6C19.01 14.408 18.196 15 17.27 15H8.112c-.927 0-1.742-.593-1.996-1.452zm0 0L3 3" />
               </svg>
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-color text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="cart-badge">
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>
               )}
@@ -97,13 +149,13 @@ function Header() {
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div className="relative">
+              <div className="user-menu-container" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-primary-color transition-colors"
+                  className="user-menu-btn"
                 >
-                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-medium">
+                  <div className="user-avatar">
+                    <span>
                       {user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'U'}
                     </span>
                   </div>
@@ -117,54 +169,64 @@ function Header() {
 
                 {/* Dropdown Menu */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                  <div className="dropdown-menu dropdown-right">
+                    <div className="dropdown-user-info">
+                      <p className="font-semibold text-gray-900 truncate">
+                        {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Usuario'}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        {user?.email}
+                      </p>
+                    </div>
+                    <hr className="dropdown-divider-light" />
+
                     <Link
                       to="/perfil"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="dropdown-item"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Mi Perfil
+                      <span className="mr-2">👤</span> Mi Perfil
                     </Link>
                     <Link
                       to="/pedidos"
-                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="dropdown-item"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      Mis Pedidos
+                      <span className="mr-2">📦</span> Mis Pedidos
                     </Link>
                     {user?.role === 'ADMIN' && (
                       <Link
                         to="/admin"
-                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        className="dropdown-item"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        Panel Admin
+                        <span className="mr-2">⚙️</span> Panel Admin
                       </Link>
                     )}
-                    <hr className="my-1" />
+                    <hr className="dropdown-divider" />
                     <button
                       onClick={() => {
                         setIsMenuOpen(false);
                         handleLogout();
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="dropdown-item dropdown-item-logout w-full text-left"
                     >
-                      Cerrar Sesión
+                      <span className="mr-2">🚪</span> Cerrar Sesión
                     </button>
                   </div>
                 )}
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
+              <div className="auth-buttons-container">
                 <Link
                   to="/login"
-                  className="text-gray-700 hover:text-primary-color transition-colors"
+                  className="btn-login"
                 >
                   Iniciar Sesión
                 </Link>
                 <Link
                   to="/registro"
-                  className="btn-primary"
+                  className="btn-register"
                 >
                   Registrarse
                 </Link>
@@ -174,7 +236,7 @@ function Header() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-primary-color"
+              className="md:hidden icon-btn p-2"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -187,37 +249,44 @@ function Header() {
         {isMenuOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-2">
-              <Link 
-                to="/productos" 
-                className="text-gray-700 hover:text-primary-color py-2"
+              <Link
+                to="/productos"
+                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Productos
               </Link>
-              <Link 
-                to="/categorias" 
-                className="text-gray-700 hover:text-primary-color py-2"
+              <Link
+                to="/categorias"
+                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Categorías
               </Link>
-              <Link 
-                to="/sobre-nosotros" 
-                className="text-gray-700 hover:text-primary-color py-2"
+              <Link
+                to="/sobre-nosotros"
+                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre Nosotros
               </Link>
-              <Link 
-                to="/contacto" 
-                className="text-gray-700 hover:text-primary-color py-2"
+              <Link
+                to="/servicios"
+                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Servicios
+              </Link>
+              <Link
+                to="/contacto"
+                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
-              
+
               {/* Mobile Search */}
-              <div className="pt-4">
+              <div className="px-4 pt-2">
                 <input
                   type="text"
                   placeholder="Buscar productos..."
