@@ -9,7 +9,7 @@ const MaquinasPage = () => {
             {/* Hero Banner */}
             <div className="service-hero" style={{ backgroundImage: `url(${vendingHeroImg})` }}>
                 <div className="hero-overlay">
-                    <h1>MÁQUINAS EXPENDEDORAS (VENDING)</h1>
+                    <h1>MÁQUINAS EXPENDEDORAS DE EPIS</h1>
                 </div>
             </div>
 
@@ -18,29 +18,25 @@ const MaquinasPage = () => {
                 {/* Intro Section */}
                 <section className="service-intro-section">
                     <div className="service-intro-text">
-                        <h2>CONTROL Y ACCESIBILIDAD 24/7</h2>
+                        <h2>¿EN QUÉ CONSISTE EL SERVICIO?</h2>
                         <p>
-                            Nuestras soluciones de Vending Industrial permiten a su empresa automatizar la entrega de
-                            Equipos de Protección Individual (EPIs) y consumibles industriales, garantizando el acceso a los
-                            materiales necesarios las 24 horas del día.
+                            El servicio de máquinas expendedoras de EPIS (Equipos de Protección Individual) es un servicio en el que se provee a los clientes de equipos de protección individual, como guantes, mascarillas, gafas de seguridad, cascos, etc., a través de máquinas expendedoras instaladas en lugares estratégicos.
                         </p>
                         <p>
-                            Mejore el control de consumo, reduzca costes operativos y asegure que sus trabajadores siempre
-                            tengan acceso al equipo de seguridad necesario, con un sistema de identificación de usuarios
-                            totalmente personalizable.
+                            Este servicio puede ser útil para empresas que necesitan proveer a sus empleados de EPIS para realizar sus tareas diarias, pero que no tienen un sistema eficiente para distribuirlos, o que desean ofrecer a sus empleados la posibilidad de obtener los EPIS de manera rápida y sencilla.
                         </p>
                     </div>
                     <div className="service-intro-image">
                         <img
                             src={vendingHeroImg}
-                            alt="Máquinas expendedoras industriales"
+                            alt="Máquinas expendedoras de EPIS"
                         />
                     </div>
                 </section>
 
                 {/* Features Section */}
                 <section className="features-section">
-                    <h2>VENTAJAS DEL SISTEMA</h2>
+                    <h2>BENEFICIOS DEL SERVICIO</h2>
 
                     <div className="features-grid">
                         {/* Feature 1 */}
@@ -50,41 +46,41 @@ const MaquinasPage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3>Disponibilidad 24/7</h3>
-                            <p>Acceso ininterrumpido a equipos de seguridad.</p>
+                            <h3>Mayor disponibilidad</h3>
+                            <p>Las máquinas pueden estar disponibles las 24 horas del día, permitiendo obtener equipos en cualquier momento.</p>
                         </div>
 
                         {/* Feature 2 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                             </div>
-                            <h3>Reducción de Consumo</h3>
-                            <p>Control exacto del uso de material por empleado.</p>
+                            <h3>Mayor eficiencia</h3>
+                            <p>Reduce el tiempo y esfuerzo necesarios para distribuir los EPIS, mejorando la productividad de la empresa.</p>
                         </div>
 
                         {/* Feature 3 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                 </svg>
                             </div>
-                            <h3>Software de Gestión</h3>
-                            <p>Informes detallados y alertas de stock en tiempo real.</p>
+                            <h3>Mayor seguridad</h3>
+                            <p>Asegura que los empleados tengan acceso a los equipos de protección necesarios para trabajar de manera segura.</p>
                         </div>
 
                         {/* Feature 4 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3>Reposición Automática</h3>
-                            <p>Gestión eficiente del inventario sin roturas de stock.</p>
+                            <h3>Reducción de costes</h3>
+                            <p>Reduce costes de distribución y permite un mayor control de los equipos suministrados.</p>
                         </div>
                     </div>
                 </section>

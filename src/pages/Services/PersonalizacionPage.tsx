@@ -9,7 +9,7 @@ const PersonalizacionPage = () => {
             {/* Hero Banner */}
             <div className="service-hero" style={{ backgroundImage: `url(${personalizacionHeroImg})` }}>
                 <div className="hero-overlay">
-                    <h1>PERSONALIZACIÓN Y BORDADO</h1>
+                    <h1>PERSONALIZACIÓN ROPA DE TRABAJO</h1>
                 </div>
             </div>
 
@@ -18,39 +18,36 @@ const PersonalizacionPage = () => {
                 {/* Intro Section */}
                 <section className="service-intro-section">
                     <div className="service-intro-text">
-                        <h2>IMAGEN CORPORATIVA DE ALTA CALIDAD</h2>
+                        <h2>VISTE TU MARCA CON ESTILO</h2>
                         <p>
-                            La imagen de su equipo es la imagen de su empresa. Ofrecemos servicios integrales de
-                            personalización textil mediante bordado, serigrafía, vinilo textil y transfer digital
-                            de última generación.
+                            Personalizamos todo tipo de ropa de trabajo con las mejores tecnologías de marcaje.
                         </p>
                         <p>
-                            Asesoramos sobre la mejor técnica para cada tipo de prenda y tejido, garantizando
-                            durabilidad y un acabado profesional que refuerce su identidad de marca en cada uniforme.
+                            Te ayudamos a reforzar tu imagen de marca con nuestra selección de ropa y complementos.
                         </p>
                     </div>
                     <div className="service-intro-image">
                         <img
                             src={personalizacionHeroImg}
-                            alt="Servicio de bordado y personalización textil"
+                            alt="Personalización de ropa laboral"
                         />
                     </div>
                 </section>
 
                 {/* Features Section */}
                 <section className="features-section">
-                    <h2>TÉCNICAS DISPONIBLES</h2>
+                    <h2>TÉCNICAS DE IMPRESIÓN Y PERSONALIZACIÓN</h2>
 
                     <div className="features-grid">
                         {/* Feature 1 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                                 </svg>
                             </div>
-                            <h3>Bordado Industrial</h3>
-                            <p>Elegancia y máxima durabilidad para sus prendas.</p>
+                            <h3>Bordado de Alta Calidad</h3>
+                            <p>Acabados premium duraderos y elegantes.</p>
                         </div>
 
                         {/* Feature 2 */}
@@ -60,30 +57,30 @@ const PersonalizacionPage = () => {
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" />
                                 </svg>
                             </div>
-                            <h3>Serigrafía</h3>
-                            <p>Ideal para grandes tiradas y colores planos.</p>
+                            <h3>Serigrafía Textil</h3>
+                            <p>Ideal para grandes tiradas y colores vivos.</p>
                         </div>
 
                         {/* Feature 3 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                                 </svg>
                             </div>
-                            <h3>Transfer Digital</h3>
-                            <p>Alta definición para logotipos complejos.</p>
+                            <h3>Vinilo Textil</h3>
+                            <p>Versatilidad para personalizaciones unitarias.</p>
                         </div>
 
                         {/* Feature 4 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
                                 </svg>
                             </div>
-                            <h3>Vinilo Textil</h3>
-                            <p>Versatilidad para numeración y nombres.</p>
+                            <h3>Sublimación</h3>
+                            <p>Impresión digital sin tacto sobre poliéster.</p>
                         </div>
                     </div>
                 </section>
