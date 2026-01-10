@@ -98,7 +98,8 @@
 
 /* --- Stats / Brands Section --- */
 .brands-section {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
+    /* Pure white for seamless logo blending */
     padding: 4rem 1rem;
     text-align: center;
     margin-left: calc(-50vw + 50%);
@@ -117,36 +118,43 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 2rem;
+    gap: 3rem;
     max-width: 1000px;
     margin: 0 auto;
     align-items: center;
 }
 
 .brand-logo {
-    height: 60px;
-    /* Uniform height */
+    max-height: 70px;
+    max-width: 160px;
     width: auto;
+    height: auto;
     object-fit: contain;
-    filter: grayscale(100%);
-    /* Elegant B&W look initially */
-    opacity: 0.7;
-    transition: all 0.3s ease;
+    transition: transform 0.3s ease;
     cursor: pointer;
 }
 
+.brand-logo-large {
+    max-height: 90px;
+    /* Specific override for Delta Plus */
+    max-width: 200px;
+}
+
 .brand-logo:hover {
-    filter: grayscale(0%);
-    /* Color on hover */
-    opacity: 1;
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .brand-logo-more {
-    font-size: 1.2rem;
-    font-weight: 600;
-    color: var(--gray-600, #666);
-    padding: 1rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color, #00258B);
+    padding: 0.5rem 1.5rem;
+    background-color: #f0f4ff;
+    border-radius: 50px;
+    margin-left: 1rem;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(0, 37, 139, 0.1);
 }
 
 /* --- Features Section --- */
@@ -265,8 +273,14 @@
         font-size: 2rem;
     }
 
+    /* Zoom and crop bottom text on mobile */
+    .sobre-nosotros-hero {
+        background-position: center top;
+        background-size: auto 125%;
+    }
+
     .about-section {
-        flex-direction: column;
+        flex-direction: column-reverse;
     }
 
     .cta-content h2 {

@@ -1,5 +1,10 @@
 import React from 'react';
 import '../styles/SobreNosotrosPage.css';
+import logo3m from '../assets/3m.jpg';
+import logoAnsell from '../assets/Ansell.jpg';
+import logoPortwest from '../assets/Portwest.jpg';
+import logoDeltaPlus from '../assets/deltaplus.webp';
+import logoFal from '../assets/fal.jpg';
 
 
 const SobreNosotrosPage: React.FC = () => {
@@ -41,15 +46,11 @@ const SobreNosotrosPage: React.FC = () => {
                 <section className="brands-section">
                     <h2>TRABAJAMOS CON MÁS DE 60 MARCAS RECONOCIDAS</h2>
                     <div className="brands-grid">
-                        <img src="https://placehold.co/200x100?text=3M" alt="Logo 3M" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Ansell" alt="Logo Ansell" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Fal+Seguridad" alt="Logo Fal Seguridad" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Portwest" alt="Logo Portwest" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Robusta" alt="Logo Robusta" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Valento" alt="Logo Valento" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Delta+Plus" alt="Logo Delta Plus" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Velilla" alt="Logo Velilla" className="brand-logo" />
-                        <img src="https://placehold.co/200x100?text=Bolle" alt="Logo Bollé" className="brand-logo" />
+                        <img src={logo3m} alt="Logo 3M" className="brand-logo" />
+                        <img src={logoAnsell} alt="Logo Ansell" className="brand-logo" />
+                        <img src={logoFal} alt="Logo Fal Seguridad" className="brand-logo" />
+                        <img src={logoPortwest} alt="Logo Portwest" className="brand-logo" />
+                        <img src={logoDeltaPlus} alt="Logo Delta Plus" className="brand-logo brand-logo-large" />
                         <div className="brand-logo-more">...y muchas más</div>
                     </div>
                 </section>
