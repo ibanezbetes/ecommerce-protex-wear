@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { AdminStats, Product, Order, User } from '../types';
 import ProductManagement from '../components/Admin/ProductManagement';
+import OrdersManagement from '../components/Admin/OrdersManagement';
+import OrderDetail from '../components/Admin/OrderDetail';
 
 /**
  * Admin Dashboard - Administrative interface
@@ -44,18 +46,17 @@ function AdminDashboard() {
             <h2 className="text-xl font-bold text-gray-900">Panel Admin</h2>
             <p className="text-sm text-gray-600">Protex Wear</p>
           </div>
-          
+
           <nav className="p-4">
             <ul className="space-y-2">
               {sidebarItems.map((item) => (
                 <li key={item.path}>
                   <Link
                     to={item.path}
-                    className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                      isActive(item.path, item.exact)
-                        ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
+                    className={`flex items-center px-3 py-2 rounded-lg transition-colors ${isActive(item.path, item.exact)
+                      ? 'bg-primary-50 text-primary-700 border border-primary-200'
+                      : 'text-gray-700 hover:bg-gray-50'
+                      }`}
                   >
                     <span className="mr-3">{item.icon}</span>
                     {item.label}
@@ -72,6 +73,7 @@ function AdminDashboard() {
             <Route path="/" element={<DashboardOverview stats={stats} />} />
             <Route path="/productos" element={<ProductManagement />} />
             <Route path="/pedidos" element={<OrdersManagement />} />
+            <Route path="/pedidos/:id" element={<OrderDetail />} />
             <Route path="/usuarios" element={<UsersManagement />} />
             <Route path="/reportes" element={<ReportsView />} />
             <Route path="/configuracion" element={<SettingsView />} />
@@ -87,7 +89,7 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
-      
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -180,8 +182,8 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
                   <p className="text-sm text-gray-600">{product.sales} ventas</p>
                 </div>
                 <div className="w-16 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-primary-600 h-2 rounded-full" 
+                  <div
+                    className="bg-primary-600 h-2 rounded-full"
                     style={{ width: `${(product.sales / 50) * 100}%` }}
                   ></div>
                 </div>
@@ -202,25 +204,12 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
 // Products Management Component (now using real GraphQL)
 // This component is now imported from ../components/Admin/ProductManagement
 
-// Orders Management Component
-function OrdersManagement() {
-  return (
-    <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Gestión de Pedidos</h1>
-      
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <p className="text-gray-600">Gestión de pedidos - En desarrollo</p>
-      </div>
-    </div>
-  );
-}
-
 // Users Management Component
 function UsersManagement() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Gestión de Usuarios</h1>
-      
+
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <p className="text-gray-600">Gestión de usuarios - En desarrollo</p>
       </div>
@@ -233,7 +222,7 @@ function ReportsView() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Reportes</h1>
-      
+
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <p className="text-gray-600">Reportes y analytics - En desarrollo</p>
       </div>
@@ -246,7 +235,7 @@ function SettingsView() {
   return (
     <div>
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Configuración</h1>
-      
+
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <p className="text-gray-600">Configuración del sistema - En desarrollo</p>
       </div>

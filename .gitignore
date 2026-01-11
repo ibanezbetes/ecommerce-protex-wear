@@ -1,12 +1,20 @@
 # Node / general
 node_modules/
 dist/
+build/
 .build/
 .cache/
 .env
 .env.*
 *.log
 .DS_Store
+
+# Build tools and caches
+.vite/
+.next/
+out/
+.swc
+.turbo
 
 # AWS / IaC
 terraform.tfstate*
@@ -16,8 +24,55 @@ terraform.tfstate*
 # Editor
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.iml
 
 # amplify
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+amplifyconfiguration.json
+
+# Generated files
+index.html
+jest.config.js
+
+# Local development
+.kiro/
+.git_local_backup/
+debug-token.js
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Admin app (Next.js)
+admin/node_modules/
+admin/.next/
+admin/out/
+admin/.env
+admin/.env.*
+admin/.eslintcache
+admin/.turbo
+admin/.swc
+admin/.vercel/
+
+# Admin editor/IDE
+admin/.vscode/
+admin/.idea/
+
+# Admin Amplify local state (do not commit)
+admin/amplify/\#current-cloud-backend/
+admin/amplify/.config/local-*
+admin/amplify/.config/local-env-info.json
+
+# Admin Amplify generated outputs (sensitive)
+admin/amplify_outputs*
+admin/amplifyconfiguration*
+admin/amplify_outputs.json
+admin/amplifyconfiguration.json

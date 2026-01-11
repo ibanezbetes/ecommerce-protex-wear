@@ -47,6 +47,7 @@ function App() {
  */
 function AppContent() {
   const { isLoading, isAuthenticated, user } = useAuth();
+  const location = useLocation(); // Move this BEFORE any conditional returns
 
   // Debug logging
   console.log('🔍 AppContent Debug:', { isLoading, isAuthenticated, user });
@@ -64,10 +65,10 @@ function AppContent() {
     );
   }
 
-  const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
 
   console.log('🏠 Mostrando contenido principal...');
+
 
   return (
     <Layout showHeader={!isAuthPage} showFooter={!isAuthPage}>

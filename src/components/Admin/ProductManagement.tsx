@@ -75,9 +75,17 @@ function ProductManagement() {
 
   const handleFormSubmit = async (productData: Omit<Product, 'id' | 'createdAt' | 'updatedAt'>) => {
     try {
+      // Convert empty strings to null for indexed fields (DynamoDB requirement)
+      const sanitizedData = {
+        ...productData,
+        category: productData.category?.trim() || null,
+        subcategory: productData.subcategory?.trim() || null,
+        brand: productData.brand?.trim() || null,
+      };
+
       if (editingProduct) {
         // Update existing product
-        const updated = await updateProduct(editingProduct.id, productData);
+        const updated = await updateProduct(editingProduct.id, sanitizedData);
         if (updated) {
           alert('Producto actualizado exitosamente');
           setShowForm(false);
@@ -85,7 +93,7 @@ function ProductManagement() {
         }
       } else {
         // Create new product
-        const created = await createProduct(productData);
+        const created = await createProduct(sanitizedData);
         if (created) {
           alert('Producto creado exitosamente');
           setShowForm(false);
@@ -116,7 +124,7 @@ function ProductManagement() {
             Cancelar
           </button>
         </div>
-        
+
         <ProductForm
           product={editingProduct}
           onSubmit={handleFormSubmit}
@@ -182,8 +190,8 @@ function ProductManagement() {
             </svg>
             <div>
               <p className="text-sm text-red-600">{error}</p>
-              <button 
-                onClick={() => refreshProducts()} 
+              <button
+                onClick={() => refreshProducts()}
                 className="mt-2 text-sm text-red-700 hover:text-red-900 underline"
               >
                 Reintentar
@@ -278,22 +286,20 @@ function ProductManagement() {
                         €{product.price.toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.stock > 10 
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.stock > 10
                             ? 'bg-green-100 text-green-800'
                             : product.stock > 0
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
+                              ? 'bg-yellow-100 text-yellow-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
                           {product.stock} unidades
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.isActive 
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${product.isActive
                             ? 'bg-green-100 text-green-800'
                             : 'bg-gray-100 text-gray-800'
-                        }`}>
+                          }`}>
                           {product.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
