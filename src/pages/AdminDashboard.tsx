@@ -1,14 +1,19 @@
 import React, { useState } from 'react';
-import { Routes, Route, Link, useLocation } from 'react-router-dom';
-import { AdminStats, Product, Order, User } from '../types';
+import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { AdminStats } from '../types';
 import ProductManagement from '../components/Admin/ProductManagement';
+import logoWhite from '../assets/logo-w.png';
+import '../styles/AdminDashboard.css';
 
 /**
  * Admin Dashboard - Administrative interface
- * Now includes real product management with GraphQL
+ * Scoped layout with bespoke sidebar and premium styling
  */
 function AdminDashboard() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const [stats] = useState<AdminStats>({
     totalOrders: 156,
     totalRevenue: 12450.75,
@@ -35,49 +40,89 @@ function AdminDashboard() {
     return location.pathname.startsWith(path);
   };
 
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const toggleCollapse = () => setIsCollapsed(!isCollapsed);
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="flex">
-        {/* Sidebar */}
-        <div className="w-64 bg-white shadow-sm border-r min-h-screen">
-          <div className="p-6 border-b">
-            <h2 className="text-xl font-bold text-gray-900">Panel Admin</h2>
-            <p className="text-sm text-gray-600">Protex Wear</p>
-          </div>
-          
-          <nav className="p-4">
-            <ul className="space-y-2">
-              {sidebarItems.map((item) => (
-                <li key={item.path}>
-                  <Link
-                    to={item.path}
-                    className={`flex items-center px-3 py-2 rounded-lg transition-colors ${
-                      isActive(item.path, item.exact)
-                        ? 'bg-primary-50 text-primary-700 border border-primary-200'
-                        : 'text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    <span className="mr-3">{item.icon}</span>
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
+    <div className="admin-dashboard-container">
+      {/* Mobile Toggle */}
+      <button className="admin-mobile-toggle" onClick={toggleSidebar}>
+        {isSidebarOpen ? '✖' : '☰'}
+      </button>
+
+      {/* Sidebar */}
+      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
+
+        <div className="admin-sidebar-header">
+          <img src={logoWhite} alt="Protex Wear" className="admin-sidebar-logo" />
+          <span className="admin-sidebar-brand">Admin Panel</span>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 p-8">
-          <Routes>
-            <Route path="/" element={<DashboardOverview stats={stats} />} />
-            <Route path="/productos" element={<ProductManagement />} />
-            <Route path="/pedidos" element={<OrdersManagement />} />
-            <Route path="/usuarios" element={<UsersManagement />} />
-            <Route path="/reportes" element={<ReportsView />} />
-            <Route path="/configuracion" element={<SettingsView />} />
-          </Routes>
+        <nav className="admin-sidebar-nav">
+          <ul className="admin-sidebar-list">
+            {sidebarItems.map((item) => (
+              <li key={item.path}>
+                <Link
+                  to={item.path}
+                  className={`admin-nav-item ${isActive(item.path, item.exact) ? 'active' : ''}`}
+                  onClick={() => setIsSidebarOpen(false)}
+                >
+                  <span className="admin-nav-icon">{item.icon}</span>
+                  <span className="admin-sidebar-label">{item.label}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
+        {/* Sidebar Footer */}
+        <div className="admin-sidebar-footer">
+          {/* Desktop Collapse Toggle */}
+          <button className="admin-sidebar-toggle-btn" onClick={toggleCollapse}>
+            {isCollapsed ? (
+              // Icon for "Expand" (Sidebar is collapsed)
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path fill="currentColor" d="M6.293 7.5H4.502a.5.5 0 0 0 0 1h1.79l-.646.647a.5.5 0 1 0 .708.707l1.5-1.5a.5.5 0 0 0 0-.707l-1.5-1.5a.5.5 0 1 0-.708.707zM12 13.001a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v6.002a2 2 0 0 0 2 2zm-3-1H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1h5z" />
+              </svg>
+            ) : (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                  <path fill="currentColor" d="m9.707 8.5l.647.647a.5.5 0 0 1-.708.707l-1.5-1.5a.5.5 0 0 1 0-.707l1.5-1.5a.5.5 0 0 1 .708.707l-.647.646h1.791a.5.5 0 0 1 0 1zM4 3a2 2 0 0 0-2 2v6.002a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm3 9.002V4h5a1 1 0 0 1 1 1v6.002a1 1 0 0 1-1 1z" />
+                </svg>
+                <span className="admin-sidebar-label" style={{ marginLeft: '0.5rem' }}>Contraer menú</span>
+              </div>
+            )}
+          </button>
+
+          <Link to="/" className="admin-exit-btn">
+            <span className="admin-btn-icon" style={{ marginRight: '0.5rem', fontSize: '1.2em' }}>🏠</span>
+            <span className="admin-sidebar-label">Volver al Inicio</span>
+          </Link>
+          <Link to="/productos" className="admin-exit-btn">
+            <span className="admin-btn-icon" style={{ marginRight: '0.5rem', fontSize: '1.2em' }}>🛍️</span>
+            <span className="admin-sidebar-label">Ir a la Tienda</span>
+          </Link>
+          <button
+            onClick={() => { /* Logout logic here if needed */ navigate('/login'); }}
+            className="admin-exit-btn primary"
+          >
+            <span className="admin-btn-icon" style={{ marginRight: '0.5rem', fontSize: '1.2em' }}>🚪</span>
+            <span className="admin-sidebar-label">Cerrar Sesión</span>
+          </button>
         </div>
-      </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className={`admin-main-content ${isCollapsed ? 'collapsed' : ''}`}>
+        <Routes>
+          <Route path="/" element={<DashboardOverview stats={stats} />} />
+          <Route path="/productos" element={<ProductManagement />} />
+          <Route path="/pedidos" element={<OrdersManagement />} />
+          <Route path="/usuarios" element={<UsersManagement />} />
+          <Route path="/reportes" element={<ReportsView />} />
+          <Route path="/configuracion" element={<SettingsView />} />
+        </Routes>
+      </main>
     </div>
   );
 }
@@ -86,130 +131,126 @@ function AdminDashboard() {
 function DashboardOverview({ stats }: { stats: AdminStats }) {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
-      
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Dashboard General</h1>
+        <p className="admin-page-subtitle">Resumen de actividad y estadísticas clave</p>
+      </div>
+
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <span className="text-2xl">💰</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Ingresos Totales</p>
-              <p className="text-2xl font-bold text-gray-900">€{stats.totalRevenue.toLocaleString()}</p>
-            </div>
+      <div className="admin-stats-grid">
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon-wrapper" style={{ backgroundColor: '#dbeafe', color: '#1e40af' }}>
+            <span>💰</span>
+          </div>
+          <div>
+            <p className="admin-stat-label">Ingresos Totales</p>
+            <p className="admin-stat-value">€{stats.totalRevenue.toLocaleString()}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <span className="text-2xl">🛒</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pedidos Totales</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalOrders}</p>
-            </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon-wrapper" style={{ backgroundColor: '#d1fae5', color: '#065f46' }}>
+            <span>🛒</span>
+          </div>
+          <div>
+            <p className="admin-stat-label">Pedidos Totales</p>
+            <p className="admin-stat-value">{stats.totalOrders}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <span className="text-2xl">📦</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Productos</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalProducts}</p>
-            </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon-wrapper" style={{ backgroundColor: '#f3e8ff', color: '#6b21a8' }}>
+            <span>📦</span>
+          </div>
+          <div>
+            <p className="admin-stat-label">Productos</p>
+            <p className="admin-stat-value">{stats.totalProducts}</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <span className="text-2xl">👥</span>
-            </div>
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Usuarios</p>
-              <p className="text-2xl font-bold text-gray-900">{stats.totalUsers}</p>
-            </div>
+        <div className="admin-stat-card">
+          <div className="admin-stat-icon-wrapper" style={{ backgroundColor: '#fef3c7', color: '#92400e' }}>
+            <span>👥</span>
+          </div>
+          <div>
+            <p className="admin-stat-label">Usuarios</p>
+            <p className="admin-stat-value">{stats.totalUsers}</p>
           </div>
         </div>
       </div>
 
       {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Pedidos Recientes</h3>
-          <div className="space-y-4">
+      <div className="admin-activity-grid">
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">Pedidos Recientes</h3>
+          </div>
+          <div className="space-y-0">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
+              <div key={i} className="admin-list-item">
                 <div>
-                  <p className="font-medium text-gray-900">Pedido #ORD-00{i}</p>
-                  <p className="text-sm text-gray-600">Cliente Demo {i}</p>
+                  <p className="admin-list-text">Pedido #ORD-00{i}</p>
+                  <p className="admin-list-subtext">Cliente Demo {i}</p>
                 </div>
                 <div className="text-right">
-                  <p className="font-semibold text-gray-900">€{(Math.random() * 200 + 50).toFixed(2)}</p>
-                  <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                  <p className="admin-list-text">€{(Math.random() * 200 + 50).toFixed(2)}</p>
+                  <span className="admin-status-badge status-success">
                     Completado
                   </span>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4">
-            <Link to="/admin/pedidos" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-              Ver todos los pedidos →
-            </Link>
-          </div>
+          <Link to="/admin/pedidos" className="admin-link-btn">
+            Ver todos los pedidos →
+          </Link>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Productos Populares</h3>
-          <div className="space-y-4">
+        <div className="admin-card">
+          <div className="admin-card-header">
+            <h3 className="admin-card-title">Productos Populares</h3>
+          </div>
+          <div className="space-y-0">
             {[
               { name: 'Casco de Seguridad Industrial', sales: 45 },
               { name: 'Guantes Anticorte', sales: 38 },
               { name: 'Chaleco Reflectante', sales: 32 },
             ].map((product, i) => (
-              <div key={i} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0">
-                <div>
-                  <p className="font-medium text-gray-900">{product.name}</p>
-                  <p className="text-sm text-gray-600">{product.sales} ventas</p>
+              <div key={i} className="admin-list-item">
+                <div style={{ flex: 1, paddingRight: '1rem' }}>
+                  <p className="admin-list-text">{product.name}</p>
+                  <p className="admin-list-subtext">{product.sales} ventas</p>
                 </div>
-                <div className="w-16 bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-primary-600 h-2 rounded-full" 
-                    style={{ width: `${(product.sales / 50) * 100}%` }}
-                  ></div>
+                <div style={{ width: '30%' }}>
+                  <div className="admin-progress-bar-bg">
+                    <div
+                      className="admin-progress-bar-fill"
+                      style={{ width: `${(product.sales / 50) * 100}%` }}
+                    ></div>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4">
-            <Link to="/admin/productos" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
-              Gestionar productos →
-            </Link>
-          </div>
+          <Link to="/admin/productos" className="admin-link-btn">
+            Gestionar productos →
+          </Link>
         </div>
       </div>
     </div>
   );
 }
 
-// Products Management Component (now using real GraphQL)
-// This component is now imported from ../components/Admin/ProductManagement
-
 // Orders Management Component
 function OrdersManagement() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Gestión de Pedidos</h1>
-      
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <p className="text-gray-600">Gestión de pedidos - En desarrollo</p>
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Gestión de Pedidos</h1>
+        <p className="admin-page-subtitle">Administra y procesa los pedidos de la tienda</p>
+      </div>
+      <div className="admin-card">
+        <p className="admin-list-subtext">Gestión de pedidos - En desarrollo</p>
       </div>
     </div>
   );
@@ -219,10 +260,12 @@ function OrdersManagement() {
 function UsersManagement() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Gestión de Usuarios</h1>
-      
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <p className="text-gray-600">Gestión de usuarios - En desarrollo</p>
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Gestión de Usuarios</h1>
+        <p className="admin-page-subtitle">Administra clientes y roles de usuario</p>
+      </div>
+      <div className="admin-card">
+        <p className="admin-list-subtext">Gestión de usuarios - En desarrollo</p>
       </div>
     </div>
   );
@@ -232,10 +275,12 @@ function UsersManagement() {
 function ReportsView() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Reportes</h1>
-      
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <p className="text-gray-600">Reportes y analytics - En desarrollo</p>
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Reportes</h1>
+        <p className="admin-page-subtitle">Análisis detallado del rendimiento de la tienda</p>
+      </div>
+      <div className="admin-card">
+        <p className="admin-list-subtext">Reportes y analytics - En desarrollo</p>
       </div>
     </div>
   );
@@ -245,10 +290,12 @@ function ReportsView() {
 function SettingsView() {
   return (
     <div>
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Configuración</h1>
-      
-      <div className="bg-white rounded-lg shadow-sm border p-6">
-        <p className="text-gray-600">Configuración del sistema - En desarrollo</p>
+      <div className="admin-page-header">
+        <h1 className="admin-page-title">Configuración</h1>
+        <p className="admin-page-subtitle">Ajustes generales del sistema</p>
+      </div>
+      <div className="admin-card">
+        <p className="admin-list-subtext">Configuración del sistema - En desarrollo</p>
       </div>
     </div>
   );

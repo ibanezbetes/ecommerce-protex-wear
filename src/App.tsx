@@ -65,12 +65,14 @@ function AppContent() {
   }
 
   const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
   const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
+  const shouldHideLayout = isAdminPage || isAuthPage;
 
   console.log('🏠 Mostrando contenido principal...');
 
   return (
-    <Layout showHeader={!isAuthPage} showFooter={!isAuthPage}>
+    <Layout showHeader={!shouldHideLayout} showFooter={!shouldHideLayout}>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
