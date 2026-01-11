@@ -60,7 +60,28 @@
   flex-wrap: wrap;
   gap: 3rem;
   align-items: center;
-  margin-bottom: 4rem;
+  margin-bottom: 2rem;
+}
+
+/* --- Section Divider --- */
+.section-divider {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  padding: 3rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.wavy-line {
+  width: 100%;
+  height: 120px;
+  color: var(--primary-color, #2e559e);
 }
 
 .service-intro-text {

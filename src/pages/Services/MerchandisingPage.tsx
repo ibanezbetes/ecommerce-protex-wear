@@ -34,6 +34,18 @@ const MerchandisingPage = () => {
                     </div>
                 </section>
 
+                <div className="section-divider">
+                    <svg viewBox="0 0 1200 300" preserveAspectRatio="none" className="wavy-line">
+                        <path
+                            d="M0,150 C150,230 350,70 600,150 C850,230 1050,70 1200,150"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="120"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
+
                 {/* Features Section */}
                 <section className="features-section">
                     <h2>¿CÓMO TRABAJAMOS?</h2>
