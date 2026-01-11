@@ -50,3 +50,29 @@ debug-token.js
 # OS
 .DS_Store
 Thumbs.db
+
+# Admin app (Next.js)
+admin/node_modules/
+admin/.next/
+admin/out/
+admin/.env
+admin/.env.*
+admin/.eslintcache
+admin/.turbo
+admin/.swc
+admin/.vercel/
+
+# Admin editor/IDE
+admin/.vscode/
+admin/.idea/
+
+# Admin Amplify local state (do not commit)
+admin/amplify/\#current-cloud-backend/
+admin/amplify/.config/local-*
+admin/amplify/.config/local-env-info.json
+
+# Admin Amplify generated outputs (sensitive)
+admin/amplify_outputs*
+admin/amplifyconfiguration*
+admin/amplify_outputs.json
+admin/amplifyconfiguration.json
