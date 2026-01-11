@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/ServicePage.css';
-import rentingHeroImg from '../../assets/renting_handshake.jpg';
+import rentingHeroImg from '../../assets/renting_natural.png';
 
 const RentingPage = () => {
     return (
@@ -37,6 +37,18 @@ const RentingPage = () => {
                         />
                     </div>
                 </section>
+
+                <div className="section-divider">
+                    <svg viewBox="0 0 1200 300" preserveAspectRatio="none" className="wavy-line">
+                        <path
+                            d="M0,150 C150,230 350,70 600,150 C850,230 1050,70 1200,150"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="120"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
 
                 {/* Features Section */}
                 <section className="features-section">

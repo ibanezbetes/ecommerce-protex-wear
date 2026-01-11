@@ -1,15 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/ServicePage.css';
-import safetyStockImg from '../../assets/safety_stock_professional.png';
+import stockHeroImg from '../../assets/safety_stock_professional.png';
 
 const StockSeguridadPage = () => {
     return (
         <div className="service-page">
             {/* Hero Banner */}
-            <div className="service-hero" style={{ backgroundImage: `url(${safetyStockImg})` }}>
+            <div className="service-hero" style={{ backgroundImage: `url(${stockHeroImg})` }}>
                 <div className="hero-overlay">
-                    <h1>STOCK DE SEGURIDAD / AUDITORÍA</h1>
+                    <h1>STOCK DE SEGURIDAD</h1>
                 </div>
             </div>
 
@@ -18,24 +18,33 @@ const StockSeguridadPage = () => {
                 {/* Intro Section */}
                 <section className="service-intro-section">
                     <div className="service-intro-text">
-                        <h2>GESTIÓN DE INVENTARIO Y ALMACENAJE</h2>
+                        <h2>¿EN QUÉ CONSISTE EL SERVICIO?</h2>
                         <p>
-                            Ofrecemos un servicio de stock de seguridad para garantizar que su empresa nunca sufra paradas
-                            por falta de material. Nos encargamos de gestionar su inventario de EPIs y vestuario laboral
-                            en nuestras propias instalaciones.
+                            A través del servicio de stock de seguridad para empresas se mantiene un inventario adicional de productos o artículos que un cliente utiliza regularmente, para asegurarse de que siempre tengan suficiente cantidad de estos artículos en caso de que suceda un imprevisto o una emergencia.
                         </p>
                         <p>
-                            Además, realizamos auditorías de vestuario para analizar el estado de las prendas,
-                            detectar necesidades de renovación y optimizar sus costes operativos.
+                            Este servicio puede ser útil para empresas que dependen de ciertos productos o materiales para su operación diaria y no pueden permitirse quedarse sin ellos.
                         </p>
                     </div>
                     <div className="service-intro-image">
                         <img
-                            src={safetyStockImg}
-                            alt="Gestión de stock de seguridad y auditoría"
+                            src={stockHeroImg}
+                            alt="Stock de seguridad en almacén"
                         />
                     </div>
                 </section>
+
+                <div className="section-divider">
+                    <svg viewBox="0 0 1200 300" preserveAspectRatio="none" className="wavy-line">
+                        <path
+                            d="M0,150 C150,230 350,70 600,150 C850,230 1050,70 1200,150"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="120"
+                            strokeLinecap="round"
+                        />
+                    </svg>
+                </div>
 
                 {/* Features Section */}
                 <section className="features-section">
@@ -46,44 +55,33 @@ const StockSeguridadPage = () => {
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                 </svg>
                             </div>
-                            <h3>Stock Siempre Disponible</h3>
-                            <p>Eliminación de riesgos por rotura de stock.</p>
+                            <h3>Reducción de riesgos</h3>
+                            <p>Evita interrupciones en la producción y minimiza riesgos de pérdida de ingresos por falta de material.</p>
                         </div>
 
                         {/* Feature 2 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                             </div>
-                            <h3>Auditoría de Prendas</h3>
-                            <p>Análisis y control de calidad periódico.</p>
+                            <h3>Ahorro de tiempo y esfuerzo</h3>
+                            <p>Elimina la preocupación y urgencia de pedidos de emergencia al tener stock disponible.</p>
                         </div>
 
                         {/* Feature 3 */}
                         <div className="feature-item">
                             <div className="feature-icon">
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
                                 </svg>
                             </div>
-                            <h3>Optimización de Costes</h3>
-                            <p>Reduzca gastos de almacenamiento propio.</p>
-                        </div>
-
-                        {/* Feature 4 */}
-                        <div className="feature-item">
-                            <div className="feature-icon">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                            </div>
-                            <h3>Respuesta Inmediata</h3>
-                            <p>Envíos rápidos desde nuestro almacén de seguridad.</p>
+                            <h3>Mayor eficiencia</h3>
+                            <p>Mejora la eficiencia operativa al tener siempre los artículos necesarios disponibles para su uso.</p>
                         </div>
                     </div>
                 </section>

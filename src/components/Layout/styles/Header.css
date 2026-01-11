@@ -15,6 +15,17 @@
     transition: color 0.2s ease;
 }
 
+.header-logo {
+    height: 2.5rem;
+    width: auto;
+}
+
+@media (min-width: 768px) {
+    .header-logo {
+        height: 3rem;
+    }
+}
+
 .header-nav-link:hover {
     color: var(--primary-color);
     text-decoration: none;
@@ -50,7 +61,8 @@
     }
 }
 
-.icon-btn {
+/*SEARCH BUTTON*/
+.header-icon-btn {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -64,30 +76,30 @@
     cursor: pointer;
 }
 
-.icon-btn:hover {
+.header-icon-btn:hover {
     color: var(--primary-color);
-    background-color: #f3f9ff;
-    transform: translateY(-1px);
+    background-color: transparent;
 }
 
-.icon-btn:active {
+.header-icon-btn:active {
     transform: translateY(0);
 }
 
+/*CART BUTTON*/
 .cart-icon-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
     padding: 0.5rem;
     color: #374151;
     /* gray-700 */
-    transition: color 0.2s;
+    transition: all 0.2s ease;
     border-radius: 0.5rem;
-    /* Ensure hover background looks good if added later */
 }
 
 .cart-icon-btn:hover {
     color: var(--primary-color);
-    background-color: #f3f9ff;
-    /* Match icon-btn hover */
 }
 
 .cart-badge {
@@ -124,10 +136,11 @@
 }
 
 .user-menu-btn:hover {
-    background-color: #f3f9ff;
+    background-color: transparent;
     color: var(--primary-color);
 }
 
+/*PERFIL*/
 .user-avatar {
     width: 2rem;
     height: 2rem;
@@ -256,6 +269,7 @@
     text-decoration: none;
     transition: all 0.2s;
     background-color: white;
+    white-space: nowrap;
 }
 
 .btn-login:hover {
@@ -274,6 +288,7 @@
     text-decoration: none;
     transition: background-color 0.2s;
     border: 1px solid var(--primary-color);
+    white-space: nowrap;
 }
 
 .btn-register:hover {
@@ -287,13 +302,20 @@
 .header-nav {
     display: none;
     align-items: center;
-    gap: 2rem;
-    /* space-x-8 */
+    gap: 1rem;
+    /* Reduced gap for tablet sizes */
 }
 
 @media (min-width: 768px) {
     .header-nav {
         display: flex;
+    }
+}
+
+@media (min-width: 1024px) {
+    .header-nav {
+        gap: 2rem;
+        /* Restore larger gap for desktops */
     }
 }
 
@@ -365,7 +387,7 @@
 
 @media (min-width: 768px) {
     .header-wide-container {
-        max-width: 768px;
+        max-width: 95%;
     }
 }
 
@@ -524,4 +546,187 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Visibility Utilities for Very Small Screens */
+@media (max-width: 500px) {
+    .responsive-hide-tiny {
+        display: none !important;
+    }
+}
+
+.responsive-show-tiny {
+    display: none;
+}
+
+@media (max-width: 500px) {
+    .responsive-show-tiny {
+        display: block;
+    }
+}
+
+/* Mobile Menu Polish - Header Specific */
+.header-mobile-user-section {
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #f3f4f6;
+    padding-bottom: 0.5rem;
+}
+
+.header-mobile-profile-button {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-mobile-profile-button:hover {
+    background-color: #f9fafb;
+}
+
+.header-mobile-profile-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    text-align: left;
+    overflow: hidden;
+}
+
+.header-mobile-user-avatar {
+    height: 2rem;
+    width: 2rem;
+    background-color: #f3f4f6;
+    color: #4b5563;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    flex-shrink: 0;
+    transition: background-color 0.2s;
+}
+
+.header-mobile-profile-button:hover .header-mobile-user-avatar {
+    background-color: #e5e7eb;
+    color: var(--primary-color);
+}
+
+.header-mobile-user-name {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #374151;
+    line-height: 1.2;
+}
+
+.header-mobile-user-email {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    line-height: 1.2;
+}
+
+.header-mobile-chevron {
+    color: #9ca3af;
+    transition: transform 0.2s, color 0.2s;
+}
+
+.header-mobile-profile-button:hover .header-mobile-chevron {
+    color: #4b5563;
+}
+
+.header-mobile-nav-link {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    color: #374151;
+    /* gray-700 */
+    font-weight: 500;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    border: none;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.header-mobile-nav-link:hover {
+    background-color: #f3f9ff;
+    color: var(--primary-color);
+    padding-left: 1.25rem;
+    /* Slide effect */
+}
+
+.header-mobile-submenu {
+    padding-left: 1rem;
+    padding-right: 0.5rem;
+    margin-top: 0.25rem;
+    margin-bottom: 0.75rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.header-mobile-submenu-item {
+    display: block;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    color: #4b5563;
+    /* gray-600 */
+    border-left: 2px solid #e5e7eb;
+    margin-left: 0.5rem;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.header-mobile-submenu-item:hover {
+    border-left-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: #f9fafb;
+    border-radius: 0 0.25rem 0.25rem 0;
+}
+
+.header-mobile-btn-login {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+    color: #374151;
+    font-weight: 500;
+    text-decoration: none;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.header-mobile-btn-login:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    background-color: #f9fafb;
+    text-decoration: none;
+}
+
+.header-mobile-btn-register {
+    display: block;
+    width: 100%;
+    text-align: center;
+    padding: 0.75rem;
+    background-color: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    border-radius: 0.5rem;
+    text-decoration: none;
+    transition: background-color 0.2s;
+}
+
+.header-mobile-btn-register:hover {
+    background-color: var(--primary-dark);
+    color: white;
+    text-decoration: none;
 }

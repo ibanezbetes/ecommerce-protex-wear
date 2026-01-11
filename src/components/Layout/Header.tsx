@@ -19,6 +19,10 @@ function Header() {
   const menuRef = React.useRef<HTMLDivElement>(null);
   const [isServicesMenuOpen, setIsServicesMenuOpen] = useState(false);
   const servicesMenuRef = React.useRef<HTMLDivElement>(null);
+  const [isMobileServicesOpen, setIsMobileServicesOpen] = useState(false);
+  const [isMobileUserOpen, setIsMobileUserOpen] = useState(false);
+  const mobileMenuRef = React.useRef<HTMLDivElement>(null);
+  const mobileMenuBtnRef = React.useRef<HTMLButtonElement>(null);
 
   // Search State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -76,10 +80,16 @@ function Header() {
 
   React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (
+        isMenuOpen &&
+        menuRef.current && !menuRef.current.contains(target) &&
+        mobileMenuRef.current && !mobileMenuRef.current.contains(target) &&
+        mobileMenuBtnRef.current && !mobileMenuBtnRef.current.contains(target)
+      ) {
         setIsMenuOpen(false);
       }
-      if (servicesMenuRef.current && !servicesMenuRef.current.contains(event.target as Node)) {
+      if (servicesMenuRef.current && !servicesMenuRef.current.contains(target)) {
         setIsServicesMenuOpen(false);
       }
     }
@@ -88,7 +98,7 @@ function Header() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [menuRef]);
+  }, [isMenuOpen]);
 
   const handleLogout = async () => {
     try {
@@ -105,7 +115,7 @@ function Header() {
         <div className="flex items-center justify-between py-4">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <img src={logo} alt="Protex Wear" className="h-12 w-auto" />
+            <img src={logo} alt="Protex Wear" className="header-logo" />
           </Link>
 
           {/* Desktop Navigation */}
@@ -174,7 +184,7 @@ function Header() {
             {/* Search Toggle Button */}
             <button
               onClick={() => setIsSearchOpen(prev => !prev)}
-              className="icon-btn"
+              className="header-icon-btn"
               aria-label="Buscar"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -204,7 +214,7 @@ function Header() {
 
             {/* User Menu */}
             {isAuthenticated ? (
-              <div className="user-menu-container" ref={menuRef}>
+              <div className="user-menu-container responsive-hide-tiny" ref={menuRef}>
                 <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="user-menu-btn"
@@ -272,7 +282,7 @@ function Header() {
                 )}
               </div>
             ) : (
-              <div className="auth-buttons-container">
+              <div className="auth-buttons-container responsive-hide-tiny">
                 <Link
                   to="/login"
                   className="btn-login"
@@ -290,8 +300,9 @@ function Header() {
 
             {/* Mobile Menu Button */}
             <button
+              ref={mobileMenuBtnRef}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden icon-btn"
+              className="md:hidden header-icon-btn"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
@@ -302,56 +313,162 @@ function Header() {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div
+            ref={mobileMenuRef}
+            className="md:hidden header-mobile-menu border-t border-gray-200"
+          >
             <nav className="flex flex-col space-y-2">
+              {/* Mobile User Actions - Visible only on small screens where header user menu is hidden */}
+              <div className="responsive-show-tiny header-mobile-user-section">
+                {isAuthenticated ? (
+                  <>
+                    <button
+                      className="header-mobile-profile-button"
+                      onClick={() => setIsMobileUserOpen(!isMobileUserOpen)}
+                    >
+                      <div className="header-mobile-profile-info">
+                        <div className="header-mobile-user-avatar">
+                          {user?.firstName?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                        </div>
+                        <div className="overflow-hidden">
+                          <span className="header-mobile-user-name">
+                            {user?.firstName ? `${user.firstName} ${user.lastName || ''}` : 'Usuario'}
+                          </span>
+                          <span className="header-mobile-user-email">{user?.email}</span>
+                        </div>
+                      </div>
+                      <svg
+                        className={`header-mobile-chevron h-4 w-4 transform ${isMobileUserOpen ? 'rotate-180' : ''}`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {isMobileUserOpen && (
+                      <div className="header-mobile-submenu">
+                        <Link to="/perfil" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
+                          <span className="mr-3">👤</span> Mi Perfil
+                        </Link>
+                        <Link to="/pedidos" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
+                          <span className="mr-3">📦</span> Mis Pedidos
+                        </Link>
+                        {user?.role === 'ADMIN' && (
+                          <Link to="/admin" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
+                            <span className="mr-3">⚙️</span> Panel Admin
+                          </Link>
+                        )}
+                        <button
+                          onClick={() => {
+                            setIsMenuOpen(false);
+                            handleLogout();
+                          }}
+                          className="header-mobile-nav-link text-red-600 hover:bg-red-50 hover:text-red-700 w-full"
+                        >
+                          <span className="mr-3">🚪</span> Cerrar Sesión
+                        </button>
+                      </div>
+                    )}
+                    <hr className="my-2 border-gray-100" />
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3 mb-2">
+                    <Link
+                      to="/login"
+                      className="header-mobile-btn-login"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Iniciar Sesión
+                    </Link>
+                    <Link
+                      to="/registro"
+                      className="header-mobile-btn-register"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Registrarse
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link
                 to="/productos"
-                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
+                className="header-mobile-nav-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Productos
               </Link>
               <Link
                 to="/categorias"
-                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
+                className="header-mobile-nav-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Categorías
               </Link>
               <Link
                 to="/sobre-nosotros"
-                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
+                className="header-mobile-nav-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Sobre Nosotros
               </Link>
-              <Link
-                to="/servicios"
-                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Servicios
-              </Link>
+              <div>
+                <button
+                  className="header-mobile-nav-link justify-between"
+                  onClick={() => setIsMobileServicesOpen(!isMobileServicesOpen)}
+                >
+                  <span>Servicios</span>
+                  <svg
+                    className={`h-4 w-4 transform transition-transform ${isMobileServicesOpen ? 'rotate-180' : ''}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                {isMobileServicesOpen && (
+                  <div className="header-mobile-submenu">
+                    <Link to="/servicios/renting" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Servicios de renting
+                    </Link>
+                    <Link to="/servicios/lavanderia" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Servicios de lavandería
+                    </Link>
+                    <Link to="/servicios/maquinas-expendedoras" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Máquinas expendedoras de epis
+                    </Link>
+                    <Link to="/servicios/stock-seguridad" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Stock de seguridad
+                    </Link>
+                    <Link to="/servicios/entregas-nominativas" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Entregas nominativas
+                    </Link>
+                    <Link to="/servicios/personalizacion" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Personalización ropa trabajo
+                    </Link>
+                    <Link to="/servicios/merchandising" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      Merchandising
+                    </Link>
+                    <Link to="/servicios/cee" className="header-mobile-submenu-item" onClick={() => setIsMenuOpen(false)}>
+                      CEE
+                    </Link>
+                  </div>
+                )}
+              </div>
               <Link
                 to="/contacto"
-                className="block px-4 py-2 text-gray-700 hover:text-primary-color hover:bg-gray-50 rounded-md"
+                className="header-mobile-nav-link"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Contacto
               </Link>
-
-              {/* Mobile Search */}
-              <div className="px-4 pt-2">
-                <input
-                  type="text"
-                  placeholder="Buscar productos..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-transparent"
-                />
-              </div>
             </nav>
           </div>
-        )}
-      </div>
+        )
+        }
+      </div >
 
       {isSearchOpen && (
         <div className="search-overlay" ref={searchRef}>
@@ -440,7 +557,7 @@ function Header() {
           )}
         </div>
       )}
-    </header>
+    </header >
   );
 }
 
