@@ -9,7 +9,7 @@
 .service-hero {
   position: relative;
   width: 100vw;
-  height: 300px;
+  height: 400px;
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -18,7 +18,8 @@
   justify-content: center;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.3);
 }
 
 .service-hero::before {
@@ -112,9 +113,15 @@
 
 .service-intro-image img {
   width: 100%;
-  height: auto;
-  border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  height: 450px;
+  object-fit: cover;
+  border-radius: 20px;
+  box-shadow: var(--shadow-xl, 0 20px 25px -5px rgb(0 0 0 / 0.1));
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.service-intro-image:hover img {
+  transform: scale(1.02);
 }
 
 /* --- Features Section --- */
@@ -235,20 +242,34 @@
 }
 
 @media (max-width: 768px) {
-  .service-hero h1 {
-    font-size: 2rem;
+  .service-hero {
+    height: 250px;
+    margin-bottom: 2rem;
   }
 
-  .service-hero {
-    background-position: center top;
-    background-size: auto 125%;
+  .service-hero h1 {
+    font-size: 1.8rem;
+    padding: 0 1rem;
+    line-height: 1.2;
   }
 
   .service-intro-section {
-    flex-direction: column-reverse;
+    flex-direction: column;
+    gap: 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .service-intro-image img {
+    height: 300px;
+    border-radius: 12px;
+  }
+
+  .service-intro-text h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
   }
 
   .cta-content h2 {
-    font-size: 1.8rem;
+    font-size: 1.6rem;
   }
 }
