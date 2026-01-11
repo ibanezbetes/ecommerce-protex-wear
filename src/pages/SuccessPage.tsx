@@ -1,17 +1,22 @@
 
 import React, { useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useCart } from '../contexts/CartContext';
 
 const SuccessPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const sessionId = searchParams.get('session_id');
 
+    const { clearCart } = useCart();
+
     useEffect(() => {
-        // Here we could clear the cart context if implemented
-        // const clearCart = useCart().clearCart;
-        // clearCart();
-    }, []);
+        // Clear the cart when payment is successful
+        const sessionId = searchParams.get('session_id');
+        if (sessionId) {
+            clearCart();
+        }
+    }, [searchParams, clearCart]);
 
     return (
         <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-4">

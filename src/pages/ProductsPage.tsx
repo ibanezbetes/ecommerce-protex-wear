@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useProducts } from '../hooks/useProducts';
+import { useCart } from '../contexts/CartContext';
 import { ProductFilters, SortOption } from '../types';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 
@@ -8,6 +9,7 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
  * Now connected to real GraphQL API
  */
 function ProductsPage() {
+  const { addItem, openCart } = useCart();
   const [searchTerm, setSearchTerm] = useState('');
   const [localFilters, setLocalFilters] = useState<ProductFilters>({});
   const [localSort, setLocalSort] = useState<SortOption>({ field: 'name', direction: 'asc' });
@@ -80,8 +82,8 @@ function ProductsPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
           <p className="text-red-600">{error}</p>
-          <button 
-            onClick={() => window.location.reload()} 
+          <button
+            onClick={() => window.location.reload()}
             className="mt-4 btn btn-primary"
           >
             Reintentar
@@ -189,8 +191,8 @@ function ProductsPage() {
             </svg>
             <div>
               <p className="text-sm text-red-600">{error}</p>
-              <button 
-                onClick={() => fetchProducts()} 
+              <button
+                onClick={() => fetchProducts()}
                 className="mt-2 text-sm text-red-700 hover:text-red-900 underline"
               >
                 Reintentar
@@ -231,11 +233,11 @@ function ProductsPage() {
                   </span>
                 )}
               </div>
-              
+
               <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
                 {product.name}
               </h3>
-              
+
               {product.description && (
                 <p className="text-sm text-gray-600 mb-3 line-clamp-2">
                   {product.description}
@@ -271,6 +273,10 @@ function ProductsPage() {
                   Ver Detalles
                 </button>
                 <button
+                  onClick={() => {
+                    addItem(product);
+                    openCart();
+                  }}
                   disabled={product.stock === 0}
                   className="flex-1 btn btn-primary text-sm disabled:opacity-50 disabled:cursor-not-allowed"
                 >
@@ -283,44 +289,48 @@ function ProductsPage() {
       </div>
 
       {/* No Results */}
-      {products.length === 0 && !loading && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 mb-4">
-            <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
-            </svg>
+      {
+        products.length === 0 && !loading && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 mb-4">
+              <svg className="w-16 h-16 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron productos</h3>
+            <p className="text-gray-600 mb-4">Intenta ajustar los filtros o términos de búsqueda</p>
+            <button
+              onClick={handleClearFilters}
+              className="btn btn-primary"
+            >
+              Limpiar Filtros
+            </button>
           </div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No se encontraron productos</h3>
-          <p className="text-gray-600 mb-4">Intenta ajustar los filtros o términos de búsqueda</p>
-          <button
-            onClick={handleClearFilters}
-            className="btn btn-primary"
-          >
-            Limpiar Filtros
-          </button>
-        </div>
-      )}
+        )
+      }
 
       {/* Load More Button */}
-      {hasMore && products.length > 0 && (
-        <div className="text-center mt-8">
-          <button
-            onClick={handleLoadMore}
-            disabled={loading}
-            className="btn btn-outline disabled:opacity-50"
-          >
-            {loading ? (
-              <div className="flex items-center">
-                <LoadingSpinner size="sm" />
-                <span className="ml-2">Cargando...</span>
-              </div>
-            ) : (
-              'Cargar Más Productos'
-            )}
-          </button>
-        </div>
-      )}
-    </div>
+      {
+        hasMore && products.length > 0 && (
+          <div className="text-center mt-8">
+            <button
+              onClick={handleLoadMore}
+              disabled={loading}
+              className="btn btn-outline disabled:opacity-50"
+            >
+              {loading ? (
+                <div className="flex items-center">
+                  <LoadingSpinner size="sm" />
+                  <span className="ml-2">Cargando...</span>
+                </div>
+              ) : (
+                'Cargar Más Productos'
+              )}
+            </button>
+          </div>
+        )
+      }
+    </div >
   );
 }
 

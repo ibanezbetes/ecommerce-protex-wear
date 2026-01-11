@@ -14,6 +14,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import SuccessPage from './pages/SuccessPage'; // Import SuccessPage
+import { CartDrawer } from './components/Cart/CartDrawer';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
@@ -60,6 +61,7 @@ function AppContent() {
 
   return (
     <Layout>
+      <CartDrawer />
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
@@ -71,13 +73,9 @@ function AppContent() {
         <Route path="/success" element={<SuccessPage />} /> {/* Success Page Route */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegisterPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
 
         {/* Protected Routes - Require Authentication */}
-        <Route path="/checkout" element={
-          <ProtectedRoute>
-            <CheckoutPage />
-          </ProtectedRoute>
-        } />
         <Route path="/perfil" element={
           <ProtectedRoute>
             <ProfilePage />

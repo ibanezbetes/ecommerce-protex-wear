@@ -1,11 +1,12 @@
 
 import Stripe from 'stripe';
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, PutItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 import { v4 as uuidv4 } from 'uuid';
 
 const dynamoClient = new DynamoDBClient({});
 const ORDER_TABLE_NAME = process.env.ORDER_TABLE_NAME;
+const PRODUCT_TABLE_NAME = process.env.PRODUCT_TABLE_NAME;
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -13,7 +14,8 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
 });
 
 interface CartItem {
-    id: string;
+    id: string; // This is the cart item ID, usually
+    productId: string; // We might need this if passed from frontend
     name: string;
     price: number;
     quantity: number;
@@ -33,34 +35,60 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             };
         }
 
+        // 0. Check Stock
+        if (PRODUCT_TABLE_NAME) {
+            for (const item of items) {
+                const productResult = await dynamoClient.send(new GetItemCommand({
+                    TableName: PRODUCT_TABLE_NAME,
+                    Key: { id: { S: item.productId } }
+                }));
+
+                const product = productResult.Item;
+                if (!product) {
+                    return { statusCode: 400, body: JSON.stringify({ error: `Product ${item.productId} not found` }) };
+                }
+
+                const stock = product.stock ? parseInt(product.stock.N || '0') : 0;
+                if (stock < item.quantity) {
+                    return { statusCode: 400, body: JSON.stringify({ error: `Insufficient stock for ${product.name?.S}. Available: ${stock}` }) };
+                }
+            }
+        }
+
         // 1. Calculate totals
         const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
         const shippingCost = subtotal >= 100 ? 0 : 5; // 5 EUR constant
-        const total = subtotal + shippingCost; // Simplified Tax logic (assumed inclusive or handled)
+        const total = subtotal + shippingCost;
 
         // 2. Create Order in DynamoDB (Status: PENDING)
         const orderId = uuidv4();
         const now = new Date().toISOString();
 
-        // Note: Using low-level DynamoDB Client for speed/compatibility in Lambda
         if (ORDER_TABLE_NAME) {
+            const item: any = {
+                id: { S: orderId },
+                userId: { S: userId },
+                customerEmail: { S: customerEmail },
+                customerName: { S: shippingAddress.firstName ? `${shippingAddress.firstName} ${shippingAddress.lastName}` : 'Guest User' },
+                status: { S: 'PENDING' },
+                items: { S: JSON.stringify(items) },
+                shippingAddress: { S: JSON.stringify(shippingAddress) },
+                subtotal: { N: subtotal.toString() },
+                totalAmount: { N: total.toString() },
+                orderDate: { S: now },
+                createdAt: { S: now },
+                updatedAt: { S: now },
+                paymentStatus: { S: 'PENDING' }
+            };
+
+            // Add owner field if user is not guest
+            if (userId !== 'GUEST') {
+                item.owner = { S: userId }; // This enables allow.owner() rule
+            }
+
             await dynamoClient.send(new PutItemCommand({
                 TableName: ORDER_TABLE_NAME,
-                Item: {
-                    id: { S: orderId },
-                    userId: { S: 'GUEST' }, // Or actual user ID if auth
-                    customerEmail: { S: customerEmail },
-                    customerName: { S: 'Guest User' }, // Placeholder
-                    status: { S: 'PENDING' },
-                    items: { S: JSON.stringify(items) },
-                    shippingAddress: { S: JSON.stringify({}) }, // Placeholder
-                    subtotal: { N: subtotal.toString() },
-                    totalAmount: { N: total.toString() },
-                    orderDate: { S: now },
-                    createdAt: { S: now },
-                    updatedAt: { S: now },
-                    paymentStatus: { S: 'PENDING' }
-                }
+                Item: item
             }));
             console.log(`Order created: ${orderId}`);
         } else {

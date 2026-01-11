@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useCart } from '../contexts/CartContext';
 import { CheckoutButton } from '../components/CheckoutButton';
 
 /**
@@ -10,56 +11,14 @@ import { CheckoutButton } from '../components/CheckoutButton';
 function CartPage() {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
+  const { items, subtotal, removeItem, updateQuantity } = useCart(); // Use real cart context
   const [guestEmail, setGuestEmail] = useState('');
 
-  // Mock cart data - TODO: Replace with CartContext
-  const mockCartItems = [
-    {
-      id: '1',
-      productId: '1',
-      product: {
-        id: '1',
-        sku: 'EPP-001',
-        name: 'Casco de Seguridad Industrial',
-        price: 45.99,
-        imageUrl: '/images/products/casco-seguridad.jpg',
-        stock: 150,
-      },
-      quantity: 2,
-      unitPrice: 45.99,
-      totalPrice: 91.98,
-    },
-    {
-      id: '2',
-      productId: '2',
-      product: {
-        id: '2',
-        sku: 'EPP-002',
-        name: 'Guantes de Trabajo Anticorte',
-        price: 12.50,
-        imageUrl: '/images/products/guantes-anticorte.jpg',
-        stock: 300,
-      },
-      quantity: 5,
-      unitPrice: 12.50,
-      totalPrice: 62.50,
-    },
-  ];
+  // No mockCartItems anymore
 
-  const subtotal = mockCartItems.reduce((sum, item) => sum + item.totalPrice, 0);
   const tax = subtotal * 0.21; // 21% IVA
   const shipping = subtotal > 100 ? 0 : 9.99; // Free shipping over €100
   const total = subtotal + tax + shipping;
-
-  const handleQuantityChange = (itemId: string, newQuantity: number) => {
-    // TODO: Implement quantity update
-    console.log(`Update item ${itemId} to quantity ${newQuantity}`);
-  };
-
-  const handleRemoveItem = (itemId: string) => {
-    // TODO: Implement item removal
-    console.log(`Remove item ${itemId}`);
-  };
 
   const handleCheckout = () => {
     if (!isAuthenticated) {
@@ -69,7 +28,7 @@ function CartPage() {
     }
   };
 
-  if (mockCartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="text-center py-12">
@@ -103,13 +62,13 @@ function CartPage() {
           <div className="bg-white rounded-lg shadow-sm border">
             <div className="p-6 border-b border-gray-200">
               <h2 className="text-lg font-semibold text-gray-900">
-                Productos ({mockCartItems.length})
+                Productos ({items.length})
               </h2>
             </div>
 
             <div className="divide-y divide-gray-200">
-              {mockCartItems.map((item) => (
-                <div key={item.id} className="p-6">
+              {items.map((item) => (
+                <div key={item.productId} className="p-6">
                   <div className="flex items-start space-x-4">
                     {/* Product Image */}
                     <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
@@ -143,7 +102,7 @@ function CartPage() {
 
                         {/* Remove Button */}
                         <button
-                          onClick={() => handleRemoveItem(item.id)}
+                          onClick={() => removeItem(item.productId)}
                           className="text-gray-400 hover:text-red-500 transition-colors"
                           title="Eliminar producto"
                         >
@@ -159,7 +118,7 @@ function CartPage() {
                           <label className="text-sm font-medium text-gray-700">Cantidad:</label>
                           <div className="flex items-center border border-gray-300 rounded-lg">
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                              onClick={() => updateQuantity(item.productId, item.quantity - 1)}
                               disabled={item.quantity <= 1}
                               className="px-3 py-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -168,13 +127,13 @@ function CartPage() {
                             <input
                               type="number"
                               value={item.quantity}
-                              onChange={(e) => handleQuantityChange(item.id, Number(e.target.value))}
+                              onChange={(e) => updateQuantity(item.productId, Number(e.target.value))}
                               min="1"
                               max={item.product.stock}
                               className="w-16 px-2 py-1 text-center border-0 focus:ring-0"
                             />
                             <button
-                              onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.productId, item.quantity + 1)}
                               disabled={item.quantity >= item.product.stock}
                               className="px-3 py-1 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -271,10 +230,13 @@ function CartPage() {
 
             {/* Checkout Button with mapped items */}
             {(() => {
-              const billingItems = mockCartItems.map(item => ({
-                id: item.id,
+              // Map real CartContext items to format expected by CheckoutButton/Backend
+              // Note: Backend expects CartItem interface, let's align it
+              const billingItems = items.map(item => ({
+                id: item.productId, // Use productId as the ID
+                productId: item.productId,
                 name: item.product.name,
-                price: item.product.price,
+                price: item.unitPrice,
                 quantity: item.quantity,
                 image: item.product.imageUrl
               }));

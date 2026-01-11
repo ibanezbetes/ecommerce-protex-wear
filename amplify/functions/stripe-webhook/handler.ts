@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import type { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient, UpdateItemCommand } from '@aws-sdk/client-dynamodb';
+import { DynamoDBClient, UpdateItemCommand, GetItemCommand } from '@aws-sdk/client-dynamodb';
 
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
@@ -63,9 +63,43 @@ export const handler: APIGatewayProxyHandler = async (event) => {
               ':status': { S: 'PAID' },
               ':pi': { S: session.payment_intent as string },
               ':orderStatus': { S: 'CONFIRMED' } // Update order status to CONFIRMED
-            }
+            },
+            ReturnValues: 'ALL_NEW'
           }));
           console.log(`Order ${session.metadata.orderId} updated to PAID`);
+
+          // Update Stock
+          // We need to fetch the order items first to know what to decrement
+          // Ideally we would have them from the session metadata or a separate query
+          // Here we query the order we just updated (or before update)
+          const orderResult = await ddbClient.send(new GetItemCommand({
+            TableName,
+            Key: { id: { S: session.metadata.orderId } }
+          }));
+
+          if (orderResult.Item && orderResult.Item.items && orderResult.Item.items.S) {
+            const items = JSON.parse(orderResult.Item.items.S);
+            const ProductTable = process.env.PRODUCT_TABLE_NAME;
+
+            if (ProductTable) {
+              for (const item of items) {
+                const pId = item.productId || item.id;
+                try {
+                  await ddbClient.send(new UpdateItemCommand({
+                    TableName: ProductTable,
+                    Key: { id: { S: pId } },
+                    UpdateExpression: 'SET stock = stock - :qty',
+                    ExpressionAttributeValues: {
+                      ':qty': { N: item.quantity.toString() }
+                    }
+                  }));
+                  console.log(`Stock decremented for product ${pId} by ${item.quantity}`);
+                } catch (err: any) {
+                  console.error(`Failed to decrement stock for ${pId}`, err);
+                }
+              }
+            }
+          }
         } catch (dbError) {
           console.error('Error updating order status:', dbError);
           // Don't fail the webhook 200 response to Stripe, but log error

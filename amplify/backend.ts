@@ -4,6 +4,7 @@ import { data } from './data/resource';
 import { storage } from './storage/resource';
 import { createCheckoutSession } from './functions/create-checkout-session/resource';
 import { stripeWebhook } from './functions/stripe-webhook/resource';
+import { PolicyStatement } from 'aws-cdk-lib/aws-iam';
 
 /**
  * @see https://docs.amplify.aws/react/build-a-backend/ to add storage, functions, and more
@@ -35,31 +36,52 @@ const stripeWebhookUrl = stripeWebhookLambda.addFunctionUrl({
 });
 
 // 1. Grant access to the Order table for the Checkout Session Lambda
-backend.createCheckoutSession.resources.lambda.addToRolePolicy({
-  Effect: 'Allow',
-  Action: ['dynamodb:PutItem'],
-  Resource: [backend.data.resources.tables['Order'].tableArn],
-} as any);
+backend.createCheckoutSession.resources.lambda.addToRolePolicy(new PolicyStatement({
+  actions: ['dynamodb:PutItem'],
+  resources: [backend.data.resources.tables['Order'].tableArn],
+}));
 
 // 2. Pass the Table Name as an environment variable
-backend.createCheckoutSession.resources.lambda.addEnvironment(
+// 2. Pass the Table Name as an environment variable
+(backend.createCheckoutSession.resources.lambda as any).addEnvironment(
   'ORDER_TABLE_NAME',
   backend.data.resources.tables['Order'].tableName
 );
 
+(backend.createCheckoutSession.resources.lambda as any).addEnvironment(
+  'PRODUCT_TABLE_NAME',
+  backend.data.resources.tables['Product'].tableName
+);
+
+// Grant read access to Product table for stock check
+backend.createCheckoutSession.resources.lambda.addToRolePolicy(new PolicyStatement({
+  actions: ['dynamodb:GetItem'],
+  resources: [backend.data.resources.tables['Product'].tableArn],
+}));
+
 // 3. Grant access to the Order table for the Webhook Lambda (to update status)
-backend.stripeWebhook.resources.lambda.addToRolePolicy({
-  Effect: 'Allow',
-  Action: ['dynamodb:UpdateItem', 'dynamodb:Query', 'dynamodb:GetItem'],
-  Resource: [
+backend.stripeWebhook.resources.lambda.addToRolePolicy(new PolicyStatement({
+  actions: ['dynamodb:UpdateItem', 'dynamodb:Query', 'dynamodb:GetItem'],
+  resources: [
     backend.data.resources.tables['Order'].tableArn,
     `${backend.data.resources.tables['Order'].tableArn}/index/*` // Allow access to indexes
   ],
-} as any);
+}));
 
-backend.stripeWebhook.resources.lambda.addEnvironment(
+// Grant update access to Product table for stock decrement
+backend.stripeWebhook.resources.lambda.addToRolePolicy(new PolicyStatement({
+  actions: ['dynamodb:UpdateItem'],
+  resources: [backend.data.resources.tables['Product'].tableArn],
+}));
+
+(backend.stripeWebhook.resources.lambda as any).addEnvironment(
   'ORDER_TABLE_NAME',
   backend.data.resources.tables['Order'].tableName
+);
+
+(backend.stripeWebhook.resources.lambda as any).addEnvironment(
+  'PRODUCT_TABLE_NAME',
+  backend.data.resources.tables['Product'].tableName
 );
 
 backend.addOutput({

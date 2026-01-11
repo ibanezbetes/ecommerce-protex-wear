@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { useCartItemCount } from '../../contexts/CartContext';
+import { useCart } from '../../contexts/CartContext';
 import logo from '../../assets/logo.png';
 import './styles/Header.css';
 
@@ -12,7 +12,7 @@ import './styles/Header.css';
 function Header() {
 
   const { user, isAuthenticated, logout } = useAuth();
-  const cartItemCount = useCartItemCount();
+  const { itemCount: cartItemCount, openCart } = useCart(); // Destructure properly
   const navigate = useNavigate();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = React.useRef<HTMLDivElement>(null);
@@ -133,19 +133,20 @@ function Header() {
             </div>
 
             {/* Cart */}
-            <Link
-              to="/carrito"
-              className="cart-icon-btn"
+            <button
+              onClick={openCart}
+              className="cart-icon-btn relative p-2 text-gray-600 hover:text-gray-900"
+              aria-label="Carrito"
             >
               <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 21a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m-8 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3M3.71 5.4h15.214c1.378 0 2.373 1.27 1.995 2.548l-1.654 5.6C19.01 14.408 18.196 15 17.27 15H8.112c-.927 0-1.742-.593-1.996-1.452zm0 0L3 3" />
               </svg>
               {cartItemCount > 0 && (
-                <span className="cart-badge">
+                <span className="cart-badge absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
                   {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             {/* User Menu */}
             {isAuthenticated ? (

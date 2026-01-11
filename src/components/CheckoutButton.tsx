@@ -5,9 +5,11 @@ import outputs from '../../amplify_outputs.json';
 interface CheckoutButtonProps {
     items: any[];
     customerEmail?: string;
+    shippingAddress?: any;
+    userId?: string;
 }
 
-export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerEmail }) => {
+export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerEmail, shippingAddress, userId }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -28,7 +30,7 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerE
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ items, customerEmail }),
+                body: JSON.stringify({ items, customerEmail, shippingAddress, userId }),
             });
 
             const data = await response.json();

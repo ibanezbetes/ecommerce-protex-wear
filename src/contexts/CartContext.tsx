@@ -13,6 +13,9 @@ interface CartContextType extends Cart {
   clearCart: () => void;
   isInCart: (productId: string) => boolean;
   getItemQuantity: (productId: string) => number;
+  isCartOpen: boolean;
+  openCart: () => void;
+  closeCart: () => void;
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -31,18 +34,18 @@ function cartReducer(state: Cart, action: CartAction): Cart {
     case 'ADD_ITEM': {
       const { product, quantity } = action.payload;
       const existingItemIndex = state.items.findIndex(item => item.productId === product.id);
-      
+
       let newItems: CartItem[];
-      
+
       if (existingItemIndex >= 0) {
         // Update existing item
-        newItems = state.items.map((item, index) => 
+        newItems = state.items.map((item, index) =>
           index === existingItemIndex
             ? {
-                ...item,
-                quantity: item.quantity + quantity,
-                totalPrice: (item.quantity + quantity) * item.unitPrice,
-              }
+              ...item,
+              quantity: item.quantity + quantity,
+              totalPrice: (item.quantity + quantity) * item.unitPrice,
+            }
             : item
         );
       } else {
@@ -56,47 +59,47 @@ function cartReducer(state: Cart, action: CartAction): Cart {
         };
         newItems = [...state.items, newItem];
       }
-      
+
       return calculateCartTotals(newItems);
     }
-    
+
     case 'REMOVE_ITEM': {
       const newItems = state.items.filter(item => item.productId !== action.payload);
       return calculateCartTotals(newItems);
     }
-    
+
     case 'UPDATE_QUANTITY': {
       const { productId, quantity } = action.payload;
-      
+
       if (quantity <= 0) {
         // Remove item if quantity is 0 or negative
         const newItems = state.items.filter(item => item.productId !== productId);
         return calculateCartTotals(newItems);
       }
-      
+
       const newItems = state.items.map(item =>
         item.productId === productId
           ? {
-              ...item,
-              quantity,
-              totalPrice: quantity * item.unitPrice,
-            }
+            ...item,
+            quantity,
+            totalPrice: quantity * item.unitPrice,
+          }
           : item
       );
-      
+
       return calculateCartTotals(newItems);
     }
-    
+
     case 'CLEAR_CART':
       return {
         items: [],
         subtotal: 0,
         itemCount: 0,
       };
-    
+
     case 'LOAD_CART':
       return calculateCartTotals(action.payload);
-    
+
     default:
       return state;
   }
@@ -106,7 +109,7 @@ function cartReducer(state: Cart, action: CartAction): Cart {
 function calculateCartTotals(items: CartItem[]): Cart {
   const subtotal = items.reduce((total, item) => total + item.totalPrice, 0);
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
-  
+
   return {
     items,
     subtotal: Math.round(subtotal * 100) / 100, // Round to 2 decimal places
@@ -124,6 +127,10 @@ const initialState: Cart = {
 // Cart Provider Component
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const [isCartOpen, setIsCartOpen] = React.useState(false);
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -149,12 +156,12 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const addItem = (product: Product, quantity: number = 1) => {
     if (quantity <= 0) return;
-    
+
     // Check stock availability
     if (product.stock < quantity) {
       throw new Error(`Solo hay ${product.stock} unidades disponibles`);
     }
-    
+
     dispatch({ type: 'ADD_ITEM', payload: { product, quantity } });
   };
 
@@ -164,14 +171,14 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
   const updateQuantity = (productId: string, quantity: number) => {
     const item = state.items.find(item => item.productId === productId);
-    
+
     if (item && quantity > 0) {
       // Check stock availability
       if (item.product.stock < quantity) {
         throw new Error(`Solo hay ${item.product.stock} unidades disponibles`);
       }
     }
-    
+
     dispatch({ type: 'UPDATE_QUANTITY', payload: { productId, quantity } });
   };
 
@@ -196,6 +203,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     clearCart,
     isInCart,
     getItemQuantity,
+    isCartOpen,
+    openCart,
+    closeCart,
   };
 
   return (
