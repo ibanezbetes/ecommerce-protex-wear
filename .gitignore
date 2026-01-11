@@ -16,3 +16,11 @@ terraform.tfstate*
 # Editor
 .vscode/
 .idea/
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*
+
+.git_local_backup/
+debug-token.js
