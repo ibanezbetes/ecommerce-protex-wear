@@ -1,12 +1,20 @@
 # Node / general
 node_modules/
 dist/
+build/
 .build/
 .cache/
 .env
 .env.*
 *.log
 .DS_Store
+
+# Build tools and caches
+.vite/
+.next/
+out/
+.swc
+.turbo
 
 # AWS / IaC
 terraform.tfstate*
@@ -16,11 +24,29 @@ terraform.tfstate*
 # Editor
 .vscode/
 .idea/
+*.swp
+*.swo
+
+# IDE
+.vscode/
+.idea/
+*.iml
 
 # amplify
 .amplify
 amplify_outputs*
 amplifyconfiguration*
+amplifyconfiguration.json
 
+# Generated files
+index.html
+jest.config.js
+
+# Local development
+.kiro/
 .git_local_backup/
 debug-token.js
+
+# OS
+.DS_Store
+Thumbs.db
