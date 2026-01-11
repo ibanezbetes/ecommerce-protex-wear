@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/ServicePage.css';
-import rentingHeroImg from '../../assets/renting_handshake.jpg';
+import rentingHeroImg from '../../assets/renting_natural.png';
 
 const RentingPage = () => {
     return (

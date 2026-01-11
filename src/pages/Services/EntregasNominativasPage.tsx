@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import '../../styles/ServicePage.css';
-import entregasHeroImg from '../../assets/entregas_nominativas_professional.png';
+import entregasHeroImg from '../../assets/entregas_natural.png';
 
 const EntregasNominativasPage = () => {
     return (
