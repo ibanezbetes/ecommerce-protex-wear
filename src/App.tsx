@@ -48,6 +48,11 @@ function App() {
 function AppContent() {
   const { isLoading, isAuthenticated, user } = useAuth();
 
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
+  const shouldHideLayout = isAdminPage || isAuthPage;
+
   // Debug logging
   console.log('🔍 AppContent Debug:', { isLoading, isAuthenticated, user });
 
@@ -63,11 +68,6 @@ function AppContent() {
       </div>
     );
   }
-
-  const location = useLocation();
-  const isAdminPage = location.pathname.startsWith('/admin');
-  const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
-  const shouldHideLayout = isAdminPage || isAuthPage;
 
   console.log('🏠 Mostrando contenido principal...');
 

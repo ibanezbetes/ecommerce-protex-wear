@@ -6,8 +6,9 @@ import type { Product } from '../../services/graphql';
 import S3Image from './S3Image';
 import {
   Save, X, Upload, Plus, Trash2, Image as ImageIcon,
-  Tag, Box, Layers, DollarSign, FileText, Info, Package
+  Tag, Box, Layers, DollarSign, FileText, Package
 } from 'lucide-react';
+import '../../styles/AdminProductForm.css';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -252,23 +253,23 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
   };
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-5xl mx-auto pb-10">
-      {/* Header Actions */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sticky top-0 bg-gray-50/95 p-3 sm:p-4 rounded-2xl backdrop-blur-sm z-30 border-b border-gray-200">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-100 text-blue-600 rounded-xl hidden sm:block">
-            <Package size={20} />
+    <form onSubmit={handleSubmit} className="product-form-container">
+      {/* Premium Header */}
+      <div className="product-form-header">
+        <div className="flex items-center gap-4">
+          <div className="product-form-header-icon">
+            <Package size={24} strokeWidth={1.5} />
           </div>
-          <div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 leading-tight">{product ? 'Editar Producto' : 'Nuevo Producto'}</h1>
-            <p className="text-[10px] sm:text-xs font-bold text-gray-500 uppercase tracking-widest">Información de inventario</p>
+          <div className="product-form-header-title">
+            <h1>{product ? 'Editar Producto' : 'Nuevo Producto'}</h1>
+            <p>Gestiona el inventario y catálogo</p>
           </div>
         </div>
-        <div className="flex gap-3 w-full sm:w-auto">
+        <div className="flex gap-3 w-full lg:w-auto">
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-4 py-2 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+            className="product-form-btn product-form-btn--secondary"
           >
             <X size={18} />
             Cancelar
@@ -276,276 +277,271 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
           <button
             type="submit"
             disabled={loading || uploading}
-            className="flex-1 sm:flex-none justify-center flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+            className="product-form-btn product-form-btn--primary"
           >
-            <Save size={18} />
-            {loading ? 'Guardando...' : 'Guardar Producto'}
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Save size={18} />
+            )}
+            {loading ? 'Guardando...' : 'Guardar Cambios'}
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column (Main Info) */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="product-form-grid">
+        {/* BIG Column (Main Info) */}
+        <div className="product-form-col-main">
 
           {/* Basic Info Card */}
-          <div className="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-              <Info size={20} className="text-blue-600" />
-              Información Básica
-            </h3>
-            <div className="grid gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Producto *</label>
-                <input
-                  type="text"
-                  name="name"
-                  required
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder="Ej. Camiseta de Seguridad Pro"
-                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border text-gray-900"
-                />
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">SKU *</label>
+          <div className="product-form-card">
+            <div className="product-form-card-header">
+              <FileText size={20} className="product-form-card-icon" />
+              <h3 className="product-form-card-title">Información Básica</h3>
+            </div>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Nombre del Producto</label>
+              <input
+                type="text"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej. Casco de Seguridad Industrial Pro-X"
+                className="product-form-input"
+              />
+            </div>
+
+            <div className="product-form-row">
+              <div className="product-form-group">
+                <label className="product-form-label">SKU (Código)</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-gray-400 font-mono text-sm">#</span>
                   <input
                     type="text"
                     name="sku"
                     required
                     value={formData.sku}
                     onChange={handleChange}
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Marca</label>
-                  <input
-                    type="text"
-                    name="brand"
-                    value={formData.brand || ""}
-                    onChange={handleChange}
-                    placeholder="Ej. ProTex"
-                    className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border text-gray-900"
+                    placeholder="PRO-001"
+                    className="product-form-input"
+                    style={{ paddingLeft: '2rem', fontFamily: 'monospace' }}
                   />
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
-                <textarea
-                  name="description"
-                  rows={4}
-                  value={formData.description || ""}
+              <div className="product-form-group">
+                <label className="product-form-label">Marca</label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={formData.brand || ""}
                   onChange={handleChange}
-                  className="block w-full rounded-lg border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm p-2.5 border text-gray-900"
+                  placeholder="Ej. ProTex"
+                  className="product-form-input"
                 />
               </div>
+            </div>
+
+            <div className="product-form-group" style={{ marginBottom: 0 }}>
+              <label className="product-form-label">Descripción</label>
+              <textarea
+                name="description"
+                value={formData.description || ""}
+                onChange={handleChange}
+                placeholder="Describe las características principales..."
+                className="product-form-input product-form-textarea"
+              />
             </div>
           </div>
 
-          {/* Detailed Specs Card */}
-          <div className="bg-white p-5 sm:p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
-              <Layers size={20} className="text-purple-600" />
-              Especificaciones Técnicas
-            </h3>
+          {/* Specs Card */}
+          <div className="product-form-card">
+            <div className="product-form-card-header">
+              <Layers size={20} className="product-form-card-icon" />
+              <h3 className="product-form-card-title">Especificaciones Técnicas</h3>
+            </div>
 
-            {/* Dynamic Specs */}
-            <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">Características (Clave - Valor)</label>
+            {/* List of Specs */}
+            <div className="product-form-group">
+              <label className="product-form-label">Detalles del Producto</label>
+
+              {specs.length === 0 && (
+                <div className="text-center py-8 text-gray-400 border border-dashed border-gray-200 rounded-xl">
+                  <p className="text-sm">No hay especificaciones añadidas</p>
+                </div>
+              )}
+
               {specs.map((spec, index) => (
-                <div key={index} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_40px] gap-2 mb-4 bg-gray-50 p-2 sm:p-0 rounded-xl sm:bg-transparent sm:mb-2">
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase font-bold text-gray-400 sm:hidden px-1">Característica</label>
-                    <input
-                      placeholder="Ej. Color"
-                      value={spec.key}
-                      onChange={(e) => updateSpec(index, 'key', e.target.value)}
-                      className="w-full rounded-lg border-gray-300 shadow-sm border p-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <label className="text-[10px] uppercase font-bold text-gray-400 sm:hidden px-1">Valor</label>
-                    <input
-                      placeholder="Ej. Azul"
-                      value={spec.value}
-                      onChange={(e) => updateSpec(index, 'value', e.target.value)}
-                      className="w-full rounded-lg border-gray-300 shadow-sm border p-2.5 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                    />
-                  </div>
+                <div key={index} className="spec-item">
+                  <input
+                    placeholder="Propiedad (ej. Material)"
+                    value={spec.key}
+                    onChange={(e) => updateSpec(index, 'key', e.target.value)}
+                    className="product-form-input bg-transparent border-0 p-0 text-sm focus:ring-0 shadow-none"
+                    style={{ flex: 1 }}
+                  />
+                  <div className="hidden sm:block w-px h-4 bg-gray-200 mx-2"></div>
+                  <input
+                    placeholder="Valor (ej. Acero)"
+                    value={spec.value}
+                    onChange={(e) => updateSpec(index, 'value', e.target.value)}
+                    className="product-form-input bg-transparent border-0 p-0 text-sm focus:ring-0 shadow-none"
+                    style={{ flex: 1 }}
+                  />
                   <button
                     type="button"
                     onClick={() => removeSpec(index)}
-                    className="flex items-center justify-center p-2.5 text-red-500 hover:bg-red-50 rounded-lg self-end sm:self-center bg-white sm:bg-transparent border sm:border-0 border-red-100 shadow-sm sm:shadow-none transition-colors"
+                    className="p-2 text-gray-400 hover:text-red-500 rounded-md transition-colors"
                   >
-                    <Trash2 size={18} />
+                    <Trash2 size={16} />
                   </button>
                 </div>
               ))}
-              <button
-                type="button"
-                onClick={addSpec}
-                className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium mt-1"
-              >
-                <Plus size={16} /> Agregar Característica
+
+              <button type="button" onClick={addSpec} className="spec-btn-add">
+                <Plus size={16} />
+                Añadir Característica
               </button>
             </div>
 
-            {/* Dimensions & Weight */}
-            <div className="border-t pt-4 mt-4">
-              <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
-                <Box size={16} /> Dimensiones y Peso
+            {/* Dimensions */}
+            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #F3F4F6' }}>
+              <label className="product-form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Box size={14} /> Dimensiones de Envío
               </label>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="product-form-row-4">
+                {['length', 'width', 'height'].map((dim) => (
+                  <div key={dim}>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">
+                      {dim === 'length' ? 'Largo' : dim === 'width' ? 'Ancho' : 'Alto'}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={dimensions[dim as keyof DimensionState]}
+                        onChange={(e) => handleDimensionChange(dim as keyof DimensionState, e.target.value)}
+                        className="product-form-input"
+                        placeholder="0"
+                      />
+                      <span className="absolute right-2 top-2.5 text-xs text-gray-400">{dimensions.unit}</span>
+                    </div>
+                  </div>
+                ))}
                 <div>
-                  <label className="text-xs text-gray-700 font-medium">Largo</label>
-                  <input
-                    type="text"
-                    placeholder="0"
-                    value={dimensions.length}
-                    onChange={(e) => handleDimensionChange('length', e.target.value)}
-                    className="w-full rounded border-gray-300 p-2 text-sm border text-gray-900"
-                  />
+                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Peso</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="weight"
+                      value={formData.weight || ""}
+                      onChange={handleChange}
+                      className="product-form-input"
+                      placeholder="0.0"
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">kg</span>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs text-gray-700 font-medium">Ancho</label>
-                  <input
-                    type="text"
-                    placeholder="0"
-                    value={dimensions.width}
-                    onChange={(e) => handleDimensionChange('width', e.target.value)}
-                    className="w-full rounded border-gray-300 p-2 text-sm border text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-700 font-medium">Alto</label>
-                  <input
-                    type="text"
-                    placeholder="0"
-                    value={dimensions.height}
-                    onChange={(e) => handleDimensionChange('height', e.target.value)}
-                    className="w-full rounded border-gray-300 p-2 text-sm border text-gray-900"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs text-gray-700 font-medium">Unidad</label>
-                  <select
-                    value={dimensions.unit}
-                    onChange={(e) => handleDimensionChange('unit', e.target.value)}
-                    className="w-full rounded border-gray-300 p-2 text-sm border text-gray-900"
-                  >
-                    <option value="cm">cm</option>
-                    <option value="m">m</option>
-                    <option value="in">in</option>
-                  </select>
-                </div>
-              </div>
-              <div className="mt-3">
-                <label className="text-xs text-gray-700 font-medium">Peso (kg)</label>
-                <input
-                  type="number"
-                  step="0.01"
-                  name="weight"
-                  value={formData.weight || ""}
-                  onChange={handleChange}
-                  className="w-full sm:w-1/4 rounded border-gray-300 p-2 text-sm border text-gray-900"
-                />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Column (Status, Pricing, Media) */}
-        <div className="space-y-6">
-          {/* Status Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4">Estado & Organización</h3>
-            <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 mb-4">
-              <span className="text-sm font-medium text-gray-700">Activo en tienda</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleCheckboxChange}
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
-              </label>
+        {/* Sidebar Column */}
+        <div className="product-form-col-sidebar">
+
+          {/* Status & Category */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Organización</h3>
+
+            <div className="status-toggle">
+              <div>
+                <span className="text-sm font-bold text-gray-800 block">Estado</span>
+                <span className={`text-xs font-bold uppercase mt-1 block ${formData.isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                  {formData.isActive ? 'Activo' : 'Borrador'}
+                </span>
+              </div>
+              <div
+                className="toggle-switch"
+                data-active={formData.isActive}
+                onClick={() => setFormData((prev: any) => ({ ...prev, isActive: !prev.isActive }))}
+              >
+                <div className="toggle-knob"></div>
+              </div>
             </div>
 
-            <div className="space-y-3">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Categoría</label>
-                <input
-                  type="text"
-                  name="category"
-                  value={formData.category || ""}
-                  onChange={handleChange}
-                  className="block w-full rounded-lg border-gray-300 p-2 border text-sm text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subcategoría</label>
-                <input
-                  type="text"
-                  name="subcategory"
-                  value={formData.subcategory || ""}
-                  onChange={handleChange}
-                  className="block w-full rounded-lg border-gray-300 p-2 border text-sm text-gray-900"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
-                  <Tag size={16} /> Etiquetas
-                </label>
-                <div className="flex flex-wrap gap-2 mb-2">
-                  {tags.map((tag, i) => (
-                    <span key={i} className="bg-indigo-50 text-indigo-700 text-xs px-2 py-1 rounded-full flex items-center gap-1">
-                      {tag}
-                      <button type="button" onClick={() => removeTag(tag)} className="hover:text-indigo-900"><X size={12} /></button>
-                    </span>
-                  ))}
-                </div>
+            <div className="product-form-group">
+              <label className="product-form-label">Categoría</label>
+              <input
+                type="text"
+                name="category"
+                value={formData.category || ""}
+                onChange={handleChange}
+                className="product-form-input"
+              />
+            </div>
+            <div className="product-form-group">
+              <label className="product-form-label">Subcategoría</label>
+              <input
+                type="text"
+                name="subcategory"
+                value={formData.subcategory || ""}
+                onChange={handleChange}
+                className="product-form-input"
+              />
+            </div>
+
+            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #F3F4F6' }}>
+              <label className="product-form-label flex items-center gap-1">
+                <Tag size={12} /> Etiquetas
+              </label>
+              <div className="tags-container">
+                {tags.map((tag, i) => (
+                  <span key={i} className="tag-badge">
+                    {tag}
+                    <button type="button" onClick={() => removeTag(tag)} className="cursor-pointer hover:text-red-500" style={{ border: 'none', background: 'none', padding: 0, display: 'flex' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
                 <input
                   type="text"
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
                   onKeyDown={handleAddTag}
-                  placeholder="Escribe y presiona Enter"
-                  className="block w-full rounded-lg border-gray-300 p-2 border text-sm text-gray-900"
+                  placeholder="Escribir..."
+                  className="tags-input"
                 />
               </div>
             </div>
           </div>
 
-          {/* Pricing Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <DollarSign size={16} /> Precio e Inventario
-            </h3>
-            <div className="grid gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Precio</label>
-                <div className="relative rounded-md shadow-sm">
-                  <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
-                    <span className="text-gray-500 sm:text-sm">€</span>
-                  </div>
-                  <input
-                    type="number"
-                    name="price"
-                    min="0"
-                    step="0.01"
-                    required
-                    value={formData.price}
-                    onChange={handleChange}
-                    className="block w-full rounded-lg border-gray-300 pl-7 p-2 border text-sm focus:ring-blue-500 focus:border-blue-500 text-gray-900"
-                  />
-                </div>
+          {/* Pricing */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Inventario</h3>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Precio</label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-500 font-bold">€</span>
+                <input
+                  type="number"
+                  name="price"
+                  min="0"
+                  step="0.01"
+                  required
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="product-form-input"
+                  style={{ paddingLeft: '2rem', fontSize: '1.25rem', fontWeight: 700 }}
+                />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Stock Disponible</label>
+            </div>
+
+            <div className="product-form-group" style={{ marginBottom: 0 }}>
+              <label className="product-form-label">Stock</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <input
                   type="number"
                   name="stock"
@@ -553,67 +549,74 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
                   required
                   value={formData.stock}
                   onChange={handleChange}
-                  className="block w-full rounded-lg border-gray-300 p-2 border text-sm text-gray-900"
+                  className="product-form-input"
+                  style={{ width: '80px', textAlign: 'center' }}
                 />
+                <span className="text-xs text-gray-500 font-medium">unidades disponibles</span>
               </div>
             </div>
           </div>
 
-          {/* Media Card */}
-          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
-            <h3 className="text-sm font-bold text-gray-700 uppercase tracking-wider mb-4 flex items-center gap-2">
-              <ImageIcon size={16} /> Imágenes
-            </h3>
+          {/* Media */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Galería</h3>
 
-            {/* Main Image */}
-            <div className="mb-4">
-              <label className="block text-xs font-medium text-gray-700 mb-2">Imagen Principal</label>
-              <div className="flex items-center gap-4">
-                <div className="relative h-20 w-20 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
-                  <S3Image
-                    s3Key={formData.imageUrl}
-                    alt="Main"
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex-1">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    id="main-image"
-                    onChange={handleMainImageUpload}
-                    className="hidden"
-                  />
-                  <label
-                    htmlFor="main-image"
-                    className="cursor-pointer inline-flex items-center px-3 py-2 border border-blue-600 rounded text-xs font-medium text-blue-600 bg-white hover:bg-blue-50 transition-colors"
-                  >
-                    <Upload size={14} className="mr-1" /> Subir Principal
-                  </label>
-                </div>
+            <div className="product-form-group">
+              <label className="product-form-label">Imagen Principal</label>
+              <div
+                className={`image-upload-area ${formData.imageUrl ? 'has-image' : ''}`}
+                onClick={() => document.getElementById('main-image')?.click()}
+              >
+                {formData.imageUrl ? (
+                  <>
+                    <S3Image
+                      s3Key={formData.imageUrl}
+                      alt="Main"
+                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="bg-white/90 text-gray-900 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <Upload size={12} /> Cambiar
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-3 bg-white text-gray-400 rounded-full mb-2 shadow-sm border border-gray-100">
+                      <ImageIcon size={20} />
+                    </div>
+                    <span className="text-xs font-bold text-gray-600">Subir Portada</span>
+                  </>
+                )}
+                <input type="file" accept="image/*" id="main-image" onChange={handleMainImageUpload} className="hidden" />
               </div>
             </div>
 
-            {/* Gallery */}
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-2">Galería (Adicionales)</label>
-              <div className="grid grid-cols-3 gap-2 mb-2">
+              <label className="product-form-label">Adicionales ({formData.imageUrls?.length || 0})</label>
+              <div className="gallery-grid">
                 {formData.imageUrls?.map((url: string, i: number) => (
-                  <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200 group">
+                  <div key={i} className="gallery-item group">
                     <S3Image
                       s3Key={url}
                       alt={`Gallery ${i}`}
-                      className="h-full w-full object-cover"
+                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
                     <button
                       type="button"
                       onClick={() => removeGalleryImage(i)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-0 right-0 p-1 bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-none"
                     >
-                      <X size={10} />
+                      <Trash2 size={12} />
                     </button>
                   </div>
                 ))}
+
+                <label htmlFor="gallery-input" className="gallery-add-btn" title="Añadir más">
+                  <Plus size={20} />
+                </label>
               </div>
               <input
                 type="file"
@@ -623,22 +626,17 @@ export default function ProductForm({ product, onSubmit, onCancel }: ProductForm
                 onChange={handleGalleryUpload}
                 className="hidden"
               />
-              <label
-                htmlFor="gallery-input"
-                className="cursor-pointer w-full flex items-center justify-center px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors text-xs text-gray-500 hover:text-blue-600 hover:bg-gray-50"
-              >
-                <Plus size={16} className="mr-1" /> Añadir Imágenes
-              </label>
             </div>
           </div>
+
         </div>
       </div>
 
-      {uploading && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-xl flex flex-col items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mb-3"></div>
-            <p className="text-gray-900 font-medium">Subiendo imágenes...</p>
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-card">
+            <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-sm font-bold text-gray-900">Procesando...</p>
           </div>
         </div>
       )}

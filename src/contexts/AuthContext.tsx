@@ -206,6 +206,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         password: credentials.password,
       };
 
+      console.log('🔐 Attempting login with:', { username: credentials.email });
       const signInResult = await signIn(signInInput);
 
       // Check if sign in is complete or if there's a challenge
@@ -244,15 +245,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             type: 'PASSWORD_CHALLENGE_REQUIRED',
             payload: {
               challengeType: 'NEW_PASSWORD_REQUIRED',
-              email: credentials.email
-            }
-          });
-        } else if (signInStep === 'FORCE_CHANGE_PASSWORD') {
-          // User is forced to change password
-          dispatch({
-            type: 'PASSWORD_CHALLENGE_REQUIRED',
-            payload: {
-              challengeType: 'FORCE_CHANGE_PASSWORD',
               email: credentials.email
             }
           });
