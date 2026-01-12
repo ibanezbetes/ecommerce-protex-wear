@@ -27,6 +27,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
         const body = event.body ? JSON.parse(event.body) : event;
         const items: CartItem[] = body.items;
         const customerEmail = body.customerEmail || 'unknown@guest.com'; // Capture email
+        const userId = body.userId || 'GUEST';
+        const shippingAddress = body.shippingAddress || {};
 
         if (!items || !items.length) {
             return {
@@ -57,12 +59,52 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
         // 1. Calculate totals
         const subtotal = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        const shippingCost = subtotal >= 100 ? 0 : 5; // 5 EUR constant
+
+        // Shipping Logic
+        const shippingMethod = body.shippingMethod || 'standard';
+        let shippingCost = 0;
+        let carrierName = 'Correos';
+        let estimatedDays = 4;
+
+        if (shippingMethod === 'express') {
+            shippingCost = 12.99;
+            carrierName = 'SEUR';
+            estimatedDays = 1;
+        } else {
+            // Standard
+            shippingCost = subtotal >= 100 ? 0 : 5.99;
+            carrierName = 'Correos';
+            estimatedDays = 4;
+        }
+
         const total = subtotal + shippingCost;
+
+        // Generate Realistic Tracking Number
+        const generateTracking = (carrier: string) => {
+            const randomNums = Math.floor(Math.random() * 1000000000).toString().padStart(9, '0');
+            if (carrier === 'SEUR') {
+                return {
+                    number: `SU${randomNums}ES`,
+                    url: `https://www.seur.com/livetrac?id=SU${randomNums}ES`
+                };
+            } else {
+                return {
+                    number: `PK${randomNums}ES`,
+                    url: `https://www.correos.es/es/es/herramientas/localizador/envios/detalle?tracking-number=PK${randomNums}ES`
+                };
+            }
+        }
+
+        const trackingInfo = generateTracking(carrierName);
 
         // 2. Create Order in DynamoDB (Status: PENDING)
         const orderId = uuidv4();
         const now = new Date().toISOString();
+
+        // Estimated Delivery Date
+        const deliveryDate = new Date();
+        deliveryDate.setDate(deliveryDate.getDate() + estimatedDays);
+        if (deliveryDate.getDay() === 0) deliveryDate.setDate(deliveryDate.getDate() + 1);
 
         if (ORDER_TABLE_NAME) {
             const item: any = {
@@ -73,7 +115,13 @@ export const handler: APIGatewayProxyHandler = async (event) => {
                 status: { S: 'PENDING' },
                 items: { S: JSON.stringify(items) },
                 shippingAddress: { S: JSON.stringify(shippingAddress) },
+                shippingMethod: { S: shippingMethod },
+                carrier: { S: carrierName },
+                trackingNumber: { S: trackingInfo.number },
+                trackingUrl: { S: trackingInfo.url },
+                estimatedDelivery: { S: deliveryDate.toISOString() },
                 subtotal: { N: subtotal.toString() },
+                shippingCost: { N: shippingCost.toString() },
                 totalAmount: { N: total.toString() },
                 orderDate: { S: now },
                 createdAt: { S: now },
@@ -112,8 +160,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
             lineItems.push({
                 price_data: {
                     currency: 'eur',
-                    product_data: { name: 'Envío (Tarifa Plana)', images: [] },
-                    unit_amount: shippingCost * 100,
+                    product_data: { name: `Envío ${carrierName}`, images: [] },
+                    unit_amount: Math.round(shippingCost * 100),
                 },
                 quantity: 1,
             });

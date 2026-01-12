@@ -41,8 +41,8 @@ const SuccessPage: React.FC = () => {
                 )}
 
                 <button
-                    onClick={() => navigate('/')}
-                    className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition"
+                    onClick={() => window.location.href = '/'}
+                    className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition cursor-pointer"
                 >
                     Volver a la Tienda
                 </button>

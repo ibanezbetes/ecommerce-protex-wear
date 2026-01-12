@@ -7,9 +7,10 @@ interface CheckoutButtonProps {
     customerEmail?: string;
     shippingAddress?: any;
     userId?: string;
+    shippingMethod?: string;
 }
 
-export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerEmail, shippingAddress, userId }) => {
+export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerEmail, shippingAddress, userId, shippingMethod = 'standard' }) => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
@@ -30,7 +31,7 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerE
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ items, customerEmail, shippingAddress, userId }),
+                body: JSON.stringify({ items, customerEmail, shippingAddress, userId, shippingMethod }),
             });
 
             const data = await response.json();
@@ -56,9 +57,9 @@ export const CheckoutButton: React.FC<CheckoutButtonProps> = ({ items, customerE
             <button
                 onClick={handleCheckout}
                 disabled={loading || items.length === 0}
-                className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
-                {loading ? 'Procesando...' : 'Iniciar Pago con Pagar'}
+                {loading ? 'Procesando...' : 'Pagar con Tarjeta'}
             </button>
         </div>
     );

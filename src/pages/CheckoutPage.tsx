@@ -13,7 +13,7 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     cost: 5.99,
     currency: 'EUR',
     estimatedDays: 4,
-    description: 'Envío Estándar (3-5 días días)',
+    description: 'Envío Estándar',
     trackingIncluded: true,
     insuranceIncluded: false,
   },
@@ -28,6 +28,19 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     insuranceIncluded: true,
   },
 ];
+
+const getDeliveryDate = (daysToAdd: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysToAdd);
+  // Skip Sundays
+  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
+
+  return new Intl.DateTimeFormat('es-ES', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long'
+  }).format(date);
+};
 
 function CheckoutPage() {
   const navigate = useNavigate();
@@ -188,14 +201,26 @@ function CheckoutPage() {
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Método de Envío</h2>
               <div className="space-y-3">
                 {SHIPPING_OPTIONS.map((option) => (
-                  <label key={option.method} className={`flex items-center p-4 border rounded-lg cursor-pointer transition-colors ${selectedShipping === option.method ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'}`}>
-                    <input type="radio" name="shipping" value={option.method} checked={selectedShipping === option.method} onChange={(e) => setSelectedShipping(e.target.value)} className="mr-4 h-4 w-4 text-blue-600 focus:ring-blue-500" />
-                    <div className="flex-1 flex justify-between">
-                      <div>
-                        <p className="font-semibold text-gray-900">{option.description}</p>
-                        <p className="text-sm text-gray-500">{option.carrier}</p>
+                  <label key={option.method} className={`flex items-center p-4 border rounded-lg cursor-pointer transition-all ${selectedShipping === option.method ? 'border-blue-600 bg-blue-50 ring-1 ring-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}>
+                    <input type="radio" name="shipping" value={option.method} checked={selectedShipping === option.method} onChange={(e) => setSelectedShipping(e.target.value)} className="mr-4 h-5 w-5 text-blue-600 focus:ring-blue-500" />
+                    <div className="flex-1">
+                      <div className="flex justify-between items-start mb-1">
+                        <div>
+                          <p className="font-bold text-gray-900">{option.method === 'express' ? '⚡ ' : '📦 '}{option.description}</p>
+                          <p className="text-sm text-green-700 font-medium mt-1">
+                            Llega el {getDeliveryDate(option.estimatedDays)}
+                          </p>
+                        </div>
+                        <span className="font-bold text-lg">
+                          {option.cost === 0 ? 'GRATIS' : `€${option.cost.toFixed(2)}`}
+                        </span>
                       </div>
-                      <p className="font-bold">€{option.cost.toFixed(2)}</p>
+                      <div className="flex items-center text-xs text-gray-500 gap-3 mt-2">
+                        <span className="flex items-center bg-gray-100 px-2 py-1 rounded">
+                          {option.carrier}
+                        </span>
+                        {option.trackingIncluded && <span className="flex items-center">✓ Seguimiento incluido</span>}
+                      </div>
                     </div>
                   </label>
                 ))}
@@ -253,6 +278,7 @@ function CheckoutPage() {
                     customerEmail={user?.email || 'guest@example.com'}
                     shippingAddress={shippingAddress}
                     userId={user?.id}
+                    shippingMethod={selectedShipping}
                   />
                 )}
               </div>

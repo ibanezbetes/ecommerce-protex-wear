@@ -5,6 +5,9 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 
+import { OrderStatusTimeline } from '../components/Orders/OrderStatusTimeline';
+import { generateInvoice } from '../utils/InvoiceGenerator';
+
 const client = generateClient<Schema>();
 
 /**
@@ -144,8 +147,8 @@ function ProfilePage() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id as any)}
                     className={`w-full flex items-center px-3 py-2 text-left rounded-lg transition-colors ${activeTab === tab.id
-                        ? 'bg-blue-50 text-blue-700 border border-blue-200'
-                        : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                      : 'text-gray-700 hover:bg-gray-50'
                       }`}
                   >
                     <span className="mr-3">{tab.icon}</span>
@@ -209,16 +212,27 @@ function ProfilePage() {
 
                         return (
                           <div key={order.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start mb-4">
-                              <div>
-                                <h3 className="font-medium text-gray-900">Pedido #{order.id.split('-')[0]}...</h3>
-                                <p className="text-sm text-gray-600">
-                                  {new Date(order.createdAt).toLocaleDateString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                                </p>
+
+                            {/* ... inside component ... */}
+
+                            <div className="mb-4">
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <h3 className="font-medium text-gray-900">Pedido #{order.id.split('-')[0]}...</h3>
+                                  <p className="text-sm text-gray-600">
+                                    {new Date(order.createdAt).toLocaleDateString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                                  </p>
+                                </div>
+                                <span className="font-bold text-lg">€{order.totalAmount?.toFixed(2)}</span>
                               </div>
-                              <span className={`px-3 py-1 text-sm rounded-full font-medium ${getStatusColor(order.paymentStatus || order.status)}`}>
-                                {getStatusText(order.paymentStatus || order.status)}
-                              </span>
+
+                              {/* Visual Timeline */}
+                              <OrderStatusTimeline
+                                status={order.paymentStatus === 'PAID' && order.status === 'PENDING' ? 'CONFIRMED' : (order.status || 'PENDING')}
+                                dates={{
+                                  createdAt: order.createdAt,
+                                }}
+                              />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm bg-gray-50 p-3 rounded">
@@ -231,7 +245,12 @@ function ProfilePage() {
                                 <p>{parsedItems.length} artículo(s)</p>
                               </div>
                               <div className="text-right">
-                                <button className="text-blue-600 hover:underline">Ver factura</button>
+                                <button
+                                  onClick={() => generateInvoice(order)}
+                                  className="text-blue-600 hover:underline flex items-center gap-1 ml-auto"
+                                >
+                                  📄 Descargar Factura
+                                </button>
                               </div>
                             </div>
 
@@ -242,6 +261,31 @@ function ProfilePage() {
                                 </div>
                               ))}
                             </div>
+
+                            {/* Tracking Info Section */}
+                            {(order.trackingNumber || order.trackingUrl) && (
+                              <div className="mt-4 pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 bg-blue-50/50 p-3 rounded-md">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-2xl">🚚</span>
+                                  <div>
+                                    <p className="text-sm font-bold text-gray-800">{order.carrier || 'Transportista'}</p>
+                                    <p className="text-xs text-gray-500 font-mono tracking-wide">{order.trackingNumber}</p>
+                                  </div>
+                                </div>
+
+                                {order.trackingUrl && (
+                                  <a
+                                    href={order.trackingUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="text-sm bg-white border border-gray-200 text-blue-600 px-4 py-2 rounded-md hover:bg-blue-50 hover:border-blue-300 transition-colors font-medium flex items-center shadow-sm"
+                                  >
+                                    Rastrear Pedido
+                                    <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                  </a>
+                                )}
+                              </div>
+                            )}
                           </div>
                         );
                       })}
@@ -249,7 +293,39 @@ function ProfilePage() {
                       {orders.length === 0 && (
                         <div className="text-center py-12 text-gray-500">
                           <p>No has realizado ningún pedido todavía.</p>
-                          <button onClick={() => window.location.href = '/productos'} className="mt-4 text-blue-600 underline">Ir a la tienda</button>
+                          <div className="flex flex-col gap-3 justify-center mt-4">
+                            <button onClick={() => window.location.href = '/productos'} className="text-blue-600 underline">Ir a la tienda</button>
+                            <button
+                              onClick={() => setOrders([{
+                                id: 'DEMO-123456',
+                                createdAt: new Date().toISOString(),
+                                totalAmount: 145.50,
+                                subtotal: 120.00,
+                                shippingCost: 5.99,
+                                taxAmount: 19.51,
+                                status: 'SHIPPED',
+                                paymentStatus: 'PAID',
+                                items: JSON.stringify([
+                                  { name: 'Casco de Seguridad', quantity: 2, price: 45.00 },
+                                  { name: 'Chaleco Reflectante', quantity: 1, price: 30.00 }
+                                ]),
+                                shippingAddress: JSON.stringify({
+                                  firstName: 'Usuario',
+                                  lastName: 'Demo',
+                                  addressLine1: 'Calle de Prueba 123',
+                                  city: 'Madrid',
+                                  postalCode: '28001',
+                                  country: 'ES'
+                                }),
+                                carrier: 'SEUR',
+                                trackingNumber: 'SU123456789ES',
+                                trackingUrl: 'https://www.seur.com'
+                              }])}
+                              className="text-sm bg-gray-100 text-gray-700 px-4 py-2 rounded hover:bg-gray-200 transition"
+                            >
+                              👁️ Ver Pedido de Ejemplo (Demo)
+                            </button>
+                          </div>
                         </div>
                       )}
                     </div>

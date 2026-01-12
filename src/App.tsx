@@ -38,8 +38,14 @@ function App() {
  * App Content Component
  * Handles routing and layout after auth is initialized
  */
+import { AnimatePresence } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+
+// ...
+
 function AppContent() {
   const { isLoading, isAuthenticated, user } = useAuth();
+  const location = useLocation();
 
   // Debug logging
   console.log('🔍 AppContent Debug:', { isLoading, isAuthenticated, user });
@@ -62,36 +68,38 @@ function AppContent() {
   return (
     <Layout>
       <CartDrawer />
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/contacto" element={<ContactPage />} />
-        <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
-        <Route path="/productos" element={<ProductsPage />} />
-        <Route path="/productos/:id" element={<ProductDetailPage />} />
-        <Route path="/carrito" element={<CartPage />} />
-        <Route path="/success" element={<SuccessPage />} /> {/* Success Page Route */}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/registro" element={<RegisterPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
+      <AnimatePresence mode='wait'>
+        <Routes location={location} key={location.pathname}>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/contacto" element={<ContactPage />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+          <Route path="/productos" element={<ProductsPage />} />
+          <Route path="/productos/:id" element={<ProductDetailPage />} />
+          <Route path="/carrito" element={<CartPage />} />
+          <Route path="/success" element={<SuccessPage />} /> {/* Success Page Route */}
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
 
-        {/* Protected Routes - Require Authentication */}
-        <Route path="/perfil" element={
-          <ProtectedRoute>
-            <ProfilePage />
-          </ProtectedRoute>
-        } />
+          {/* Protected Routes - Require Authentication */}
+          <Route path="/perfil" element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          } />
 
-        {/* Admin Routes - Require Admin Role */}
-        <Route path="/admin/*" element={
-          <ProtectedRoute requiredRole="ADMIN">
-            <AdminDashboard />
-          </ProtectedRoute>
-        } />
+          {/* Admin Routes - Require Admin Role */}
+          <Route path="/admin/*" element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <AdminDashboard />
+            </ProtectedRoute>
+          } />
 
-        {/* 404 Page */}
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+          {/* 404 Page */}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AnimatePresence>
 
       {/* Development Auth Configuration Panel */}
       <DevAuthConfig />

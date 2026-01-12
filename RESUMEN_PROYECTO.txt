@@ -1,0 +1,75 @@
+================================================================================
+                    PROYECTO E-COMMERCE PROTEX WEAR
+                    Informe de Estado y Hoja de Ruta
+================================================================================
+
+FECHA: 11 de Enero de 2026
+ESTADO: Funcional (MVP Completo + Mejoras UX)
+
+--------------------------------------------------------------------------------
+1. RESUMEN DE MEJORAS IMPLEMENTADAS (FASES 1-4 COMPLETADAS)
+--------------------------------------------------------------------------------
+
+A continuación se detallan las características que ya están funcionando en la aplicación:
+
+A) INTEGRIDAD OPERATIVA (BACKEND & DATOS)
+   - [x] Conexión a Base de Datos Real: El carrito y el checkout usan datos reales de DynamoDB.
+   - [x] Gestión de Stock:
+         - El sistema verifica si hay stock antes de permitir el pago.
+         - Se descuenta el stock automáticamente tras el pago exitoso.
+   - [x] Limpieza de Sesión: El carrito se vacía automáticamente tras comprar.
+
+B) EXPERIENCIA DE USUARIO (UX PREMIUM)
+   - [x] Carrito Deslizante (Slide-Over): 
+         - Panel lateral moderno en lugar de página estática.
+         - Feedback inmediato al añadir productos.
+   - [x] Navegación Fluida: El botón del header abre el panel directamente.
+   - [x] Skeletons: Animaciones de carga para mejorar la percepción de velocidad.
+
+C) CONFIANZA Y LEGALIDAD (CHECKOUT)
+   - [x] Checkout de Invitado: No es necesario registrarse para comprar.
+   - [x] Proceso de Pago Robusto (/checkout):
+         - Paso 1: Validación de dirección completa.
+         - Paso 2: Selección de envío.
+         - Paso 3: Resumen con impuestos y Checkbox legal obligatorio.
+         - Paso 4: Pago integrado.
+   - [x] Sellos de Confianza: Iconos visuales (SSL, Stripe) en el pago.
+
+D) RETENCIÓN (ÁREA DE CLIENTE)
+   - [x] Historial de Pedidos Real:
+         - La sección "Mi Perfil > Pedidos" conecta con la base de datos.
+         - Los usuarios logueados ven sus pedidos pasados y su estado.
+   - [x] Vinculación Segura: Los pedidos se guardan asociados al ID de usuario.
+
+--------------------------------------------------------------------------------
+2. HOJA DE RUTA RECOMENDADA (PRÓXIMOS PASOS "PRO")
+--------------------------------------------------------------------------------
+
+Para llevar la plataforma al nivel profesional final, se recomiendan estas 3 implementaciones:
+
+A) GESTIÓN DE PEDIDOS (PANEL DE ADMINISTRACIÓN)
+   - Situación: El Dashboard actual es visual pero no funcional.
+   - Acción: Conectar la sección "Pedidos" del Admin a la base de datos.
+   - Objetivo: Que el administrador pueda ver los pedidos entrantes, marcar "Enviado" e introducir el número de seguimiento (Tracking ID).
+
+B) EMAILS TRANSACCIONALES (AWS SES)
+   - Situación: El cliente solo ve una pantalla de "Éxito" en la web.
+   - Acción: Configurar AWS SES para enviar emails automáticos ("Gracias por tu pedido...").
+   - Objetivo: Generar confianza y tener un registro en el correo del cliente.
+
+C) SEO Y PERFORMANCE (VISIBILIDAD)
+   - Situación: Títulos genéricos en la pestaña del navegador.
+   - Acción: Implementar `react-helmet-async`.
+   - Objetivo: Que cada producto tenga su título y descripción para que Google los indexe mejor (ej: "Casco Seguridad | Protex Wear").
+
+--------------------------------------------------------------------------------
+3. INSTRUCCIONES DE ACCESO
+--------------------------------------------------------------------------------
+
+- URL Local: http://localhost:3001
+- Usuario Demo: cliente@demo.com / password123
+- Admin Demo: admin@demo.com / password123
+
+================================================================================
+FIN DEL INFORME
+================================================================================
