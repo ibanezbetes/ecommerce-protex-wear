@@ -1,279 +1,2865 @@
 [
   {
-    "sku": "130-B",
-    "name": "Guante Poliuretano Blanco",
-    "description": "Guante de soporte nylon blanco galga 13 recubierto de poliuretano blanco en palma. Dorso transpirable. Gran tacto y sensibilidad.",
-    "price": 0.95,
-    "stock": 1000,
-    "category": "Protección Manos",
-    "subcategory": "Riesgos Mecánicos",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/130-blanco.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/130-blanco.jpg"],
+    "sku": "MK605V",
+    "name": "SIDNEY - Sudadera con capucha",
+    "description": "Sudadera con capucha de 3 paneles forrada con tejido Single Jersey. Incluye puños y cinturilla de canalé, cubrecosturas reforzado con cinta espiga en el interior del cuello y bolsillo tipo canguro con vivos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK605V.jpg",
+    "imageUrls": ["/images/products/vestuario/MK605V.jpg"],
     "specifications": {
-      "normativas": ["EN 388", "EN 420", "Cat II"],
-      "materiales": ["Nylon", "Poliuretano (PU)"],
-      "tallas": ["6", "7", "8", "9", "10"],
-      "niveles_proteccion": {
-        "abrasion": 4,
-        "corte": 1,
-        "desgarro": 3,
-        "puncion": 1,
-        "cutTDM": "X"
-      },
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["50% Algodón", "40% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
       "detalles_tecnicos": {
-        "galga": "13",
-        "uso_recomendado": ["Electrónica", "Automoción", "Montaje preciso", "Inspección de calidad"]
-      },
-      "empaquetado": "12 pares/bolsa"
-    },
-    "isActive": true,
-    "tags": ["guante", "poliuretano", "blanco", "precisión", "EN388"]
-  },
-  {
-    "sku": "130-G",
-    "name": "Guante Poliuretano Gris",
-    "description": "Guante de soporte nylon gris recubierto de poliuretano gris en palma. Excelente para trabajos sucios que requieren tacto.",
-    "price": 0.95,
-    "stock": 1000,
-    "category": "Protección Manos",
-    "subcategory": "Riesgos Mecánicos",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/130-gris.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/130-gris.jpg"],
-    "specifications": {
-      "normativas": ["EN 388", "EN 420", "Cat II"],
-      "materiales": ["Nylon", "Poliuretano (PU)"],
-      "tallas": ["6", "7", "8", "9", "10"],
-      "niveles_proteccion": {
-        "abrasion": 4,
-        "corte": 1,
-        "desgarro": 3,
-        "puncion": 1,
-        "cutTDM": "X"
-      },
-      "empaquetado": "12 pares/bolsa"
-    },
-    "isActive": true,
-    "tags": ["guante", "poliuretano", "gris", "montaje"]
-  },
-  {
-    "sku": "NI-150",
-    "name": "Guante Nitrilo Foam Gris/Blanco",
-    "description": "Guante soporte nylon spandex galga 15. Recubrimiento nitrilo foam en palma. Tecnología transpirable. Máximo confort.",
-    "price": 2.45,
-    "stock": 500,
-    "category": "Protección Manos",
-    "subcategory": "Riesgos Mecánicos",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/ni-150-nitrilo.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/ni-150-nitrilo.jpg"],
-    "specifications": {
-      "normativas": ["EN 388", "EN 420", "Cat II"],
-      "materiales": ["Nylon Spandex", "Nitrilo Foam"],
-      "tallas": ["7", "8", "9", "10", "11"],
-      "niveles_proteccion": {
-        "abrasion": 4,
-        "corte": 1,
-        "desgarro": 3,
-        "puncion": 1,
-        "cutTDM": "X"
-      },
-      "detalles_tecnicos": {
-        "galga": "15",
-        "caracteristicas": ["Transpirable", "Tacto segunda piel", "Agarre en seco y aceitoso"]
+        "gramaje": "270 g/m²",
+        "tejido": "Felpa perchada",
+        "bolsillos": "1 tipo canguro"
       }
     },
     "isActive": true,
-    "tags": ["nitrilo", "foam", "transpirable", "aceite", "mecánico"]
+    "tags": ["sudadera", "capucha", "algodón", "industrial"]
   },
   {
-    "sku": "100-CF",
-    "name": "Guante Piel Flor Vacuno Gris",
-    "description": "Guante conductor piel flor vacuno gris. Ribeteado en muñeca. Pulgar plano. Muy suave y flexible.",
-    "price": 3.90,
-    "stock": 300,
-    "category": "Protección Manos",
-    "subcategory": "Riesgos Mecánicos",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/100-cf-piel.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/100-cf-piel.jpg"],
+    "sku": "MK620V",
+    "name": "AVALON - Sudadera cuello redondo",
+    "description": "Sudadera clásica de cuello redondo con puños y cinturilla de canalé. Incorpora cubrecosturas con cinta espiga en el interior del cuello para mayor durabilidad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK620V.jpg",
+    "imageUrls": ["/images/products/vestuario/MK620V.jpg"],
     "specifications": {
-      "normativas": ["EN 388", "EN 420", "Cat II"],
-      "materiales": ["Piel Flor Vacuno"],
-      "tallas": ["8", "9", "10"],
-      "niveles_proteccion": {
-        "abrasion": 2,
-        "corte": 1,
-        "desgarro": 2,
-        "puncion": 2,
-        "cutTDM": "X"
-      },
-      "uso_recomendado": ["Conducción", "Carga y descarga", "Agricultura", "Jardinería"]
-    },
-    "isActive": true,
-    "tags": ["piel", "conductor", "flor vacuno", "trabajo general"]
-  },
-  {
-    "sku": "404-S",
-    "name": "Guante Soldador Rojo",
-    "description": "Guante soldador piel serraje crupón rojo. Forrado interior. Costuras reforzadas e ignífugas (Kevlar). Longitud 35cm.",
-    "price": 5.50,
-    "stock": 150,
-    "category": "Protección Manos",
-    "subcategory": "Soldadura y Calor",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/404-soldador.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/404-soldador.jpg"],
-    "specifications": {
-      "normativas": ["EN 388", "EN 407", "EN 12477", "Type A", "Cat II"],
-      "materiales": ["Piel Serraje Crupón", "Hilo Kevlar", "Forro Algodón"],
-      "tallas": ["10"],
-      "niveles_proteccion": {
-        "abrasion": 3,
-        "corte": 1,
-        "desgarro": 3,
-        "puncion": 3,
-        "calor_inflamabilidad": 4,
-        "calor_contacto": 1,
-        "calor_convectivo": 3,
-        "calor_radiante": "X",
-        "salpicaduras_pequeñas": 4,
-        "salpicaduras_grandes": "X"
-      },
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["60% Algodón", "40% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
       "detalles_tecnicos": {
-        "longitud": "35 cm",
-        "tipo_soldadura": "MIG/MAG, Electrodo"
+        "gramaje": "270 g/m²",
+        "tejido": "Felpa perchada"
       }
     },
     "isActive": true,
-    "tags": ["soldador", "calor", "serraje", "rojo", "ignifugo"]
+    "tags": ["sudadera", "cuello redondo", "confort", "trabajo"]
   },
   {
-    "sku": "BOTA-S3",
-    "name": "Bota Seguridad S3 SRC Metal Free",
-    "description": "Bota de seguridad S3 negra. Puntera composite y plantilla textil antiperforación. Hidrófuga y transpirable.",
-    "price": 35.00,
-    "stock": 200,
+    "sku": "105702",
+    "name": "Sudadera con media cremallera",
+    "description": "Sudadera de cuello alto con media cremallera. Cuenta con puños y cinturilla de canalé y tratamiento antipilling para evitar la formación de bolitas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105702.jpg",
+    "imageUrls": ["/images/products/vestuario/105702.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "260 g/m²",
+        "tratamiento": "Antipilling",
+        "cuello": "Alto con cremallera"
+      }
+    },
+    "isActive": true,
+    "tags": ["sudadera", "media cremallera", "antipilling", "invierno"]
+  },
+  {
+    "sku": "PS2001U",
+    "name": "MACKAY - Polo manga corta",
+    "description": "Polo de manga corta con cierre central de botones. Costuras laterales con aberturas inferiores para mejorar el ajuste.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/PS2001U.jpg",
+    "imageUrls": ["/images/products/vestuario/PS2001U.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun preencogido"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "210 g/m²",
+        "tejido": "Punto piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "algodón", "piqué", "manga corta"]
+  },
+  {
+    "sku": "PS200WW",
+    "name": "MACKAY WOMAN - Polo manga corta mujer",
+    "description": "Versión femenina del polo Mackay, con corte entallado, cierre central con botones y aberturas laterales.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/PS200WW.jpg",
+    "imageUrls": ["/images/products/vestuario/PS200WW.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun preencogido"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "210 g/m²",
+        "tejido": "Punto piqué",
+        "corte": "Mujer"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo mujer", "algodón", "entallado", "piqué"]
+  },
+  {
+    "sku": "PL200UW",
+    "name": "HOBART - Polo manga larga",
+    "description": "Polo de manga larga robusto con cierre central de botones y aberturas en los bajos laterales.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/PL200UW.jpg",
+    "imageUrls": ["/images/products/vestuario/PL200UW.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun preencogido"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "210 g/m²",
+        "tejido": "Punto piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "manga larga", "algodón", "invierno"]
+  },
+  {
+    "sku": "PL200WW",
+    "name": "HOBART WOMAN - Polo manga larga mujer",
+    "description": "Polo de manga larga con diseño para mujer, confeccionado en algodón de alta calidad con costuras laterales.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/PL200WW.jpg",
+    "imageUrls": ["/images/products/vestuario/PL200WW.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun preencogido"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "210 g/m²",
+        "tejido": "Punto piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo mujer", "manga larga", "algodón", "corporativo"]
+  },
+  {
+    "sku": "MK023WV",
+    "name": "PALM - Camiseta manga corta",
+    "description": "Camiseta básica de alta resistencia. Cuello redondo de canalé, cubrecosturas reforzado de hombro a hombro y tejido tubular sin costuras laterales.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK023WV.jpg",
+    "imageUrls": ["/images/products/vestuario/MK023WV.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "190 g/m²",
+        "tejido": "Single Jersey",
+        "construccion": "Tubular"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "algodón", "heavy weight", "manga corta"]
+  },
+  {
+    "sku": "MK022WV",
+    "name": "MELBOURNE - Camiseta manga corta",
+    "description": "Camiseta ligera de algodón con cuello redondo de canalé y tejido tubular. Ideal para uso diario y marcaje.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK022WV.jpg",
+    "imageUrls": ["/images/products/vestuario/MK022WV.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "155 g/m²",
+        "tejido": "Single Jersey"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "algodón", "ligera", "manga corta"]
+  },
+  {
+    "sku": "MK520V",
+    "name": "TECH - Camiseta técnica",
+    "description": "Camiseta técnica de manga corta tipo raglán. Cuello redondo del mismo tejido con cubrecosturas interno y costuras decorativas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK520V.jpg",
+    "imageUrls": ["/images/products/vestuario/MK520V.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "130 g/m²",
+        "tejido": "Bird-Eye",
+        "manga": "Raglán"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta técnica", "transpirable", "deporte", "trabajo"]
+  },
+  {
+    "sku": "MK170WV",
+    "name": "CORAL - Camiseta manga corta mujer",
+    "description": "Camiseta para mujer con cuello redondo de canalé y costuras laterales para un ajuste entallado.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK170WV.jpg",
+    "imageUrls": ["/images/products/vestuario/MK170WV.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun"],
+      "tallas": ["S", "M", "L", "XL", "2XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "155 g/m²",
+        "tejido": "Single Jersey",
+        "corte": "Slim Fit"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta mujer", "algodón", "entallada", "manga corta"]
+  },
+  {
+    "sku": "MK156WV",
+    "name": "PARADISE - Camiseta manga larga",
+    "description": "Camiseta de manga larga sin puños. Cuello de canalé y cubrecosturas reforzado en hombro y cuello.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK156WV.jpg",
+    "imageUrls": ["/images/products/vestuario/MK156WV.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Algodón ringspun"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "155 g/m²",
+        "tejido": "Single Jersey"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "manga larga", "algodón", "básico"]
+  },
+  {
+    "sku": "103003",
+    "name": "Pantalón multibolsillos reflectante",
+    "description": "Pantalón de corte Slim Fit con cierre central de cremallera y botón. Incluye cinturilla elástica, doble costura de seguridad y seis bolsillos amplios.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103003.jpg",
+    "imageUrls": ["/images/products/vestuario/103003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": 6
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "multibolsillos", "reflectante", "Slim Fit"]
+  },
+  {
+    "sku": "1030295",
+    "name": "Bermudas canvas stretch",
+    "description": "Bermuda de trabajo elástica fabricada en canvas stretch. Cierre de cremallera y botón, con refuerzo de tejido trasero para mayor resistencia.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030295.jpg",
+    "imageUrls": ["/images/products/vestuario/1030295.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["98% Algodón", "2% Elastano"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Canvas stretch"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda", "stretch", "canvas", "verano"]
+  },
+  {
+    "sku": "103025",
+    "name": "Pantalón multibolsillos sarga",
+    "description": "Pantalón industrial clásico Slim Fit con seis bolsillos, cinturilla elástica lateral y doble costura de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103025.jpg",
+    "imageUrls": ["/images/products/vestuario/103025.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Sarga"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "multibolsillos", "trabajo", "sarga"]
+  },
+  {
+    "sku": "1030055",
+    "name": "Pantalón stretch multibolsillos",
+    "description": "Pantalón stretch de alta flexibilidad. Costuras con hilo de contraste, cinturilla elástica y seis bolsillos con tiradores.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030055.jpg",
+    "imageUrls": ["/images/products/vestuario/1030055.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["46% Algodón", "38% EME", "16% Poliéster"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Stretch",
+        "caracteristica": "Libertad de movimientos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "stretch", "confort", "multibolsillos"]
+  },
+  {
+    "sku": "1030155",
+    "name": "Pantalón stretch multibolsillos mujer",
+    "description": "Versión femenina del pantalón stretch multibolsillos, con corte Slim Fit adaptado y alta elasticidad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030155.jpg",
+    "imageUrls": ["/images/products/vestuario/1030155.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["46% Algodón", "38% EME", "16% Poliéster"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Stretch",
+        "corte": "Mujer"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón mujer", "stretch", "trabajo", "flexibilidad"]
+  },
+  {
+    "sku": "1030185",
+    "name": "Pantalón denim stretch",
+    "description": "Vaquero de trabajo resistente y cómodo. Siete bolsillos, incluyendo bolsillos para móvil o herramientas y remaches de refuerzo metálicos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030185.jpg",
+    "imageUrls": ["/images/products/vestuario/1030185.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["98% Algodón", "2% Elastano"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "380 g/m²",
+        "tejido": "Denim stretch",
+        "sostenibilidad": "EcoMade (70% menos agua)"
+      }
+    },
+    "isActive": true,
+    "tags": ["vaquero", "denim", "stretch", "resistente"]
+  },
+  {
+    "sku": "1030285",
+    "name": "Pantalón denim stretch multibolsillos",
+    "description": "Pantalón vaquero de ocho bolsillos con pinzas en rodillas para mejorar la ergonomía. Cierre de botones y remaches metálicos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030285.jpg",
+    "imageUrls": ["/images/products/vestuario/1030285.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["98% Algodón", "2% Elastano"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "380 g/m²",
+        "tejido": "Denim stretch",
+        "bolsillos": 8
+      }
+    },
+    "isActive": true,
+    "tags": ["vaquero", "multibolsillos", "denim stretch", "ergonómico"]
+  },
+  {
+    "sku": "1030175",
+    "name": "Bermudas denim stretch",
+    "description": "Bermuda vaquera multibolsillos elástica. Diseño funcional con ocho bolsillos y remaches de refuerzo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030175.jpg",
+    "imageUrls": ["/images/products/vestuario/1030175.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["98% Algodón", "2% Elastano"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "380 g/m²",
+        "tejido": "Denim stretch"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda vaquera", "denim", "stretch", "verano"]
+  },
+  {
+    "sku": "103012S",
+    "name": "Pantalón algodón stretch multibolsillos",
+    "description": "Pantalón de corte slim fit con cierre central de cremallera y botón. Incorpora refuerzo de tejido trasero, pliegues en rodillas y triple costura de seguridad. Cinturilla trasera más alta para mayor protección[cite: 58].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103012S.jpg",
+    "imageUrls": ["/images/products/vestuario/103012S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["98% Algodón", "2% Elastano [cite: 59]"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL [cite: 58]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "260 g/m² [cite: 59]",
+        "tejido": "Stretch [cite: 58]",
+        "bolsillos": "8 bolsillos [cite: 58]"
+      }
+    },
+    "isActive": true,
+    "tags": ["algodón", "stretch", "multibolsillos", "confort"]
+  },
+  {
+    "sku": "103003",
+    "name": "Pantalón 100% algodón multibolsillos",
+    "description": "Pantalón industrial de corte slim fit con cierre de cremallera y botón. Cinturilla elástica y triple costura de seguridad. Incluye bolsillos laterales con tapeta y bolsillo carpintero[cite: 59, 734].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103003_cotton.jpg",
+    "imageUrls": ["/images/products/vestuario/103003_cotton.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["100% Algodón [cite: 735]"],
+      "tallas": ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60 [cite: 736]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "260 g/m² [cite: 735]",
+        "tejido": "Sarga [cite: 735]",
+        "bolsillos": "6 bolsillos [cite: 734]"
+      }
+    },
+    "isActive": true,
+    "tags": ["100% algodón", "sarga", "multibolsillos", "industrial"]
+  },
+  {
+    "sku": "103013",
+    "name": "Pantalón 100% algodón multibolsillos invierno",
+    "description": "Versión térmica del pantalón de algodón con interior de tejido felpa perchada para ambientes fríos. Mantiene el corte slim fit y la configuración de seis bolsillos[cite: 60, 742].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103013.jpg",
+    "imageUrls": ["/images/products/vestuario/103013.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]", "EN 14058 [cite: 9]"],
+      "materiales": ["100% Algodón [cite: 749]"],
+      "tallas": ["36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60 [cite: 762]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "350 g/m² [cite: 749]",
+        "tejido": "Sarga con felpa interior [cite: 746, 749]"
+      }
+    },
+    "isActive": true,
+    "tags": ["invierno", "felpa", "algodón", "térmico"]
+  },
+  {
+    "sku": "106003",
+    "name": "Cazadora 100% algodón",
+    "description": "Cazadora de trabajo con cierre central de cremallera oculta por tapeta con velcro. Puños de canalé y canesú delantero y trasero. Dos bolsillos de fuelle en el pecho[cite: 61, 62, 752].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/106003.jpg",
+    "imageUrls": ["/images/products/vestuario/106003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["100% Algodón [cite: 760]"],
+      "tallas": ["48", "50", "52", "54", "56", "58", "60", "62", "64 [cite: 761]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² [cite: 760]",
+        "tejido": "Sarga [cite: 762]",
+        "bolsillos": "2 bolsillos de pecho [cite: 757]"
+      }
+    },
+    "isActive": true,
+    "tags": ["cazadora", "algodón", "protección", "clásico"]
+  },
+  {
+    "sku": "206007",
+    "name": "Cazadora soft shell bicolor con capucha",
+    "description": "Prenda técnica triple capa resistente al viento y agua, altamente transpirable. Incluye capucha ajustable, cremalleras estancas y puños con velcro[cite: 63, 65, 770].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/206007.jpg",
+    "imageUrls": ["/images/products/vestuario/206007.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]", "EN 14058 [cite: 9]"],
+      "materiales": ["100% Poliéster (base)", "94% Pol - 6% Ela (contraste) [cite: 780, 781]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 783]"],
+      "niveles_proteccion": {
+        "impermeabilidad": "Resistente al agua [cite: 65]",
+        "cortavientos": "Resistente al viento [cite: 65]"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "320 g/m² [cite: 780]",
+        "membrana": "TPU con forro polar [cite: 779]",
+        "bolsillos": "5 bolsillos [cite: 778]"
+      }
+    },
+    "isActive": true,
+    "tags": ["soft shell", "bicolor", "impermeable", "técnico"]
+  },
+  {
+    "sku": "103031S",
+    "name": "Pantalón stretch bicolor",
+    "description": "Pantalón elástico bicolor con refuerzos de tejido en la parte trasera y rodillas. Costuras con hilo de contraste y doble costura de seguridad[cite: 65, 797].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103031S.jpg",
+    "imageUrls": ["/images/products/vestuario/103031S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["46% Algodón", "38% EME", "16% Poliéster [cite: 808]"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60 [cite: 809]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² [cite: 808]",
+        "tejido": "Stretch [cite: 808]",
+        "bolsillos": "6 bolsillos [cite: 806]"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "stretch", "refuerzos", "movilidad"]
+  },
+  {
+    "sku": "103022S",
+    "name": "Pantalón trekking stretch",
+    "description": "Pantalón de inspiración casual con tejido elástico en 4 direcciones. Textura interior especial para mayor suavidad al contacto con la piel[cite: 66, 68, 812].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103022S.jpg",
+    "imageUrls": ["/images/products/vestuario/103022S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["86% Poliéster", "14% Elastano [cite: 818]"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL [cite: 819]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "180 g/m² [cite: 818]",
+        "tejido": "Técnico stretch 4-way [cite: 68, 823]",
+        "cremalleras": "Invertidas en bolsillos [cite: 817]"
+      }
+    },
+    "isActive": true,
+    "tags": ["trekking", "stretch", "ligero", "técnico"]
+  },
+  {
+    "sku": "105703",
+    "name": "Sudadera bicolor con media cremallera",
+    "description": "Sudadera de la gama Solid Match con contrastes en costados, mangas y hombros. Tratamiento antipilling y puños de canalé[cite: 73, 833].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105703.jpg",
+    "imageUrls": ["/images/products/vestuario/105703.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["65% Poliéster", "35% Algodón [cite: 74, 840]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 841]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "260 g/m² [cite: 840]",
+        "tejido": "Felpa perchada [cite: 838]",
+        "tratamiento": "Antipilling [cite: 839]"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "media cremallera", "antipilling", "Solid Match"]
+  },
+  {
+    "sku": "105529S",
+    "name": "Polo stretch bicolor manga larga",
+    "description": "Polo de piqué elástico con cierre de botones. Color contraste en canesú, espalda e interior de la botonadura[cite: 74, 75, 851].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105529S.jpg",
+    "imageUrls": ["/images/products/vestuario/105529S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["96% Algodón", "4% Elastano [cite: 857]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 858]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m² [cite: 857]",
+        "tejido": "Piqué stretch [cite: 850, 857]",
+        "aberturas": "Laterales [cite: 856]"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "stretch", "bicolor", "manga larga"]
+  },
+  {
+    "sku": "105519S",
+    "name": "Polo stretch bicolor manga corta",
+    "description": "Polo de piqué con alta movilidad. Diseño Solid Match con contrastes en hombros y espalda[cite: 75, 76, 866].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105519S.jpg",
+    "imageUrls": ["/images/products/vestuario/105519S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["96% Algodón", "4% Elastano [cite: 872]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 873]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m² [cite: 872]",
+        "tejido": "Piqué stretch [cite: 872]",
+        "manga": "Bajo de canalé [cite: 868]"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "stretch", "bicolor", "verano"]
+  },
+  {
+    "sku": "103020B",
+    "name": "Pantalón bicolor multibolsillos",
+    "description": "Pantalón de sarga resistente con refuerzos traseros y en rodillas. Diseño ergonómico con costuras decorativas en contraste[cite: 76, 77, 881].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103020B.jpg",
+    "imageUrls": ["/images/products/vestuario/103020B.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["65% Poliéster", "35% Algodón [cite: 78, 891]"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60 [cite: 892]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² [cite: 78, 891]",
+        "tejido": "Sarga [cite: 78, 891]",
+        "bolsillos": "6 bolsillos [cite: 76, 889]"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "sarga", "reforzado", "industrial"]
+  },
+  {
+    "sku": "103021B",
+    "name": "Bermudas bicolor multibolsillos",
+    "description": "Bermuda industrial con refuerzo de tejido trasero y cinturilla elástica. Costuras reforzadas e hilo de contraste[cite: 78, 906, 911].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103021B.jpg",
+    "imageUrls": ["/images/products/vestuario/103021B.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["65% Poliéster", "35% Algodón [cite: 79, 915]"],
+      "tallas": ["34", "36", "38", "40", "42", "44", "46", "48", "50", "52", "54", "56", "58", "60 [cite: 916]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² [cite: 79, 915]",
+        "tejido": "Sarga [cite: 915]"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda", "bicolor", "sarga", "verano"]
+  },
+  {
+    "sku": "103019S",
+    "name": "Pantalón canvas stretch con bolsillos flotantes",
+    "description": "Pantalón de alta resistencia con 10 bolsillos. Incluye bolsillos flotantes extraíbles y compartimentos Oxford para rodilleras[cite: 79, 925, 937].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103019S.jpg",
+    "imageUrls": ["/images/products/vestuario/103019S.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["98% Algodón", "2% Elastano (base) [cite: 79, 938]", "100% Poliéster PU (refuerzos) [cite: 80, 939]"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL [cite: 941]"],
+      "niveles_proteccion": {
+        "resistencia_abrasion": "Refuerzos Oxford en rodillas [cite: 79, 928]"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² [cite: 80, 938]",
+        "tejido": "Canvas stretch [cite: 79, 938]",
+        "especial": "Compartimento para rodillera [cite: 930]"
+      }
+    },
+    "isActive": true,
+    "tags": ["canvas", "bolsillos flotantes", "rodilleras", "profesional"]
+  },
+  {
+    "sku": "106004",
+    "name": "Cazadora soft shell bicolor",
+    "description": "Chaqueta técnica de la gama Total Match. Resistente al viento y agua con tejido tricapa y cremalleras invertidas[cite: 86, 87, 995].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/106004.jpg",
+    "imageUrls": ["/images/products/vestuario/106004.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]", "EN 14058 [cite: 9]"],
+      "materiales": ["96% Poliéster", "4% Elastano [cite: 1005]", "Forro 100% Pol [cite: 1006]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 1007]"],
+      "niveles_proteccion": {
+        "impermeabilidad": "Resistente al agua [cite: 86]",
+        "cortavientos": "Resistente al viento [cite: 86]"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "280 g/m² [cite: 87, 1005]",
+        "tejido": "Soft shell con TPU [cite: 87, 1004]"
+      }
+    },
+    "isActive": true,
+    "tags": ["soft shell", "Total Match", "técnico", "invierno"]
+  },
+  {
+    "sku": "201504",
+    "name": "Chaqueta polar bicolor",
+    "description": "Chaqueta de microfibra polar con cierre de cremallera. Contrastes de color en costados e interior del cuello[cite: 88, 89, 1031].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polares",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/201504.jpg",
+    "imageUrls": ["/images/products/vestuario/201504.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["100% Poliéster [cite: 90, 1037]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 90, 1038]"],
+      "niveles_proteccion": {
+        "proteccion_termica": "Tejido polar aislante [cite: 89, 1032]"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "220 g/m² [cite: 90, 1037]",
+        "tejido": "Microfibra polar [cite: 1037]",
+        "bolsillos": "5 bolsillos [cite: 89, 1036]"
+      }
+    },
+    "isActive": true,
+    "tags": ["polar", "microfibra", "bicolor", "abrigo"]
+  },
+  {
+    "sku": "105704",
+    "name": "Sudadera bicolor con media cremallera (Total Match)",
+    "description": "Sudadera de cuello alto con tratamiento antipilling. Diseño combinado Total Match con contrastes en costados y cuello[cite: 90, 1059].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105704.jpg",
+    "imageUrls": ["/images/products/vestuario/105704.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["65% Poliéster", "35% Algodón [cite: 91, 1065]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 91, 1066]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "260 g/m² [cite: 91, 1065]",
+        "tejido": "Felpa perchada [cite: 1063]",
+        "tratamiento": "Antipilling [cite: 1064]"
+      }
+    },
+    "isActive": true,
+    "tags": ["sudadera", "Total Match", "bicolor", "confort"]
+  },
+  {
+    "sku": "205902",
+    "name": "Chaleco acolchado bicolor multibolsillos",
+    "description": "Chaleco con cierre de cremallera oculta y faldón trasero. Incorpora cortavientos en sisa y múltiples bolsillos funcionales[cite: 91, 1083, 1087].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/205902.jpg",
+    "imageUrls": ["/images/products/vestuario/205902.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["Exterior 100% Pol [cite: 92, 1089]", "Guata 100% Pol [cite: 93, 1091]"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL [cite: 93, 1092]"],
+      "niveles_proteccion": {
+        "cortavientos": "Cortavientos en sisa [cite: 91, 1087]"
+      },
+      "detalles_tecnicos": {
+        "gramaje_guata": "220 g/m² [cite: 93, 1091]",
+        "bolsillos": "7 bolsillos [cite: 92, 1088]"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "acolchado", "bicolor", "multibolsillos"]
+  },
+  {
+    "sku": "105514",
+    "name": "Polo bicolor manga larga",
+    "description": "Polo de piqué con contrastes en costados e interior de botonadura. Cuello y puños de canalé con presillas de refuerzo[cite: 93, 94, 1117, 1121].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105514.jpg",
+    "imageUrls": ["/images/products/vestuario/105514.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["60% Algodón", "40% Poliéster [cite: 94, 1123]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 94, 1124]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "180 g/m² [cite: 94, 1123]",
+        "tejido": "Piqué [cite: 1123]"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "manga larga", "bicolor", "Total Match"]
+  },
+  {
+    "sku": "105504",
+    "name": "Polo bicolor manga corta",
+    "description": "Polo clásico bicolor para uniformidad. Cinta de tejido que cubre la costura del cuello para mayor comodidad[cite: 95, 1150, 1154].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105504.jpg",
+    "imageUrls": ["/images/products/vestuario/105504.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["60% Algodón", "40% Poliéster [cite: 96, 1156]"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL [cite: 96, 1157]"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "180 g/m² [cite: 96, 1156]",
+        "tejido": "Piqué [cite: 1156]"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "bicolor", "manga corta", "uniformidad"]
+  },
+  {
+    "sku": "105501",
+    "name": "Camiseta técnica bicolor",
+    "description": "Camiseta transpirable con costadillos e interior de manga en contraste. Cubrecosturas reforzado en cuello[cite: 96, 1181, 1184].",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/105501.jpg",
+    "imageUrls": ["/images/products/vestuario/105501.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688 [cite: 7, 8]"],
+      "materiales": ["100% Poliéster [cite: 97, 1185]"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL [cite: 97, 1186]"],
+      "niveles_proteccion": {
+        "transpirabilidad": "Tejido Bird-Eye [cite: 1185]"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "160 g/m² [cite: 97, 1185]",
+        "tejido": "Bird-Eye [cite: 1185]"
+      }
+    },
+    "isActive": true,
+    "tags": ["técnica", "bicolor", "transpirable", "deporte-trabajo"]
+  },
+  {
+    "sku": "1030245",
+    "name": "Pantalón stretch bicolor multibolsillos",
+    "description": "Pantalón de corte slim fit con cierre central de cremallera y botón. Presenta color de contraste en fuelles, tiradores y presillas. Incluye cinturilla elástica y doble costura de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/1030245.jpg",
+    "imageUrls": ["/images/products/vestuario/1030245.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["46% Algodón", "38% EME", "16% Poliéster"],
+      "tallas": ["34 a 60"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Stretch",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["stretch", "bicolor", "slim fit", "multibolsillos"]
+  },
+  {
+    "sku": "103004",
+    "name": "Pantalón bicolor multibolsillos",
+    "description": "Pantalón industrial con cierre de cremallera y botón, refuerzo de tejido trasero y cinturilla elástica. Color de contraste en fuelles, tiradores y presillas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103004.jpg",
+    "imageUrls": ["/images/products/vestuario/103004.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["34 a 60"],
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "sarga", "multibolsillos", "industrial"]
+  },
+  {
+    "sku": "103007",
+    "name": "Bermudas bicolor multibolsillos",
+    "description": "Bermuda de sarga con cierre central de cremallera y botón. Presenta refuerzo trasero, cinturilla elástica y doble costura de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/103007.jpg",
+    "imageUrls": ["/images/products/vestuario/103007.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["34 a 60"],
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda", "bicolor", "sarga", "verano"]
+  },
+  {
+    "sku": "108",
+    "name": "Chaleco acolchado multibolsillos",
+    "description": "Chaleco acolchado con cierre de cremallera oculta por tapeta con botones automáticos. Incluye cortavientos en sisa y cinturilla lateral elástica.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/108.jpg",
+    "imageUrls": ["/images/products/vestuario/108.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["Exterior Microfibra 100% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {
+        "aislamiento": "Guata 100% Poliéster 220 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje_exterior": "120 g/m²",
+        "bolsillos": "7 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "acolchado", "multibolsillos", "invierno"]
+  },
+  {
+    "sku": "MK610V",
+    "name": "PERTH - Chaqueta polar",
+    "description": "Chaqueta de tejido polar suave con cierre central de cremallera invertida. Incorpora cubrecosturas reforzado con cinta espiga en el interior del cuello.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polares",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/MK610V.jpg",
+    "imageUrls": ["/images/products/vestuario/MK610V.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "280 g/m²",
+        "tejido": "Polar",
+        "bolsillos": "2 bolsillos tipo canguro"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaqueta", "polar", "suave", "invierno"]
+  },
+  {
+    "sku": "VPRO M",
+    "name": "Chaleco polar",
+    "description": "Chaleco de tejido microfibra con cierre central de cremallera. Acabado con cinta de bies elástica en el bajo y borde de las sisas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Polares",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/VPRO_M.jpg",
+    "imageUrls": ["/images/products/vestuario/VPRO_M.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["XS a 3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "220 g/m²",
+        "tejido": "Microfibra polar",
+        "bolsillos": "5 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "polar", "microfibra", "ligero"]
+  },
+  {
+    "sku": "205905",
+    "name": "Chaleco soft shell",
+    "description": "Chaleco con tejido soft shell y forro polar. Cierre central con cremallera invertida en color contraste y canesú frontal y trasero.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/205905.jpg",
+    "imageUrls": ["/images/products/vestuario/205905.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["94% Poliéster", "6% Elastano"],
+      "tallas": ["XS a 3XL"],
+      "niveles_proteccion": {
+        "forro": "100% Poliéster 130 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje_exterior": "280 g/m²",
+        "bolsillos": "3 bolsillos de vivo"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "soft shell", "técnico", "cortavientos"]
+  },
+  {
+    "sku": "206008",
+    "name": "Chaqueta de punto afelpado",
+    "description": "Chaqueta de punto afelpado con refuerzos de soft shell en pecho, hombros, interior de mangas y costados. Cierre de cremallera invertida.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/206008.jpg",
+    "imageUrls": ["/images/products/vestuario/206008.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliéster (base)", "96% Pol - 4% Ela (contraste)"],
+      "tallas": ["XS a 3XL"],
+      "detalles_tecnicos": {
+        "gramaje_base": "300 g/m²",
+        "gramaje_contraste": "330 g/m²",
+        "bolsillos": "3 bolsillos de vivo"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaqueta", "punto afelpado", "soft shell", "reforzada"]
+  },
+  {
+    "sku": "206009",
+    "name": "Chaqueta ligera acolchada",
+    "description": "Chaqueta de nylon acolchado con refuerzos de tejido técnico stretch en pecho, mangas y costados para facilitar el marcaje.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/206009.jpg",
+    "imageUrls": ["/images/products/vestuario/206009.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliamida (base)", "100% Poliéster (contraste)"],
+      "tallas": ["XS a 3XL"],
+      "niveles_proteccion": {
+        "aislamiento": "Guata 100% Poliéster 125 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje_base": "40 g/m²",
+        "gramaje_contraste": "265 g/m²",
+        "bolsillos": "3 bolsillos de vivo"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaqueta", "acolchada", "ligera", "nylon"]
+  },
+  {
+    "sku": "VG200U",
+    "name": "MELTON - Chaleco acolchado ligero",
+    "description": "Chaleco acolchado repelente al agua con cierre de cremallera invertida. Incluye bolsa de transporte para guardarlo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/VG200U.jpg",
+    "imageUrls": ["/images/products/vestuario/VG200U.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {
+        "acabado": "Repelente al agua"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Tafetán",
+        "bolsillos": "2 laterales con cremallera"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "acolchado", "ligero", "repelente agua"]
+  },
+  {
+    "sku": "206005",
+    "name": "Cazadora soft shell",
+    "description": "Cazadora de tejido triple capa con forro polar y membrana TPU. Manga raglán, puños ajustables con velcro y pinzas en los codos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/206005.jpg",
+    "imageUrls": ["/images/products/vestuario/206005.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["94% Poliéster", "6% Elastano"],
+      "tallas": ["XS a 3XL"],
+      "niveles_proteccion": {
+        "forro": "100% Poliéster 130 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje_exterior": "280 g/m²",
+        "bolsillos": "5 bolsillos (3 exteriores, 2 interiores)"
+      }
+    },
+    "isActive": true,
+    "tags": ["soft shell", "tricapa", "técnico", "invierno"]
+  },
+  {
+    "sku": "206003",
+    "name": "Parka acolchada impermeable",
+    "description": "Parka impermeable con costuras termoselladas y capucha ajustable oculta en el cuello. Interior del cuello y bolsillos con forro polar.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/206003.jpg",
+    "imageUrls": ["/images/products/vestuario/206003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688", "EN 343"],
+      "materiales": ["100% Poliéster con recubrimiento de PVC"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {
+        "impermeabilidad": "Costuras termoselladas",
+        "guata": "100% Poliéster 100 g/m²",
+        "polar": "100% Poliéster 220 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje_exterior": "250 g/m²",
+        "bolsillos": "3 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["parka", "impermeable", "térmica", "invierno"]
+  },
+  {
+    "sku": "195",
+    "name": "Traje de lluvia dos piezas",
+    "description": "Traje compuesto de chaqueta y pantalón con costuras termoselladas. Chaqueta con capucha oculta y pantalón con cinturilla elástica. Incluye bolsa.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Ropa de lluvia",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/195.jpg",
+    "imageUrls": ["/images/products/vestuario/195.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688", "EN 343"],
+      "materiales": ["100% Poliéster con recubrimiento de PVC"],
+      "tallas": ["M a 3XL"],
+      "niveles_proteccion": {
+        "impermeabilidad": "Tejido impermeable y termosellado"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "225 g/m²",
+        "transpirabilidad": "Rejilla en espalda y ojales en axilas"
+      }
+    },
+    "isActive": true,
+    "tags": ["traje lluvia", "impermeable", "PVC", "dos piezas"]
+  },
+  {
+    "sku": "19000",
+    "name": "basic - Traje de lluvia dos piezas",
+    "description": "Traje de lluvia básico de PVC con costuras termoselladas. Chaqueta con canesú en espalda y pantalón con bajo ajustable mediante botones.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Vestuario",
+    "subcategory": "Ropa de lluvia",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/19000.jpg",
+    "imageUrls": ["/images/products/vestuario/19000.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 13688"],
+      "materiales": ["100% PVC"],
+      "tallas": ["M a 2XL"],
+      "detalles_tecnicos": {
+        "gramaje": "180 g/m²",
+        "bolsillos": "2 bolsillos de parche en chaqueta"
+      }
+    },
+    "isActive": true,
+    "tags": ["traje lluvia", "básico", "PVC", "económico"]
+  },
+  {
+    "sku": "305522",
+    "name": "Polo algodón MC cinta segmentada",
+    "description": "Polo de alta visibilidad con cintas reflectantes segmentadas termofijadas en torso y mangas. Cuello de canalé y cierre con botones.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305522.jpg",
+    "imageUrls": ["/images/products/vestuario/305522.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {
+        "reflectante": "Cinta segmentada termofijada"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "polo", "cinta segmentada", "algodón"]
+  },
+  {
+    "sku": "305704",
+    "name": "Sudadera con cuello redondo",
+    "description": "Sudadera de alta visibilidad con cintas reflectantes termofijadas en torso y mangas. Puños y cinturilla de canalé.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305704.jpg",
+    "imageUrls": ["/images/products/vestuario/305704.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "300 g/m²",
+        "tejido": "Punto afelpado"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "sudadera", "reflectante", "cuello redondo"]
+  },
+  {
+    "sku": "305523",
+    "name": "Polo algodón bicolor MC cinta segmentada",
+    "description": "Polo bicolor de alta visibilidad con cintas segmentadas. Botones, cuello, presillas y bajo de la manga en color contraste.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305523.jpg",
+    "imageUrls": ["/images/products/vestuario/305523.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {
+        "reflectante": "Cinta segmentada termofijada"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "polo", "bicolor", "cinta segmentada"]
+  },
+  {
+    "sku": "305703",
+    "name": "Sudadera bicolor con media cremallera cinta",
+    "description": "Sudadera de cuello alto con media cremallera y cintas reflectantes termofijadas. Puños y cinturilla de canalé.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Sudaderas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305703.jpg",
+    "imageUrls": ["/images/products/vestuario/305703.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "300 g/m²",
+        "tejido": "Punto afelpado"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "sudadera", "bicolor", "media cremallera"]
+  },
+  {
+    "sku": "305524",
+    "name": "Polo algodón ML cinta segmentada",
+    "description": "Polo de manga larga con cintas segmentadas termofijadas en torso y mangas. Cuello y puños de canalé.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305524.jpg",
+    "imageUrls": ["/images/products/vestuario/305524.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "polo", "manga larga", "cinta segmentada"]
+  },
+  {
+    "sku": "305525",
+    "name": "Polo algodón bicolor ML cinta segmentada",
+    "description": "Polo bicolor de manga larga con cintas segmentadas. Botones, cuello y presillas en color contraste.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/vestuario/305525.jpg",
+    "imageUrls": ["/images/products/vestuario/305525.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 3XL"],
+      "niveles_proteccion": {},
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["alta visibilidad", "polo", "bicolor", "manga larga"]
+  },
+  {
+    "sku": "305508",
+    "name": "Camiseta algodón cinta segmentada",
+    "description": "Camiseta de alta visibilidad con cuello redondo de canalé. Incorpora cintas reflectantes segmentadas termofijadas en torso y mangas. Cubrecosturas del cuello reforzado con cinta de tejido base.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305508.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305508.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {
+        "reflectante": "Cinta segmentada termofijada"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "alta visibilidad", "algodón", "segmentada"]
+  },
+  {
+    "sku": "305509",
+    "name": "Camiseta algodón bicolor cinta segmentada",
+    "description": "Camiseta bicolor de alta visibilidad con cuello redondo de canalé en color contraste. Cintas reflectantes segmentadas termofijadas en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305509.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305509.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "camiseta", "alta visibilidad", "segmentada"]
+  },
+  {
+    "sku": "305612",
+    "name": "Camiseta algodón manga corta",
+    "description": "Camiseta de alta visibilidad con cuello redondo de canalé y cubrecosturas con cinta de espiga. Cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305612.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305612.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "manga corta", "alta visibilidad", "clásica"]
+  },
+  {
+    "sku": "305512",
+    "name": "Polo algodón manga corta",
+    "description": "Polo de alta visibilidad con cierre central con botones y cuello de canalé. Incluye un bolsillo de parche en el pecho.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305512.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305512.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué",
+        "bolsillos": "1 de parche"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "manga corta", "alta visibilidad", "bolsillo"]
+  },
+  {
+    "sku": "305613",
+    "name": "Camiseta algodón bicolor manga corta",
+    "description": "Camiseta bicolor con cuello redondo de canalé en contraste. Cubrecosturas con cinta de espiga y cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305613.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305613.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "camiseta", "manga corta", "alta visibilidad"]
+  },
+  {
+    "sku": "305614",
+    "name": "Camiseta algodón manga larga",
+    "description": "Camiseta de manga larga con cuello y puños de canalé. Cubrecosturas con cinta de espiga y cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305614.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305614.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué",
+        "puños": "Canalé"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta", "manga larga", "alta visibilidad", "algodón"]
+  },
+  {
+    "sku": "305615",
+    "name": "Camiseta algodón bicolor manga larga",
+    "description": "Camiseta de manga larga bicolor con cuello y puños de canalé en color contraste. Cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305615.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305615.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["bicolor", "manga larga", "camiseta", "alta visibilidad"]
+  },
+  {
+    "sku": "305513",
+    "name": "Polo algodón bicolor manga corta",
+    "description": "Polo bicolor con cierre central de botones y un bolsillo de parche en el pecho. Cuello de canalé y cintas reflectantes en torso.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305513.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305513.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué",
+        "bolsillos": "1 de parche"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo bicolor", "manga corta", "bolsillo", "alta visibilidad"]
+  },
+  {
+    "sku": "305514",
+    "name": "Polo algodón manga larga",
+    "description": "Polo de manga larga certificado con un bolsillo de parche en el pecho. Cuello y puños de canalé, cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305514.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305514.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "manga larga", "alta visibilidad", "bolsillo"]
+  },
+  {
+    "sku": "305515",
+    "name": "Polo algodón bicolor manga larga",
+    "description": "Polo bicolor de manga larga con cierre de botones y un bolsillo de parche en el pecho. Botones, cuello y presillas en contraste.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305515.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305515.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["55% Algodón", "45% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "150 g/m²",
+        "tejido": "Piqué"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo bicolor", "manga larga", "alta visibilidad", "bolsillo"]
+  },
+  {
+    "sku": "173",
+    "name": "Polo bicolor manga corta",
+    "description": "Polo bicolor de alta visibilidad fabricado en tejido transpirable Bird-Eye. Cierre central de botones y un bolsillo de parche en el pecho.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/173.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/173.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "niveles_proteccion": {
+        "transpirabilidad": "Tejido Bird-Eye"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "160 g/m²",
+        "tejido": "Bird-Eye",
+        "bolsillos": "1 de parche"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "bicolor", "bird-eye", "transpirable"]
+  },
+  {
+    "sku": "175",
+    "name": "Polo bicolor manga larga",
+    "description": "Polo técnico de manga larga con tejido Bird-Eye. Cuello y puños de canalé en color contraste y cierre central de botones.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/175.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/175.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["XS a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "160 g/m²",
+        "tejido": "Bird-Eye"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo técnico", "manga larga", "alta visibilidad", "bird-eye"]
+  },
+  {
+    "sku": "305506",
+    "name": "Camiseta técnica bicolor",
+    "description": "Camiseta técnica de alta visibilidad con cuello redondo de canalé en color contraste. Cintas reflectantes en torso y mangas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Camisetas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/305506.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/305506.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "140 g/m²",
+        "tejido": "Bird-Eye"
+      }
+    },
+    "isActive": true,
+    "tags": ["camiseta técnica", "bicolor", "transpirable", "alta visibilidad"]
+  },
+  {
+    "sku": "3030105",
+    "name": "Pantalón stretch con cinta segmentada",
+    "description": "Pantalón de alta visibilidad con gran elasticidad. Cintas reflectantes segmentadas termofijadas y refuerzos en rodillas y bajo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/3030105.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/3030105.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["77% Poliéster", "20% Algodón", "3% Elastano"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {
+        "reflectante": "Cinta segmentada termofijada"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "250 g/m²",
+        "tejido": "Stretch",
+        "bolsillos": "8 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "stretch", "segmentado", "movilidad"]
+  },
+  {
+    "sku": "303007",
+    "name": "Pantalón 100% algodón bicolor multibolsillos",
+    "description": "Pantalón industrial bicolor fabricado en algodón. Cierre central con cremallera y cintas reflectantes en el bajo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/303007.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/303007.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% Algodón (Tejido base)"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "algodón", "bicolor", "alta visibilidad"]
+  },
+  {
+    "sku": "3030025",
+    "name": "Pantalón stretch bicolor multibolsillos",
+    "description": "Pantalón elástico certificado con cintas reflectantes en el bajo. Ofrece total libertad de movimientos y ajuste lateral elástico.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/3030025.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/3030025.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["46% Algodón", "38% EME", "16% Poliéster"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Stretch",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón stretch", "bicolor", "confort", "multibolsillos"]
+  },
+  {
+    "sku": "157",
+    "name": "Pantalón bicolor multibolsillos",
+    "description": "Pantalón de alta visibilidad con cierre central de cremallera y botón. Cintas reflectantes en el bajo y seis bolsillos amplios.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/157.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/157.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "bicolor", "reflectante", "multibolsillos"]
+  },
+  {
+    "sku": "156",
+    "name": "Pantalón forrado bicolor multibolsillos",
+    "description": "Pantalón industrial certificado para frío con forro interior de punto liso. Cintas reflectantes en el bajo y seis bolsillos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/156.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/156.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471", "EN 14058"],
+      "materiales": ["65% Poliéster", "35% Algodón"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "niveles_proteccion": {
+        "termico": "Forro punto liso 185 g/m²"
+      },
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m² (base)",
+        "tejido": "Sarga forrada"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón invierno", "forrado", "bicolor", "térmico"]
+  },
+  {
+    "sku": "160",
+    "name": "Pantalón alta visibilidad 4 bolsillos",
+    "description": "Pantalón funcional con cinturilla elástica y cintas reflectantes en el bajo. Incluye un bolsillo para herramientas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/160.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/160.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["Sarga (Pol/Alg)"],
+      "tallas": ["S a 5XL"],
+      "detalles_tecnicos": {
+        "tejido": "Sarga",
+        "bolsillos": "4 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "alta visibilidad", "herramientas", "sarga"]
+  },
+  {
+    "sku": "F160",
+    "name": "Pantalón forrado alta visibilidad",
+    "description": "Pantalón con forro térmico de punto liso y cintas reflectantes en el bajo. Diseño de cuatro bolsillos con cierre de cremallera.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/F160.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/F160.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471", "EN 14058"],
+      "materiales": ["Sarga (base)", "Forro: 100% Poliéster"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "tejido": "Sarga forrada",
+        "bolsillos": "4 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón forrado", "invierno", "alta visibilidad", "térmico"]
+  },
+  {
+    "sku": "303004",
+    "name": "Bermudas bicolor multibolsillos",
+    "description": "Bermuda de alta visibilidad con cierre central de cremallera y botón. Presenta color de contraste en fuelles, tapetas, tiradores y bajo de la pernera. Incluye cinturilla elástica y doble costura de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/303004.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/303004.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": [
+        "Tejido flúor amarillo: 80% poliéster - 20% algodón",
+        "Tejido flúor naranja: 60% algodón - 40% poliéster",
+        "Tejido contraste: 65% poliéster - 35% algodón"
+      ],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "200 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda", "bicolor", "alta visibilidad", "verano"]
+  },
+  {
+    "sku": "303005",
+    "name": "Bermudas multibolsillos",
+    "description": "Bermuda certificada de alta visibilidad con cinturilla elástica, cierre central de cremallera y botón, y pinzas para un mejor ajuste.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/303005.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/303005.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": [
+        "Tejido flúor amarillo: 80% poliéster - 20% algodón",
+        "Tejido flúor naranja: 60% algodón - 40% poliéster"
+      ],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "210 g/m² (Amarillo) / 240 g/m² (Naranja)",
+        "tejido": "Sarga",
+        "bolsillos": "6 bolsillos"
+      }
+    },
+    "isActive": true,
+    "tags": ["bermuda", "alta visibilidad", "sarga", "multibolsillos"]
+  },
+  {
+    "sku": "9313",
+    "name": "Chaleco reversible multibolsillos y alta visibilidad",
+    "description": "Chaleco reversible con cuello alto. Un lado es multibolsillos con faldón trasero y el otro es de alta visibilidad con cintas reflectantes horizontales y certificación Clase I.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/9313.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/9313.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471:2013/A1:2017 Clase I", "EN ISO 13688:2013/A1:2021"],
+      "materiales": [
+        "Exterior: 100% poliéster (Tafetán)",
+        "Guata: 100% poliéster",
+        "Tejido flúor: 100% poliéster (Punto liso)"
+      ],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL"],
+      "detalles_tecnicos": {
+        "gramaje_fluor": "450 g/m²",
+        "caracteristicas": "Reversible, cortavientos en bocamangas"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "reversible", "acolchado", "multibolsillos"]
+  },
+  {
+    "sku": "5063",
+    "name": "Chaleco alta visibilidad cuello pico",
+    "description": "Chaleco básico de alta visibilidad Clase II con cierre de velcro ajustable y dos bandas reflectantes en pecho y espalda.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/5063.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/5063.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471:2013/A1:2017 Clase II", "EN ISO 13688:2013/A1:2021"],
+      "materiales": ["100% poliéster"],
+      "tallas": ["M", "L", "XL", "2XL"],
+      "detalles_tecnicos": {
+        "ajuste": "Velcro",
+        "visibilidad": "Dos bandas reflectantes horizontales"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "velcro", "alta visibilidad", "seguridad"]
+  },
+  {
+    "sku": "9311",
+    "name": "Chaleco alta visibilidad con cremallera",
+    "description": "Chaleco de alta visibilidad Clase II con cierre de cremallera. Incluye dos bandas reflectantes horizontales en el pecho y bandas verticales en los hombros.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Chalecos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/9311.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/9311.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471:2013/A1:2017 Clase II", "EN ISO 13688:2013/A1:2021"],
+      "materiales": ["100% poliéster"],
+      "tallas": ["M", "L", "XL", "2XL"],
+      "detalles_tecnicos": {
+        "cierre": "Cremallera",
+        "configuracion_reflectante": "2 horizontales + 2 verticales en hombros"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaleco", "cremallera", "alta visibilidad", "reflectante"]
+  },
+  {
+    "sku": "183",
+    "name": "Chaqueta polar bicolor",
+    "description": "Chaqueta de microfibra polar con cierre central de cremallera. Incluye cintas reflectantes en torso y mangas, bajo ajustable con stopper y puños elásticos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Polares",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/183.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/183.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": ["100% poliéster"],
+      "tallas": ["XS", "S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "detalles_tecnicos": {
+        "gramaje": "300 g/m²",
+        "tejido": "Microfibra polar",
+        "bolsillos": "3 bolsillos de vivo con cremallera"
+      }
+    },
+    "isActive": true,
+    "tags": ["chaqueta", "polar", "bicolor", "alta visibilidad"]
+  },
+  {
+    "sku": "161",
+    "name": "Cazadora acolchada bicolor",
+    "description": "Cazadora de alta visibilidad con mangas desmontables y capucha oculta. Interior del cuello con forro polar y puños elásticos con velcro.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/161.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/161.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": [
+        "Exterior: 100% poliéster con recubrimiento de PU",
+        "Guata: 100% poliéster",
+        "Interior (Polar): 100% poliéster"
+      ],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "detalles_tecnicos": {
+        "gramaje_exterior": "180 g/m²",
+        "gramaje_polar": "280 g/m²",
+        "funcionalidad": "Mangas desmontables"
+      }
+    },
+    "isActive": true,
+    "tags": ["cazadora", "acolchada", "mangas desmontables", "bicolor"]
+  },
+  {
+    "sku": "166",
+    "name": "Parka bicolor",
+    "description": "Parka certificada con capucha ajustable oculta y bajo con stopper. Incorpora ojal metálico en axilas para transpirabilidad y puños de canalé.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/166.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/166.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": [
+        "Exterior: 100% poliéster con recubrimiento de PU",
+        "Forro y Guata: 100% poliéster"
+      ],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje_exterior": "180 g/m²",
+        "bolsillos": "4 bolsillos (incluye interior de parche)"
+      }
+    },
+    "isActive": true,
+    "tags": ["parka", "bicolor", "impermeable", "térmica"]
+  },
+  {
+    "sku": "189",
+    "name": "Traje de lluvia dos piezas",
+    "description": "Conjunto de chaqueta y pantalón impermeable con cintas reflectantes. Incluye rejilla interna en la espalda para transpirabilidad y costuras termoselladas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Ropa de lluvia",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/189.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/189.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471"],
+      "materiales": [
+        "Exterior: 100% poliéster con recubrimiento de PU",
+        "Rejilla: 100% poliéster"
+      ],
+      "tallas": ["M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje_exterior": "130 g/m²",
+        "caracteristicas": "Costuras termoselladas, bajo ajustable"
+      }
+    },
+    "isActive": true,
+    "tags": ["traje lluvia", "impermeable", "PU", "reflectante"]
+  },
+  {
+    "sku": "306003",
+    "name": "Parka 4 en 1 bicolor",
+    "description": "Sistema de protección multifunción compuesto por: Parka, Chubasquero, Cazadora y Chaleco con mangas desmontables. Impermeable y certificado en alta visibilidad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Alta Visibilidad",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/alta-visibilidad/306003.jpg",
+    "imageUrls": ["/images/products/alta-visibilidad/306003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20471", "EN 343"],
+      "materiales": ["100% poliéster con recubrimiento de PU"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL", "4XL", "5XL"],
+      "detalles_tecnicos": {
+        "gramaje_exterior": "180 g/m²",
+        "versatilidad": "4 prendas en 1"
+      }
+    },
+    "isActive": true,
+    "tags": ["parka 4 en 1", "multifunción", "impermeable", "alta visibilidad"]
+  },
+  {
+    "sku": "50",
+    "name": "SANTANA - Polo manga larga ignífugo",
+    "description": "Polo técnico en tejido inherente ignífugo y antiestático. Incluye tapeta con botones ocultos y aberturas laterales en el bajo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Polos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/50.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/50.jpg"],
+    "specifications": {
+      "normativas": [
+        "EN ISO 11612 (A1, B1, C1, F1)",
+        "EN 1149-5",
+        "EN 61482-1-2 APC-1"
+      ],
+      "materiales": ["60% modacrílico, 37% algodón, 3% fibra de carbono"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "220 g/m²",
+        "tejido": "Punto liso"
+      }
+    },
+    "isActive": true,
+    "tags": ["polo", "ignífugo", "antiestático", "arco eléctrico"]
+  },
+  {
+    "sku": "606003",
+    "name": "Cazadora ignífuga - antiestática",
+    "description": "Cazadora de sarga con cierre de cremallera oculta y tapeta con velcro. Incorpora cinturilla elástica lateral y doble costura de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/606003.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/606003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5"],
+      "materiales": ["97% algodón - 3% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "270 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "2 bolsillos de parche en el pecho"
+      }
+    },
+    "isActive": true,
+    "tags": ["cazadora", "ignífugo", "antiestático", "sarga"]
+  },
+  {
+    "sku": "605003",
+    "name": "Camisa ignífuga - antiestática",
+    "description": "Camisa técnica con cierre de botones automáticos ocultos y puños ajustables con velcro. Presenta un diseño ergonómico con canesú en la espalda.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Camisas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/605003.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/605003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5"],
+      "materiales": ["97% algodón - 3% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "250 g/m²",
+        "tejido": "Sarga",
+        "bolsillos": "2 de parche en el pecho"
+      }
+    },
+    "isActive": true,
+    "tags": ["camisa", "protección", "ignífugo", "antiestático"]
+  },
+  {
+    "sku": "602003",
+    "name": "Mono ignífugo - antiestático",
+    "description": "Mono de protección integral con cremallera de doble cursor oculta. Bajos ajustables con velcro y cinturilla elástica para mayor comodidad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Monos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/602003.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/602003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5"],
+      "materiales": ["97% algodón - 3% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "270 g/m²",
+        "bolsillos": "5 bolsillos con tapeta y velcro"
+      }
+    },
+    "isActive": true,
+    "tags": ["mono", "protección integral", "ignífugo", "antiestático"]
+  },
+  {
+    "sku": "603003",
+    "name": "Pantalón ignífugo - antiestático",
+    "description": "Pantalón de sarga ignífuga con cierre de cremallera y botón automático. Incorpora bajos ajustables mediante velcro y costuras de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/603003.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/603003.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5"],
+      "materiales": ["97% algodón - 3% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "270 g/m²",
+        "bolsillos": "4 bolsillos (2 traseros de parche con tapeta)"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "ignífugo", "antiestático", "seguridad laboral"]
+  },
+  {
+    "sku": "606001",
+    "name": "Cazadora ignífuga - antiestática modacrílica",
+    "description": "Cazadora técnica fabricada en tejido inherente modacrílico. Protege contra calor y llama con cierre de cremallera oculta por tapeta.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/606001.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/606001.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5"],
+      "materiales": ["60% modacrílica - 38% algodón - 2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Sarga"
+      }
+    },
+    "isActive": true,
+    "tags": ["cazadora", "modacrílica", "ignífugo", "antiestático"]
+  },
+  {
+    "sku": "605001",
+    "name": "Camisa ignífuga - antiestática modacrílica",
+    "description": "Camisa técnica inherente con cierre de botones automáticos ocultos. Ofrece propiedades de disipación electrostática certificadas.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Camisas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/605001.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/605001.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5"],
+      "materiales": ["60% modacrílica - 38% algodón - 2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "190 g/m²",
+        "tejido": "Sarga"
+      }
+    },
+    "isActive": true,
+    "tags": ["camisa", "modacrílica", "técnico", "ignífugo"]
+  },
+  {
+    "sku": "602001",
+    "name": "Mono ignífugo - antiestático modacrílico",
+    "description": "Mono técnico inherente diseñado para riesgos térmicos extremos. Incluye cremallera de doble cursor y bajos ajustables con velcro.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Monos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/602001.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/602001.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5"],
+      "materiales": ["60% modacrílica - 38% algodón - 2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "tejido": "Sarga"
+      }
+    },
+    "isActive": true,
+    "tags": ["mono", "ignífugo", "antiestático", "arco eléctrico"]
+  },
+  {
+    "sku": "603001",
+    "name": "Pantalón ignífugo - antiestático modacrílico",
+    "description": "Pantalón técnico inherente que ofrece protección contra arco eléctrico. Incorpora bajos ajustables y cuatro bolsillos con tapeta.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/603001.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/603001.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5", "IEC 61482-2"],
+      "materiales": ["60% modacrílica - 38% algodón - 2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "bolsillos": "4 bolsillos (incluye traseros con tapeta)"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "arco eléctrico", "ignífugo", "modacrílico"]
+  },
+  {
+    "sku": "606002",
+    "name": "Cazadora ignífuga - antiestática con reflectantes",
+    "description": "Cazadora que une protección ignífuga inherente y alta visibilidad. Incluye cintas reflectantes en torso y mangas para riesgos combinados.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Cazadoras",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/606002.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/606002.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5", "EN 20471 (combinada)"],
+      "materiales": ["60% modacrílica - 38% algodón - 2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "visibilidad": "Cintas reflectantes en torso y mangas"
+      }
+    },
+    "isActive": true,
+    "tags": ["cazadora", "reflectante", "ignífugo", "alta visibilidad"]
+  },
+  {
+    "sku": "605002",
+    "name": "Camisa ignífuga - antiestática con reflectantes",
+    "description": "Camisa técnica de sarga con propiedades ignífugas y antiestáticas. Incluye cintas reflectantes en torso y mangas, cierre central con botones automáticos ocultos y puños ajustables con velcro.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Camisas",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/605002.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/605002.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5"],
+      "materiales": ["60% modacrílica", "38% algodón", "2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "190 g/m²",
+        "tejido": "Sarga inherente",
+        "visibilidad": "Cintas reflectantes en torso y mangas"
+      }
+    },
+    "isActive": true,
+    "tags": ["camisa", "ignífugo", "antiestático", "reflectante"]
+  },
+  {
+    "sku": "602002",
+    "name": "Mono ignífugo - antiestático con reflectantes",
+    "description": "Mono de protección integral contra calor, llama y arco eléctrico. Equipado con cintas reflectantes en torso, mangas y bajos. Cierre con cremallera de doble cursor oculta.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Monos",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/602002.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/602002.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN ISO 11611", "EN 1149-5"],
+      "materiales": ["60% modacrílica", "38% algodón", "2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "bolsillos": "5 bolsillos con tapeta y velcro",
+        "ajuste": "Cinturilla y puños elásticos"
+      }
+    },
+    "isActive": true,
+    "tags": ["mono", "ignífugo", "antiestático", "alta visibilidad"]
+  },
+  {
+    "sku": "603002",
+    "name": "Pantalón ignífugo - antiestático con reflectantes",
+    "description": "Pantalón técnico certificado para riesgos térmicos. Incorpora cintas reflectantes en el bajo para mejorar la visibilidad. Bajos ajustables con velcro y costuras de seguridad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Industria Técnica",
+    "subcategory": "Pantalones",
+    "brand": "Protex Wear",
+    "imageUrl": "/images/products/industria-tecnica/603002.jpg",
+    "imageUrls": ["/images/products/industria-tecnica/603002.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 11612", "EN 1149-5", "EN 20471 (combinada)"],
+      "materiales": ["60% modacrílica", "38% algodón", "2% antiestático"],
+      "tallas": ["S", "M", "L", "XL", "2XL", "3XL"],
+      "detalles_tecnicos": {
+        "gramaje": "240 g/m²",
+        "bolsillos": "4 bolsillos",
+        "visibilidad": "Cintas reflectantes en bajos"
+      }
+    },
+    "isActive": true,
+    "tags": ["pantalón", "ignífugo", "antiestático", "reflectante"]
+  },
+  {
+    "sku": "707007K",
+    "name": "SPEZIAL COLOURS BLACK - Zapatilla S1P",
+    "description": "Zapatilla de seguridad tipo deportiva, ultra transpirable y ligera. Diseño Metal Free con puntera de composite y plantilla antiperforación textil.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007K.jpg",
+    "imageUrls": ["/images/products/calzado/707007K.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "materiales": ["Textil de punto", "Suela PU Doble densidad"],
+      "tallas": ["35 a 48"],
+      "niveles_proteccion": {
+        "puntera": "Composite (200J)",
+        "plantilla": "Textil antiperforación (1100N)",
+        "antideslizante": "SRC",
+        "proteccion_esd": "Sí"
+      },
+      "detalles_tecnicos": {
+        "metal_free": true,
+        "plantilla_extraible": true,
+        "forro": "Malla transpirable"
+      }
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "S1P", "deportiva", "metal free", "ESD"]
+  },
+  {
+    "sku": "707007R",
+    "name": "SPEZIAL COLOURS RED - Zapatilla S1P",
+    "description": "Calzado de seguridad deportivo en color rojo. Alta circulación de aire gracias a su corte textil de punto y forro de malla.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007R.jpg",
+    "imageUrls": ["/images/products/calzado/707007R.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "materiales": ["Textil de punto", "PU Doble densidad"],
+      "tallas": ["35 a 48"],
+      "niveles_proteccion": {
+        "puntera": "Composite",
+        "plantilla": "Textil"
+      }
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "S1P", "rojo", "transpirable"]
+  },
+  {
+    "sku": "707007C",
+    "name": "SPEZIAL COLOURS ORANGE - Zapatilla S1P",
+    "description": "Zapatilla de seguridad deportiva color naranja flúor. Máximo nivel de antideslizamiento y protección electrostática.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007C.jpg",
+    "imageUrls": ["/images/products/calzado/707007C.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "materiales": ["Textil de punto"],
+      "tallas": ["35 a 48"]
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "naranja", "S1P", "ESD"]
+  },
+  {
+    "sku": "707007Y",
+    "name": "SPEZIAL COLOURS YELLOW - Zapatilla S1P",
+    "description": "Calzado de seguridad ligero con diseño en amarillo flúor. Puntera y plantilla no metálica para mayor confort.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007Y.jpg",
+    "imageUrls": ["/images/products/calzado/707007Y.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "tallas": ["35 a 48"]
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "amarillo", "seguridad"]
+  },
+  {
+    "sku": "707007L",
+    "name": "SPEZIAL COLOURS LIME - Zapatilla S1P",
+    "description": "Zapatilla deportiva de seguridad color verde lima. Incluye puntera composite y suela de doble densidad.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007L.jpg",
+    "imageUrls": ["/images/products/calzado/707007L.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"]
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "lima", "metal free"]
+  },
+  {
+    "sku": "707007B",
+    "name": "SPEZIAL COLOURS BLUE - Zapatilla S1P",
+    "description": "Zapatilla de seguridad deportiva color azul. Gran flexibilidad y ligereza para largas jornadas de trabajo.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatillas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707007B.jpg",
+    "imageUrls": ["/images/products/calzado/707007B.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"]
+    },
+    "isActive": true,
+    "tags": ["zapatilla", "azul", "confort"]
+  },
+  {
+    "sku": "707001",
+    "name": "SPEZIAL Serie 707001 - Zapato S1P",
+    "description": "Zapato de seguridad clásico con corte textil de punto y suela de doble densidad. Ofrece máxima flexibilidad y nivel SRC de antideslizamiento.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707001.jpg",
+    "imageUrls": ["/images/products/calzado/707001.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "SRC"],
+      "materiales": ["Textil de punto", "PU/PU"],
+      "tallas": ["35 a 48"],
+      "detalles_tecnicos": {
+        "puntera": "Composite",
+        "plantilla": "Textil antiperforación",
+        "metal_free": true
+      }
+    },
+    "isActive": true,
+    "tags": ["zapato", "S1P", "flexible", "industrial"]
+  },
+  {
+    "sku": "707003G",
+    "name": "PLAY GREY - Zapato S1P",
+    "description": "Zapato de seguridad fabricado en piel serraje con inserciones de malla transpirable. Incluye protección ESD para entornos electrónicos.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707003G.jpg",
+    "imageUrls": ["/images/products/calzado/707003G.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "materiales": ["Piel Serraje", "Malla transpirable"],
+      "tallas": ["35 a 48"],
+      "detalles_tecnicos": {
+        "puntera": "Composite",
+        "metal_free": true,
+        "proteccion_esd": true
+      }
+    },
+    "isActive": true,
+    "tags": ["piel serraje", "ESD", "S1P", "gris"]
+  },
+  {
+    "sku": "707003B",
+    "name": "PLAY BLUE - Zapato S1P",
+    "description": "Variante en color azul del modelo Play. Combina la resistencia del serraje con la ventilación de la malla técnica.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707003B.jpg",
+    "imageUrls": ["/images/products/calzado/707003B.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"]
+    },
+    "isActive": true,
+    "tags": ["zapato", "azul", "transpirable", "S1P"]
+  },
+  {
+    "sku": "707004Y",
+    "name": "VITAL YELLOW - Zapato S1P",
+    "description": "Zapato de seguridad en piel serraje con detalles en amarillo flúor. Diseño ergonómico con puntera y plantilla no metálica.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707004Y.jpg",
+    "imageUrls": ["/images/products/calzado/707004Y.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"],
+      "materiales": ["Piel Serraje"],
+      "tallas": ["35 a 48"]
+    },
+    "isActive": true,
+    "tags": ["serraje", "S1P", "amarillo", "ESD"]
+  },
+  {
+    "sku": "707004C",
+    "name": "VITAL ORANGE - Zapato S1P",
+    "description": "Zapato de seguridad en piel serraje color naranja. Máximo confort y transpirabilidad gracias a su forro de malla.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707004C.jpg",
+    "imageUrls": ["/images/products/calzado/707004C.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "ESD", "SRC"]
+    },
+    "isActive": true,
+    "tags": ["serraje", "S1P", "naranja", "ESD"]
+  },
+  {
+    "sku": "707005K",
+    "name": "FLUX - Bota de seguridad S3",
+    "description": "Bota de seguridad fabricada en piel nobuk. Certificación S3 que garantiza resistencia a la penetración y absorción de agua.",
+    "price": 0.00,
+    "stock": 100,
     "category": "Calzado Seguridad",
     "subcategory": "Botas",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-pies/bota-s3.jpg",
-    "imageUrls": ["/images/products/proteccion-pies/bota-s3.jpg"],
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707005K.jpg",
+    "imageUrls": ["/images/products/calzado/707005K.jpg"],
     "specifications": {
-      "normativas": ["EN ISO 20345", "S3", "SRC"],
-      "materiales": ["Piel Grabada", "Suela PU/PU"],
-      "tallas": ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47"],
+      "normativas": ["EN ISO 20345 S3", "ESD", "SRC"],
+      "materiales": ["Piel Nobuk", "PU Doble densidad"],
+      "tallas": ["35 a 48"],
       "niveles_proteccion": {
         "categoria_calzado": "S3",
-        "energia_impacto": 200,
-        "resistencia_perforacion": 1100,
-        "resistencia_agua": true,
-        "antideslizante": "SRC",
+        "resistencia_agua": "Sí (WRU)",
+        "puntera": "Composite",
+        "plantilla": "Textil"
+      },
+      "detalles_tecnicos": {
+        "metal_free": true,
+        "plantilla_extraible": true
+      }
+    },
+    "isActive": true,
+    "tags": ["bota", "piel nobuk", "S3", "impermeable", "ESD"]
+  },
+  {
+    "sku": "707101K",
+    "name": "GLIDE - Bota de seguridad S3",
+    "description": "Bota técnica en piel nobuk con altos niveles de protección y confort. Totalmente libre de metal y resistente al agua.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Botas",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707101K.jpg",
+    "imageUrls": ["/images/products/calzado/707101K.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S3", "ESD", "SRC"],
+      "materiales": ["Piel Nobuk"],
+      "tallas": ["35 a 48"]
+    },
+    "isActive": true,
+    "tags": ["bota", "S3", "metal free", "seguridad"]
+  },
+  {
+    "sku": "707006",
+    "name": "FORCE - Zapato de seguridad S3",
+    "description": "Zapato de seguridad en piel flor con tratamiento hidrofugado. Ofrece protección robusta en entornos húmedos con nivel SRC.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707006.jpg",
+    "imageUrls": ["/images/products/calzado/707006.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S3", "SRC"],
+      "materiales": ["Piel Flor Hidrofugada"],
+      "tallas": ["35 a 48"],
+      "niveles_proteccion": {
+        "resistencia_agua": "Hidrófugo",
+        "puntera": "Composite",
+        "plantilla": "Textil"
+      }
+    },
+    "isActive": true,
+    "tags": ["piel flor", "hidrófugo", "S3", "industrial"]
+  },
+  {
+    "sku": "707002",
+    "name": "BRISK - Zapato de seguridad S1P",
+    "description": "Zapato de alta durabilidad frente a esfuerzos mecánicos. Confeccionado en textil Canvas reforzado con piel serraje.",
+    "price": 0.00,
+    "stock": 100,
+    "category": "Calzado Seguridad",
+    "subcategory": "Zapatos",
+    "brand": "VPRO",
+    "imageUrl": "/images/products/calzado/707002.jpg",
+    "imageUrls": ["/images/products/calzado/707002.jpg"],
+    "specifications": {
+      "normativas": ["EN ISO 20345 S1P", "SRC"],
+      "materiales": ["Textil Canvas", "Piel Serraje"],
+      "tallas": ["35 a 48"],
+      "detalles_tecnicos": {
+        "puntera": "Composite",
+        "plantilla": "Textil antiperforación",
         "metal_free": true
-      },
-      "detalles_tecnicos": {
-        "puntera": "Composite (No metálica)",
-        "plantilla": "Textil Antiperforación",
-        "suela": "Doble densidad PU/PU"
       }
     },
     "isActive": true,
-    "tags": ["bota", "S3", "composite", "seguridad", "sin metal"]
-  },
-  {
-    "sku": "CH-AV-AM",
-    "name": "Chaleco Alta Visibilidad Amarillo",
-    "description": "Chaleco reflectante homologado Clase 2. Cierre velcro. Bandas reflectantes cosidas.",
-    "price": 3.50,
-    "stock": 2000,
-    "category": "Vestuario",
-    "subcategory": "Alta Visibilidad",
-    "brand": "Protex",
-    "imageUrl": "/images/products/vestuario/chaleco-av-amarillo.jpg",
-    "imageUrls": ["/images/products/vestuario/chaleco-av-amarillo.jpg"],
-    "specifications": {
-      "normativas": ["EN ISO 20471", "Clase 2", "CE"],
-      "materiales": ["100% Poliéster"],
-      "tallas": ["M", "L", "XL", "XXL", "3XL"],
-      "niveles_proteccion": {
-        "clase_visibilidad": "2"
-      }
-    },
-    "isActive": true,
-    "tags": ["chaleco", "alta visibilidad", "amarillo", "reflectante"]
-  },
-  {
-    "sku": "CH-AV-NA",
-    "name": "Chaleco Alta Visibilidad Naranja",
-    "description": "Chaleco reflectante homologado Clase 2. Cierre velcro. Color naranja flúor.",
-    "price": 3.50,
-    "stock": 1500,
-    "category": "Vestuario",
-    "subcategory": "Alta Visibilidad",
-    "brand": "Protex",
-    "imageUrl": "/images/products/vestuario/chaleco-av-naranja.jpg",
-    "imageUrls": ["/images/products/vestuario/chaleco-av-naranja.jpg"],
-    "specifications": {
-      "normativas": ["EN ISO 20471", "Clase 2", "CE"],
-      "materiales": ["100% Poliéster"],
-      "tallas": ["M", "L", "XL", "XXL", "3XL"],
-      "niveles_proteccion": {
-        "clase_visibilidad": "2"
-      }
-    },
-    "isActive": true,
-    "tags": ["chaleco", "alta visibilidad", "naranja", "reflectante"]
-  },
-  {
-    "sku": "PANT-MULTI",
-    "name": "Pantalón Multibolsillos Gris/Negro",
-    "description": "Pantalón de trabajo reforzado. 6 bolsillos. Cintura elástica. Tejido resistente 240g.",
-    "price": 18.90,
-    "stock": 400,
-    "category": "Vestuario",
-    "subcategory": "Ropa Trabajo",
-    "brand": "Protex",
-    "imageUrl": "/images/products/vestuario/pantalon-multi.jpg",
-    "imageUrls": ["/images/products/vestuario/pantalon-multi.jpg"],
-    "specifications": {
-      "normativas": ["EN 13688", "Riesgos Mínimos"],
-      "materiales": ["65% Poliéster", "35% Algodón"],
-      "tallas": ["38", "40", "42", "44", "46", "48", "50", "52", "54", "56"],
-      "detalles_tecnicos": {
-        "gramaje": "240 g/m2",
-        "bolsillos": 6,
-        "refuerzos": "Rodillas y culera"
-      }
-    },
-    "isActive": true,
-    "tags": ["pantalon", "trabajo", "multibolsillos", "gris"]
-  },
-  {
-    "sku": "350-LATEX",
-    "name": "Guante Látex Rugoso Verde",
-    "description": "Guante soporte algodón/poliéster con recubrimiento látex rugoso verde en palma. Excelente agarre.",
-    "price": 1.95,
-    "stock": 600,
-    "category": "Protección Manos",
-    "subcategory": "Riesgos Mecánicos",
-    "brand": "Protex",
-    "imageUrl": "/images/products/proteccion-manos/350-latex.jpg",
-    "imageUrls": ["/images/products/proteccion-manos/350-latex.jpg"],
-    "specifications": {
-      "normativas": ["EN 388", "EN 420", "Cat II"],
-      "materiales": ["Algodón/Poliéster", "Látex Rugoso"],
-      "tallas": ["8", "9", "10"],
-      "niveles_proteccion": {
-        "abrasion": 2,
-        "corte": 1,
-        "desgarro": 4,
-        "puncion": 1,
-        "cutTDM": "X"
-      },
-      "uso_recomendado": ["Construcción", "Manipulación de vidrio", "Recogida de residuos", "Jardinería"]
-    },
-    "isActive": true,
-    "tags": ["latex", "verde", "agarre", "construccion"]
+    "tags": ["canvas", "serraje", "S1P", "duradero"]
   }
 ]
