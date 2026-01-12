@@ -49,14 +49,6 @@
     color: white;
 }
 
-.admin-sidebar-label {
-    white-space: nowrap;
-    opacity: 1;
-    transition: opacity 0.2s ease-in-out;
-    transition-delay: 0.1s;
-    /* Delay text appearance slightly so container widens first */
-}
-
 .admin-sidebar-nav {
     flex: 1;
     padding: 0 1rem;
@@ -89,7 +81,6 @@
     /* gray-700 */
     color: white;
     transform: translateX(4px);
-    text-decoration: none;
 }
 
 .admin-nav-item.active {
@@ -137,7 +128,6 @@
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
     /* Subtle glow for uniqueness */
     transform: translateY(-1px);
-    text-decoration: none;
 }
 
 .admin-exit-btn.primary {
@@ -155,15 +145,6 @@
     border-color: #dc2626;
     box-shadow: 0 0 15px rgba(220, 38, 38, 0.3);
     /* Red glow */
-    text-decoration: none;
-}
-
-/* NEW: Style for the icon wrapper to replace inline styles */
-.admin-btn-icon {
-    margin-right: 0.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 /* Main Content Area */
@@ -397,22 +378,11 @@
 
     .admin-sidebar.collapsed .admin-sidebar-brand,
     .admin-sidebar.collapsed .admin-sidebar-label {
-        opacity: 0;
-        width: 0;
-        overflow: hidden;
-        margin-left: 0 !important;
-        /* prevent margin from keeping space */
+        display: none;
     }
 
     .admin-sidebar.collapsed .admin-sidebar-header {
         padding: 1.5rem 0.5rem;
-    }
-
-    .admin-sidebar.collapsed .admin-sidebar-footer {
-        padding: 1.5rem 0.5rem;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
     }
 
     .admin-sidebar.collapsed .admin-sidebar-logo {
@@ -420,23 +390,20 @@
         height: auto;
     }
 
-    .admin-sidebar.collapsed .admin-nav-item {
-        justify-content: center;
-        padding: 0.75rem;
-    }
-
+    .admin-sidebar.collapsed .admin-nav-item,
     .admin-sidebar.collapsed .admin-exit-btn,
     .admin-sidebar.collapsed .admin-sidebar-toggle-btn {
         justify-content: center;
         padding: 0;
         width: 3rem;
         height: 3rem;
-        /* Square shape */
+        margin: 0.25rem auto;
+        border-radius: 0.5rem;
     }
 
     .admin-sidebar.collapsed .admin-nav-icon {
         margin-right: 0;
-        font-size: 1.5rem;
+        /* Ensure specific size for icons if needed, though usually font-size handles it */
     }
 
     .admin-sidebar.collapsed .admin-btn-icon {

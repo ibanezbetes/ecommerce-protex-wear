@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { uploadData } from 'aws-amplify/storage';
+import { productOperations } from '../../services/graphql';
 import type { Product } from '../../services/graphql';
-
-/**
- * Product Form Component for Admin
- * Handles creation and editing of products
- */
+import S3Image from './S3Image';
+import {
+  Save, X, Upload, Plus, Trash2, Image as ImageIcon,
+  Tag, Box, Layers, DollarSign, FileText, Package
+} from 'lucide-react';
+import '../../styles/AdminProductForm.css';
 
 interface ProductFormProps {
   product?: Product | null;
@@ -12,592 +16,630 @@ interface ProductFormProps {
   onCancel: () => void;
 }
 
-interface ProductFormData {
-  sku: string;
-  name: string;
-  description: string;
-  price: number;
-  stock: number;
-  category: string;
-  subcategory: string;
-  brand: string;
-  imageUrl: string;
-  imageUrls: string[];
-  specifications: Record<string, any>;
-  isActive: boolean;
-  weight: number;
-  dimensions: {
-    length: number;
-    width: number;
-    height: number;
-    unit: string;
-  };
-  tags: string[];
+interface DimensionState {
+  length: string;
+  width: string;
+  height: string;
+  unit: string;
 }
 
-function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
-  const [formData, setFormData] = useState<ProductFormData>({
-    sku: '',
-    name: '',
-    description: '',
+interface SpecificationItem {
+  key: string;
+  value: string;
+}
+
+export default function ProductForm({ product, onSubmit, onCancel }: ProductFormProps) {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Core Data
+  const [formData, setFormData] = useState<any>({
+    name: "",
+    sku: "",
     price: 0,
     stock: 0,
-    category: '',
-    subcategory: '',
-    brand: '',
-    imageUrl: '',
-    imageUrls: [],
-    specifications: {},
+    description: "",
+    category: "",
+    subcategory: "",
+    brand: "",
     isActive: true,
+    imageUrl: "",
+    imageUrls: [],
     weight: 0,
-    dimensions: {
-      length: 0,
-      width: 0,
-      height: 0,
-      unit: 'cm',
-    },
-    tags: [],
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [newTag, setNewTag] = useState('');
-  const [newImageUrl, setNewImageUrl] = useState('');
-  const [newSpecKey, setNewSpecKey] = useState('');
-  const [newSpecValue, setNewSpecValue] = useState('');
+  // Complex States
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [specs, setSpecs] = useState<SpecificationItem[]>([]);
+  const [dimensions, setDimensions] = useState<DimensionState>({
+    length: "", width: "", height: "", unit: "cm"
+  });
 
-  // Categories for dropdown
-  const categories = [
-    'Protección Cabeza',
-    'Protección Manos',
-    'Protección Pies',
-    'Protección Respiratoria',
-    'Alta Visibilidad',
-    'Ropa de Trabajo',
-    'Protección Auditiva',
-    'Protección Ocular',
-    'Equipos de Altura',
-    'Señalización',
-  ];
-
-  // Load product data if editing
+  // Load existing product data
   useEffect(() => {
     if (product) {
       setFormData({
-        sku: product.sku,
         name: product.name,
-        description: product.description || '',
+        sku: product.sku,
         price: product.price,
         stock: product.stock,
-        category: product.category || '',
-        subcategory: product.subcategory || '',
-        brand: product.brand || '',
-        imageUrl: product.imageUrl || '',
-        imageUrls: product.imageUrls || [],
-        specifications: (product.specifications as Record<string, any>) || {},
+        description: product.description || "",
+        category: product.category || "",
+        subcategory: product.subcategory || "",
+        brand: product.brand || "",
         isActive: product.isActive,
+        imageUrl: product.imageUrl || "",
+        imageUrls: product.imageUrls || [],
         weight: product.weight || 0,
-        dimensions: (product.dimensions as any) || {
-          length: 0,
-          width: 0,
-          height: 0,
-          unit: 'cm',
-        },
-        tags: product.tags || [],
       });
+
+      if (product.tags) setTags(product.tags.filter(t => t !== null) as string[]);
+
+      // Parse Specs
+      if (product.specifications) {
+        try {
+          const parsedSpecs = typeof product.specifications === 'string'
+            ? JSON.parse(product.specifications)
+            : product.specifications;
+          const specArray = Object.entries(parsedSpecs).map(([key, value]) => ({
+            key,
+            value: typeof value === 'object' && value !== null
+              ? JSON.stringify(value)
+              : String(value)
+          }));
+          setSpecs(specArray);
+        } catch (e) {
+          console.warn("Failed to parse specifications", e);
+        }
+      }
+
+      // Parse Dimensions
+      if (product.dimensions) {
+        try {
+          const parsedDims = typeof product.dimensions === 'string'
+            ? JSON.parse(product.dimensions)
+            : product.dimensions;
+          setDimensions({
+            length: parsedDims.length || "",
+            width: parsedDims.width || "",
+            height: parsedDims.height || "",
+            unit: parsedDims.unit || "cm"
+          });
+        } catch (e) {
+          console.warn("Failed to parse dimensions", e);
+        }
+      }
     }
   }, [product]);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  // Handlers
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    
-    if (type === 'checkbox') {
-      const checked = (e.target as HTMLInputElement).checked;
-      setFormData(prev => ({ ...prev, [name]: checked }));
-    } else if (type === 'number') {
-      setFormData(prev => ({ ...prev, [name]: parseFloat(value) || 0 }));
-    } else {
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
-  };
-
-  const handleDimensionChange = (field: string, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
-      dimensions: {
-        ...prev.dimensions,
-        [field]: field === 'unit' ? value : parseFloat(value) || 0,
-      },
+      [name]: type === 'number' ? (value === '' ? 0 : parseFloat(value)) : value
     }));
   };
 
-  const handleAddTag = () => {
-    if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, newTag.trim()],
-      }));
-      setNewTag('');
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, checked } = e.target;
+    setFormData((prev: any) => ({ ...prev, [name]: checked }));
+  };
+
+  // Tag Handling
+  const handleAddTag = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault();
+      if (!tags.includes(tagInput.trim())) {
+        setTags([...tags, tagInput.trim()]);
+      }
+      setTagInput("");
     }
   };
 
-  const handleRemoveTag = (tagToRemove: string) => {
-    setFormData(prev => ({
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
+
+  // Specs Handling
+  const addSpec = () => setSpecs([...specs, { key: "", value: "" }]);
+  const removeSpec = (index: number) => setSpecs(specs.filter((_, i) => i !== index));
+  const updateSpec = (index: number, field: 'key' | 'value', value: string) => {
+    const newSpecs = [...specs];
+    newSpecs[index][field] = value;
+    setSpecs(newSpecs);
+  };
+
+  // Dimensions Handling
+  const handleDimensionChange = (field: keyof DimensionState, value: string) => {
+    setDimensions(prev => ({ ...prev, [field]: value }));
+  };
+
+  // Image Upload Logic
+  const handleMainImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      await uploadFile(e.target.files[0], 'main');
+    }
+  };
+
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setUploading(true);
+      const files = Array.from(e.target.files);
+      for (const file of files) {
+        await uploadFile(file, 'gallery');
+      }
+      setUploading(false);
+    }
+  };
+
+  const uploadFile = async (file: File, type: 'main' | 'gallery') => {
+    try {
+      setUploading(true);
+      const cleanFileName = file.name.replace(/[^a-zA-Z0-9.]/g, '_');
+      const path = `product-images/${Date.now()}-${cleanFileName}`;
+
+      await uploadData({
+        path,
+        data: file,
+      }).result;
+
+      if (type === 'main') {
+        setFormData((prev: any) => ({ ...prev, imageUrl: path }));
+      } else {
+        setFormData((prev: any) => ({
+          ...prev,
+          imageUrls: [...(prev.imageUrls || []), path]
+        }));
+      }
+    } catch (error) {
+      console.error("Upload failed", error);
+      alert("Upload failed. Please try again.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setFormData((prev: any) => ({
       ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove),
+      imageUrls: prev.imageUrls?.filter((_: any, i: number) => i !== index)
     }));
   };
 
-  const handleAddImageUrl = () => {
-    if (newImageUrl.trim() && !formData.imageUrls.includes(newImageUrl.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        imageUrls: [...prev.imageUrls, newImageUrl.trim()],
-      }));
-      setNewImageUrl('');
-    }
-  };
-
-  const handleRemoveImageUrl = (urlToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      imageUrls: prev.imageUrls.filter(url => url !== urlToRemove),
-    }));
-  };
-
-  const handleAddSpecification = () => {
-    if (newSpecKey.trim() && newSpecValue.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        specifications: {
-          ...prev.specifications,
-          [newSpecKey.trim()]: newSpecValue.trim(),
-        },
-      }));
-      setNewSpecKey('');
-      setNewSpecValue('');
-    }
-  };
-
-  const handleRemoveSpecification = (keyToRemove: string) => {
-    setFormData(prev => ({
-      ...prev,
-      specifications: Object.fromEntries(
-        Object.entries(prev.specifications).filter(([key]) => key !== keyToRemove)
-      ),
-    }));
-  };
-
-  const validateForm = (): boolean => {
-    const newErrors: Record<string, string> = {};
-
-    if (!formData.sku.trim()) {
-      newErrors.sku = 'El SKU es obligatorio';
-    }
-
-    if (!formData.name.trim()) {
-      newErrors.name = 'El nombre es obligatorio';
-    }
-
-    if (formData.price <= 0) {
-      newErrors.price = 'El precio debe ser mayor que 0';
-    }
-
-    if (formData.stock < 0) {
-      newErrors.stock = 'El stock no puede ser negativo';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
+  // Submit Logic
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setLoading(true);
 
-    if (!validateForm()) {
-      return;
-    }
+    // Prepare JSON fields
+    const specificationsJSON = JSON.stringify(
+      specs.reduce((acc, curr) => {
+        if (curr.key.trim()) acc[curr.key.trim()] = curr.value;
+        return acc;
+      }, {} as Record<string, string>)
+    );
+
+    const dimensionsJSON = JSON.stringify(dimensions);
 
     try {
-      setIsSubmitting(true);
-      await onSubmit(formData);
-    } catch (error) {
-      console.error('Error submitting form:', error);
+      const productData: any = {
+        name: formData.name!,
+        sku: formData.sku!,
+        price: Number(formData.price),
+        stock: Number(formData.stock),
+        description: formData.description,
+        category: formData.category?.trim() || null,
+        subcategory: formData.subcategory?.trim() || null,
+        brand: formData.brand?.trim() || null,
+        isActive: formData.isActive,
+        imageUrl: formData.imageUrl,
+        imageUrls: formData.imageUrls,
+        weight: Number(formData.weight),
+        tags: tags,
+        specifications: specificationsJSON,
+        dimensions: dimensionsJSON,
+      };
+
+      await onSubmit(productData);
+    } catch (error: any) {
+      console.error("Error saving product:", error);
+      alert("Error al guardar el producto");
     } finally {
-      setIsSubmitting(false);
+      setLoading(false);
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border p-6">
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Basic Information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              SKU *
-            </label>
-            <input
-              type="text"
-              name="sku"
-              value={formData.sku}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.sku ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder="EPP-001"
-            />
-            {errors.sku && <p className="mt-1 text-sm text-red-600">{errors.sku}</p>}
+    <form onSubmit={handleSubmit} className="product-form-container">
+      {/* Premium Header */}
+      <div className="product-form-header">
+        <div className="flex items-center gap-4">
+          <div className="product-form-header-icon">
+            <Package size={24} strokeWidth={1.5} />
           </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Nombre *
-            </label>
-            <input
-              type="text"
-              name="name"
-              value={formData.name}
-              onChange={handleInputChange}
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.name ? 'border-red-300' : 'border-gray-300'
-              }`}
-              placeholder="Casco de Seguridad Industrial"
-            />
-            {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name}</p>}
+          <div className="product-form-header-title">
+            <h1>{product ? 'Editar Producto' : 'Nuevo Producto'}</h1>
+            <p>Gestiona el inventario y catálogo</p>
           </div>
         </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Descripción
-          </label>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="Descripción detallada del producto..."
-          />
-        </div>
-
-        {/* Price and Stock */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Precio (€) *
-            </label>
-            <input
-              type="number"
-              name="price"
-              value={formData.price}
-              onChange={handleInputChange}
-              min="0"
-              step="0.01"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.price ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
-            {errors.price && <p className="mt-1 text-sm text-red-600">{errors.price}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Stock *
-            </label>
-            <input
-              type="number"
-              name="stock"
-              value={formData.stock}
-              onChange={handleInputChange}
-              min="0"
-              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent ${
-                errors.stock ? 'border-red-300' : 'border-gray-300'
-              }`}
-            />
-            {errors.stock && <p className="mt-1 text-sm text-red-600">{errors.stock}</p>}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Peso (kg)
-            </label>
-            <input
-              type="number"
-              name="weight"
-              value={formData.weight}
-              onChange={handleInputChange}
-              min="0"
-              step="0.01"
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-          </div>
-        </div>
-
-        {/* Category and Brand */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Categoría
-            </label>
-            <select
-              name="category"
-              value={formData.category}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="">Seleccionar categoría</option>
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Subcategoría
-            </label>
-            <input
-              type="text"
-              name="subcategory"
-              value={formData.subcategory}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Cascos, Guantes, etc."
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Marca
-            </label>
-            <input
-              type="text"
-              name="brand"
-              value={formData.brand}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="3M, Honeywell, etc."
-            />
-          </div>
-        </div>
-
-        {/* Main Image */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL de Imagen Principal
-          </label>
-          <input
-            type="url"
-            name="imageUrl"
-            value={formData.imageUrl}
-            onChange={handleInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="https://ejemplo.com/imagen.jpg"
-          />
-        </div>
-
-        {/* Additional Images */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Imágenes Adicionales
-          </label>
-          <div className="flex space-x-2 mb-2">
-            <input
-              type="url"
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="URL de imagen adicional"
-            />
-            <button
-              type="button"
-              onClick={handleAddImageUrl}
-              className="btn btn-outline"
-            >
-              Añadir
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.imageUrls.map((url, index) => (
-              <div key={index} className="flex items-center bg-gray-100 rounded px-2 py-1 text-sm">
-                <span className="truncate max-w-32">{url}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveImageUrl(url)}
-                  className="ml-2 text-red-600 hover:text-red-800"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Dimensions */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Dimensiones
-          </label>
-          <div className="grid grid-cols-4 gap-2">
-            <input
-              type="number"
-              value={formData.dimensions.length}
-              onChange={(e) => handleDimensionChange('length', e.target.value)}
-              placeholder="Largo"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <input
-              type="number"
-              value={formData.dimensions.width}
-              onChange={(e) => handleDimensionChange('width', e.target.value)}
-              placeholder="Ancho"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <input
-              type="number"
-              value={formData.dimensions.height}
-              onChange={(e) => handleDimensionChange('height', e.target.value)}
-              placeholder="Alto"
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
-            <select
-              value={formData.dimensions.unit}
-              onChange={(e) => handleDimensionChange('unit', e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            >
-              <option value="cm">cm</option>
-              <option value="mm">mm</option>
-              <option value="in">in</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Etiquetas
-          </label>
-          <div className="flex space-x-2 mb-2">
-            <input
-              type="text"
-              value={newTag}
-              onChange={(e) => setNewTag(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Nueva etiqueta"
-              onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTag())}
-            />
-            <button
-              type="button"
-              onClick={handleAddTag}
-              className="btn btn-outline"
-            >
-              Añadir
-            </button>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            {formData.tags.map((tag, index) => (
-              <div key={index} className="flex items-center bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm">
-                <span>{tag}</span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveTag(tag)}
-                  className="ml-2 text-blue-600 hover:text-blue-800"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Specifications */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            Especificaciones Técnicas
-          </label>
-          <div className="flex space-x-2 mb-2">
-            <input
-              type="text"
-              value={newSpecKey}
-              onChange={(e) => setNewSpecKey(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Clave (ej: Material)"
-            />
-            <input
-              type="text"
-              value={newSpecValue}
-              onChange={(e) => setNewSpecValue(e.target.value)}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-              placeholder="Valor (ej: ABS)"
-            />
-            <button
-              type="button"
-              onClick={handleAddSpecification}
-              className="btn btn-outline"
-            >
-              Añadir
-            </button>
-          </div>
-          <div className="space-y-2">
-            {Object.entries(formData.specifications).map(([key, value]) => (
-              <div key={key} className="flex items-center justify-between bg-gray-50 rounded px-3 py-2">
-                <span className="text-sm">
-                  <strong>{key}:</strong> {value}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleRemoveSpecification(key)}
-                  className="text-red-600 hover:text-red-800"
-                >
-                  ×
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Status */}
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              name="isActive"
-              checked={formData.isActive}
-              onChange={handleInputChange}
-              className="mr-2"
-            />
-            <span className="text-sm font-medium text-gray-700">Producto activo</span>
-          </label>
-        </div>
-
-        {/* Form Actions */}
-        <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
+        <div className="flex gap-3 w-full lg:w-auto">
           <button
             type="button"
             onClick={onCancel}
-            className="btn btn-outline"
+            className="product-form-btn product-form-btn--secondary"
           >
+            <X size={18} />
             Cancelar
           </button>
           <button
             type="submit"
-            disabled={isSubmitting}
-            className="btn btn-primary disabled:opacity-50"
+            disabled={loading || uploading}
+            className="product-form-btn product-form-btn--primary"
           >
-            {isSubmitting ? 'Guardando...' : product ? 'Actualizar Producto' : 'Crear Producto'}
+            {loading ? (
+              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            ) : (
+              <Save size={18} />
+            )}
+            {loading ? 'Guardando...' : 'Guardar Cambios'}
           </button>
         </div>
-      </form>
-    </div>
+      </div>
+
+      <div className="product-form-grid">
+        {/* BIG Column (Main Info) */}
+        <div className="product-form-col-main">
+
+          {/* Basic Info Card */}
+          <div className="product-form-card">
+            <div className="product-form-card-header">
+              <FileText size={20} className="product-form-card-icon" />
+              <h3 className="product-form-card-title">Información Básica</h3>
+            </div>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Nombre del Producto</label>
+              <input
+                type="text"
+                name="name"
+                required
+                value={formData.name}
+                onChange={handleChange}
+                placeholder="Ej. Casco de Seguridad Industrial Pro-X"
+                className="product-form-input"
+              />
+            </div>
+
+            <div className="product-form-row">
+              <div className="product-form-group">
+                <label className="product-form-label">SKU (Código)</label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-gray-400 font-mono text-sm">#</span>
+                  <input
+                    type="text"
+                    name="sku"
+                    required
+                    value={formData.sku}
+                    onChange={handleChange}
+                    placeholder="PRO-001"
+                    className="product-form-input"
+                    style={{ paddingLeft: '2rem', fontFamily: 'monospace' }}
+                  />
+                </div>
+              </div>
+              <div className="product-form-group">
+                <label className="product-form-label">Marca</label>
+                <input
+                  type="text"
+                  name="brand"
+                  value={formData.brand || ""}
+                  onChange={handleChange}
+                  placeholder="Ej. ProTex"
+                  className="product-form-input"
+                />
+              </div>
+            </div>
+
+            <div className="product-form-group" style={{ marginBottom: 0 }}>
+              <label className="product-form-label">Descripción</label>
+              <textarea
+                name="description"
+                value={formData.description || ""}
+                onChange={handleChange}
+                placeholder="Describe las características principales..."
+                className="product-form-input product-form-textarea"
+              />
+            </div>
+          </div>
+
+          {/* Specs Card */}
+          <div className="product-form-card">
+            <div className="product-form-card-header">
+              <Layers size={20} className="product-form-card-icon" />
+              <h3 className="product-form-card-title">Especificaciones Técnicas</h3>
+            </div>
+
+            {/* List of Specs */}
+            <div className="product-form-group">
+              <label className="product-form-label">Detalles del Producto</label>
+
+              {specs.length === 0 && (
+                <div className="text-center py-8 text-gray-400 border border-dashed border-gray-200 rounded-xl">
+                  <p className="text-sm">No hay especificaciones añadidas</p>
+                </div>
+              )}
+
+              {specs.map((spec, index) => (
+                <div key={index} className="spec-item">
+                  <input
+                    placeholder="Propiedad (ej. Material)"
+                    value={spec.key}
+                    onChange={(e) => updateSpec(index, 'key', e.target.value)}
+                    className="product-form-input bg-transparent border-0 p-0 text-sm focus:ring-0 shadow-none"
+                    style={{ flex: 1 }}
+                  />
+                  <div className="hidden sm:block w-px h-4 bg-gray-200 mx-2"></div>
+                  <input
+                    placeholder="Valor (ej. Acero)"
+                    value={spec.value}
+                    onChange={(e) => updateSpec(index, 'value', e.target.value)}
+                    className="product-form-input bg-transparent border-0 p-0 text-sm focus:ring-0 shadow-none"
+                    style={{ flex: 1 }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeSpec(index)}
+                    className="p-2 text-gray-400 hover:text-red-500 rounded-md transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ))}
+
+              <button type="button" onClick={addSpec} className="spec-btn-add">
+                <Plus size={16} />
+                Añadir Característica
+              </button>
+            </div>
+
+            {/* Dimensions */}
+            <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid #F3F4F6' }}>
+              <label className="product-form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Box size={14} /> Dimensiones de Envío
+              </label>
+              <div className="product-form-row-4">
+                {['length', 'width', 'height'].map((dim) => (
+                  <div key={dim}>
+                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">
+                      {dim === 'length' ? 'Largo' : dim === 'width' ? 'Ancho' : 'Alto'}
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={dimensions[dim as keyof DimensionState]}
+                        onChange={(e) => handleDimensionChange(dim as keyof DimensionState, e.target.value)}
+                        className="product-form-input"
+                        placeholder="0"
+                      />
+                      <span className="absolute right-2 top-2.5 text-xs text-gray-400">{dimensions.unit}</span>
+                    </div>
+                  </div>
+                ))}
+                <div>
+                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Peso</label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      step="0.01"
+                      name="weight"
+                      value={formData.weight || ""}
+                      onChange={handleChange}
+                      className="product-form-input"
+                      placeholder="0.0"
+                    />
+                    <span className="absolute right-2 top-2.5 text-xs text-gray-400">kg</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar Column */}
+        <div className="product-form-col-sidebar">
+
+          {/* Status & Category */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Organización</h3>
+
+            <div className="status-toggle">
+              <div>
+                <span className="text-sm font-bold text-gray-800 block">Estado</span>
+                <span className={`text-xs font-bold uppercase mt-1 block ${formData.isActive ? 'text-green-600' : 'text-gray-400'}`}>
+                  {formData.isActive ? 'Activo' : 'Borrador'}
+                </span>
+              </div>
+              <div
+                className="toggle-switch"
+                data-active={formData.isActive}
+                onClick={() => setFormData((prev: any) => ({ ...prev, isActive: !prev.isActive }))}
+              >
+                <div className="toggle-knob"></div>
+              </div>
+            </div>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Categoría</label>
+              <input
+                type="text"
+                name="category"
+                value={formData.category || ""}
+                onChange={handleChange}
+                className="product-form-input"
+              />
+            </div>
+            <div className="product-form-group">
+              <label className="product-form-label">Subcategoría</label>
+              <input
+                type="text"
+                name="subcategory"
+                value={formData.subcategory || ""}
+                onChange={handleChange}
+                className="product-form-input"
+              />
+            </div>
+
+            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #F3F4F6' }}>
+              <label className="product-form-label flex items-center gap-1">
+                <Tag size={12} /> Etiquetas
+              </label>
+              <div className="tags-container">
+                {tags.map((tag, i) => (
+                  <span key={i} className="tag-badge">
+                    {tag}
+                    <button type="button" onClick={() => removeTag(tag)} className="cursor-pointer hover:text-red-500" style={{ border: 'none', background: 'none', padding: 0, display: 'flex' }}>
+                      <X size={12} />
+                    </button>
+                  </span>
+                ))}
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  placeholder="Escribir..."
+                  className="tags-input"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Inventario</h3>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Precio</label>
+              <div className="relative">
+                <span className="absolute left-3 top-3 text-gray-500 font-bold">€</span>
+                <input
+                  type="number"
+                  name="price"
+                  min="0"
+                  step="0.01"
+                  required
+                  value={formData.price}
+                  onChange={handleChange}
+                  className="product-form-input"
+                  style={{ paddingLeft: '2rem', fontSize: '1.25rem', fontWeight: 700 }}
+                />
+              </div>
+            </div>
+
+            <div className="product-form-group" style={{ marginBottom: 0 }}>
+              <label className="product-form-label">Stock</label>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <input
+                  type="number"
+                  name="stock"
+                  min="0"
+                  required
+                  value={formData.stock}
+                  onChange={handleChange}
+                  className="product-form-input"
+                  style={{ width: '80px', textAlign: 'center' }}
+                />
+                <span className="text-xs text-gray-500 font-medium">unidades disponibles</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Media */}
+          <div className="product-form-card">
+            <h3 className="product-form-label" style={{ marginBottom: '1rem', borderBottom: '1px solid #F3F4F6', paddingBottom: '0.5rem' }}>Galería</h3>
+
+            <div className="product-form-group">
+              <label className="product-form-label">Imagen Principal</label>
+              <div
+                className={`image-upload-area ${formData.imageUrl ? 'has-image' : ''}`}
+                onClick={() => document.getElementById('main-image')?.click()}
+              >
+                {formData.imageUrl ? (
+                  <>
+                    <S3Image
+                      s3Key={formData.imageUrl}
+                      alt="Main"
+                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="bg-white/90 text-gray-900 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1">
+                        <Upload size={12} /> Cambiar
+                      </span>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="p-3 bg-white text-gray-400 rounded-full mb-2 shadow-sm border border-gray-100">
+                      <ImageIcon size={20} />
+                    </div>
+                    <span className="text-xs font-bold text-gray-600">Subir Portada</span>
+                  </>
+                )}
+                <input type="file" accept="image/*" id="main-image" onChange={handleMainImageUpload} className="hidden" />
+              </div>
+            </div>
+
+            <div>
+              <label className="product-form-label">Adicionales ({formData.imageUrls?.length || 0})</label>
+              <div className="gallery-grid">
+                {formData.imageUrls?.map((url: string, i: number) => (
+                  <div key={i} className="gallery-item group">
+                    <S3Image
+                      s3Key={url}
+                      alt={`Gallery ${i}`}
+                      className="w-full h-full object-cover"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeGalleryImage(i)}
+                      className="absolute top-0 right-0 p-1 bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer border-none"
+                    >
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+
+                <label htmlFor="gallery-input" className="gallery-add-btn" title="Añadir más">
+                  <Plus size={20} />
+                </label>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                id="gallery-input"
+                onChange={handleGalleryUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-card">
+            <div className="w-8 h-8 border-4 border-gray-200 border-t-gray-900 rounded-full animate-spin mx-auto mb-3"></div>
+            <p className="text-sm font-bold text-gray-900">Procesando...</p>
+          </div>
+        </div>
+      )}
+    </form>
   );
 }
-
-export default ProductForm;
