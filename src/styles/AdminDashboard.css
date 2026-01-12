@@ -22,7 +22,9 @@
     height: 100vh;
     left: 0;
     top: 0;
-    z-index: 50;
+    top: 0;
+    z-index: 500;
+    /* High priority to cover content */
     transition: transform 0.3s ease-in-out;
     box-shadow: 4px 0 10px rgba(0, 0, 0, 0.1);
 }
@@ -105,9 +107,11 @@
 .admin-exit-btn {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
+    /* Align left for expanded state */
     width: 100%;
-    padding: 0.75rem;
+    padding: 0.75rem 1rem;
+    /* Match nav item padding */
     border-radius: 0.5rem;
     border: 1px solid #374151;
     background-color: transparent;
@@ -126,8 +130,14 @@
     border-color: #6b7280;
     color: white;
     box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-    /* Subtle glow for uniqueness */
     transform: translateY(-1px);
+}
+
+.admin-btn-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.5rem;
 }
 
 .admin-exit-btn.primary {
@@ -159,7 +169,26 @@
 }
 
 .admin-main-content.collapsed {
-    margin-left: 5rem;
+    margin-left: 4.5rem;
+}
+
+/* Overlay for Mobile Sidebar */
+.admin-sidebar-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 400;
+    /* Below sidebar (500) but above everything else */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.admin-sidebar-overlay.visible {
+    opacity: 1;
 }
 
 /* Dashboard Header */
@@ -323,7 +352,7 @@
 }
 
 .admin-link-btn:hover {
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 /* Sidebar Toggle (Desktop) */
@@ -336,7 +365,8 @@
         display: flex;
         align-items: center;
         width: 100%;
-        padding: 0.75rem;
+        padding: 0.75rem 1rem;
+        /* Match nav padding */
         border-radius: 0.5rem;
         border: 1px solid #374151;
         background-color: transparent;
@@ -346,7 +376,8 @@
         transition: all 0.3s ease;
         position: relative;
         z-index: 10;
-        justify-content: center;
+        justify-content: flex-start;
+        /* Align left */
         /* Icons centered in collapsed/expanded by default unless specific alignment requested */
         box-shadow: none;
     }
@@ -373,7 +404,8 @@
 
     /* Collapsed Sidebar Styles */
     .admin-sidebar.collapsed {
-        width: 5rem;
+        width: 4.5rem;
+        /* Adjusted for tighter look */
     }
 
     .admin-sidebar.collapsed .admin-sidebar-brand,
@@ -383,10 +415,22 @@
 
     .admin-sidebar.collapsed .admin-sidebar-header {
         padding: 1.5rem 0.5rem;
+        /* Center content horizontally */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .admin-sidebar.collapsed .admin-sidebar-footer {
+        padding: 1rem 0.5rem;
+        /* Reduced padding to allow buttons to fit and center */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
     }
 
     .admin-sidebar.collapsed .admin-sidebar-logo {
-        width: 2.5rem;
+        width: 2rem;
         height: auto;
     }
 
@@ -401,14 +445,39 @@
         border-radius: 0.5rem;
     }
 
-    .admin-sidebar.collapsed .admin-nav-icon {
-        margin-right: 0;
-        /* Ensure specific size for icons if needed, though usually font-size handles it */
-    }
-
+    .admin-sidebar.collapsed .admin-nav-icon,
     .admin-sidebar.collapsed .admin-btn-icon {
         margin-right: 0;
     }
+
+    /* Adjust main content when collapsed */
+    .admin-main-content.collapsed {
+        margin-left: 4.5rem;
+    }
+}
+
+.admin-toggle-content {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.admin-toggle-content .admin-sidebar-label {
+    margin-left: 0.5rem;
+}
+
+.admin-sidebar-label {
+    white-space: nowrap;
+    /* Prevent text wrapping during transition */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-decoration: none;
+}
+
+.admin-sidebar-label:hover,
+.admin-nav-item:hover .admin-sidebar-label,
+.admin-exit-btn:hover .admin-sidebar-label {
+    text-decoration: none;
 }
 
 /* Mobile Toggle */
@@ -417,7 +486,8 @@
     position: fixed;
     top: 1rem;
     right: 1rem;
-    z-index: 60;
+    z-index: 501;
+    /* Above sidebar */
     background: #1f2937;
     color: white;
     border: none;
@@ -445,9 +515,30 @@
 
     .admin-sidebar.open {
         transform: translateX(0);
+        box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .admin-sidebar-overlay {
+        display: block;
+        /* Only active on mobile logic via JS class toggle or state */
     }
 
     .admin-mobile-toggle {
-        display: block;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 3rem;
+        height: 3rem;
+        top: 0.75rem;
+        left: 1rem;
+        /* Moved to left for better UX */
+        right: auto;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Adjust header to make space for the toggle button */
+    .admin-page-header {
+        margin-top: 3rem;
+        padding-left: 0.5rem;
     }
 }

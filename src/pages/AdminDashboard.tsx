@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { AdminStats } from '../types';
 import ProductManagement from '../components/Admin/ProductManagement';
 import logoWhite from '../assets/logo-w.png';
+import faviconWhite from '../assets/favicon-w.png';
 import '../styles/AdminDashboard.css';
 
 /**
@@ -58,8 +59,20 @@ function AdminDashboard() {
 
   return (
     <div className="admin-dashboard-container">
+      {/* Mobile Sidebar Overlay */}
+      {isSidebarOpen && (
+        <div
+          className="admin-sidebar-overlay visible"
+          onClick={() => setIsSidebarOpen(false)}
+        />
+      )}
       {/* Mobile Toggle */}
-      <button className="admin-mobile-toggle" onClick={toggleSidebar}>
+      {/* Mobile Toggle - always visible on mobile */}
+      <button
+        className="admin-mobile-toggle"
+        onClick={toggleSidebar}
+        aria-label={isSidebarOpen ? "Cerrar menú" : "Abrir menú"}
+      >
         {isSidebarOpen ?
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> :
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
@@ -70,7 +83,11 @@ function AdminDashboard() {
       <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
 
         <div className="admin-sidebar-header">
-          <img src={logoWhite} alt="Protex Wear" className="admin-sidebar-logo" />
+          <img
+            src={isCollapsed ? faviconWhite : logoWhite}
+            alt="Protex Wear"
+            className="admin-sidebar-logo"
+          />
           <span className="admin-sidebar-brand">Admin Panel</span>
         </div>
 
@@ -102,29 +119,29 @@ function AdminDashboard() {
                 <polyline points="6 17 11 12 6 7"></polyline>
               </svg>
             ) : (
-              <div style={{ display: 'flex', alignItems: 'center' }}>
+              <div className="admin-toggle-content">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="11 17 6 12 11 7"></polyline>
                   <polyline points="18 17 13 12 18 7"></polyline>
                 </svg>
-                <span className="admin-sidebar-label" style={{ marginLeft: '0.5rem' }}>Contraer menú</span>
+                <span className="admin-sidebar-label">Contraer menú</span>
               </div>
             )}
           </button>
 
           <Link to="/" className="admin-exit-btn">
-            <span className="admin-btn-icon" style={{ marginRight: '0.5rem' }}>{Icons.BackHome}</span>
+            <span className="admin-btn-icon">{Icons.BackHome}</span>
             <span className="admin-sidebar-label">Volver al Inicio</span>
           </Link>
           <Link to="/productos" className="admin-exit-btn">
-            <span className="admin-btn-icon" style={{ marginRight: '0.5rem' }}>{Icons.Shop}</span>
+            <span className="admin-btn-icon">{Icons.Shop}</span>
             <span className="admin-sidebar-label">Ir a la Tienda</span>
           </Link>
           <button
             onClick={() => { /* Logout logic here if needed */ navigate('/login'); }}
             className="admin-exit-btn primary"
           >
-            <span className="admin-btn-icon" style={{ marginRight: '0.5rem' }}>{Icons.Logout}</span>
+            <span className="admin-btn-icon">{Icons.Logout}</span>
             <span className="admin-sidebar-label">Cerrar Sesión</span>
           </button>
         </div>
