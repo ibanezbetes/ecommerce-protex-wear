@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Order } from '../../services/graphql';
 import { orderOperations } from '../../services/graphql';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import '../../styles/AdminOrders.css';
 
 /**
  * Orders Management Component for Admin Dashboard
@@ -21,30 +22,46 @@ function OrdersManagement() {
 
     async function fetchOrders() {
         try {
-            const { data: items, errors } = await orderOperations.listAllOrders();
+            setLoading(true);
+            let allOrders: any[] = [];
+            let nextToken: string | undefined = undefined;
 
-            if (errors) {
-                const isUnauthorized = errors.some((e: any) => e.message.includes('Unauthorized'));
-                if (isUnauthorized) {
-                    setAccessDenied(true);
-                }
-                console.error('GraphQL errors:', JSON.stringify(errors, null, 2));
-            } else if (items) {
-                // Deduplicate by ID
-                const uniqueMap = new Map();
-                items.forEach((item: any) => {
-                    if (!uniqueMap.has(item.id)) {
-                        uniqueMap.set(item.id, item);
+            // Loop to fetch all pages
+            do {
+                const { data: items, errors, nextToken: newNextToken } = await orderOperations.listAllOrders(undefined, 100, nextToken);
+
+                if (errors) {
+                    const isUnauthorized = errors.some((e: any) => e.message.includes('Unauthorized'));
+                    if (isUnauthorized) {
+                        setAccessDenied(true);
+                        return; // Stop if unauthorized
                     }
-                });
-                const uniqueItems = Array.from(uniqueMap.values()) as Order[];
+                    console.error('GraphQL errors:', JSON.stringify(errors, null, 2));
+                    // Continue fetching if partial data? usually better to break or just log
+                }
 
-                // Sort by date desc
-                const sorted = uniqueItems.sort((a, b) =>
-                    new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
-                );
-                setOrders(sorted);
-            }
+                if (items) {
+                    allOrders = [...allOrders, ...items];
+                }
+
+                nextToken = newNextToken;
+            } while (nextToken);
+
+            // Deduplicate by ID
+            const uniqueMap = new Map();
+            allOrders.forEach((item: any) => {
+                if (!uniqueMap.has(item.id)) {
+                    uniqueMap.set(item.id, item);
+                }
+            });
+            const uniqueItems = Array.from(uniqueMap.values()) as Order[];
+
+            // Sort by date desc
+            const sorted = uniqueItems.sort((a, b) =>
+                new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+            );
+            setOrders(sorted);
+
         } catch (error) {
             console.error('Error fetching orders:', error);
         } finally {
@@ -52,16 +69,16 @@ function OrdersManagement() {
         }
     }
 
-    const getStatusColor = (status: string) => {
+    const getStatusClass = (status: string) => {
         switch (status) {
-            case 'PENDING': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-            case 'CONFIRMED': return 'bg-blue-100 text-blue-800 border-blue-200';
-            case 'PROCESSING': return 'bg-indigo-100 text-indigo-800 border-indigo-200';
-            case 'SHIPPED': return 'bg-purple-100 text-purple-800 border-purple-200';
-            case 'DELIVERED': return 'bg-green-100 text-green-800 border-green-200';
-            case 'CANCELLED': return 'bg-red-100 text-red-800 border-red-200';
-            case 'REFUNDED': return 'bg-gray-100 text-gray-800 border-gray-200';
-            default: return 'bg-gray-100 text-gray-800 border-gray-200';
+            case 'PENDING': return 'status-pending';
+            case 'CONFIRMED': return 'status-confirmed';
+            case 'PROCESSING': return 'status-processing';
+            case 'SHIPPED': return 'status-shipped';
+            case 'DELIVERED': return 'status-delivered';
+            case 'CANCELLED': return 'status-cancelled';
+            case 'REFUNDED': return 'status-refunded';
+            default: return 'status-pending';
         }
     };
 
@@ -87,10 +104,10 @@ function OrdersManagement() {
 
     if (accessDenied) {
         return (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-                <h3 className="text-lg font-semibold text-red-800 mb-2">Acceso Denegado</h3>
-                <p className="text-red-600">Solo los administradores pueden ver los pedidos.</p>
-                <p className="text-sm text-red-500 mt-2">
+            <div style={{ backgroundColor: '#FEF2F2', borderColor: '#FECACA', color: '#991B1B', padding: '1.5rem', borderRadius: '0.5rem', border: '1px solid', textAlign: 'center' }}>
+                <h3 style={{ fontSize: '1.125rem', fontWeight: 600, marginBottom: '0.5rem' }}>Acceso Denegado</h3>
+                <p>Solo los administradores pueden ver los pedidos.</p>
+                <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
                     Por favor, cierra sesión y vuelve a iniciar sesión para actualizar tus permisos.
                 </p>
             </div>
@@ -99,48 +116,52 @@ function OrdersManagement() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-96">
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
                 <LoadingSpinner size="lg" text="Cargando pedidos..." />
             </div>
         );
     }
 
     return (
-        <div>
+        <div className="orders-container">
             {/* Header */}
-            <div className="flex justify-between items-center mb-6">
+            <div className="orders-header">
                 <div>
-                    <h2 className="text-2xl font-bold text-gray-900">Gestión de Pedidos</h2>
-                    <p className="text-sm text-gray-600 font-medium">{filteredOrders.length} pedidos encontrados</p>
+                    <h2 className="orders-title">Gestión de Pedidos</h2>
+                    <p className="orders-subtitle">{filteredOrders.length} pedidos encontrados</p>
                 </div>
+                <button
+                    onClick={fetchOrders}
+                    className="product-form-btn product-form-btn--secondary"
+                    style={{ gap: '0.5rem', display: 'flex', alignItems: 'center' }}
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.5 2v6h-6M21.34 5.5A10 10 0 1 1 11.26 2.8" /></svg>
+                    Actualizar
+                </button>
             </div>
 
             {/* Search and Filters */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="orders-filter-card">
+                <div className="orders-filter-grid">
                     {/* Search */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Buscar
-                        </label>
+                    <div className="orders-form-group">
+                        <label>Buscar</label>
                         <input
                             type="text"
                             placeholder="Buscar por cliente, email o ID..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="orders-input"
                         />
                     </div>
 
                     {/* Status Filter */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Estado
-                        </label>
+                    <div className="orders-form-group">
+                        <label>Estado</label>
                         <select
                             value={statusFilter}
                             onChange={(e) => setStatusFilter(e.target.value)}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                            className="orders-select"
                         >
                             <option value="ALL">Todos</option>
                             <option value="PENDING">Pendiente</option>
@@ -156,71 +177,59 @@ function OrdersManagement() {
             </div>
 
             {/* Orders Table */}
-            <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+            <div className="orders-table-container">
                 {filteredOrders.length === 0 ? (
-                    <div className="p-8 text-center">
-                        <div className="text-gray-400 mb-4">
-                            <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="orders-empty-state">
+                        <div className="orders-empty-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                             </svg>
                         </div>
-                        <h3 className="text-lg font-medium text-gray-900 mb-2">No hay pedidos</h3>
-                        <p className="text-gray-600">
+                        <h3 onClick={() => { }} style={{ fontSize: '1.125rem', fontWeight: 500, color: '#111827', marginBottom: '0.5rem' }}>No hay pedidos</h3>
+                        <p style={{ color: '#4B5563' }}>
                             {searchTerm || statusFilter !== 'ALL'
                                 ? 'No se encontraron pedidos con los filtros aplicados'
                                 : 'Aún no hay pedidos en el sistema'}
                         </p>
                     </div>
                 ) : (
-                    <div className="overflow-x-auto">
-                        <table className="w-full">
-                            <thead className="bg-gray-50">
+                    <div style={{ overflowX: 'auto' }}>
+                        <table className="orders-table">
+                            <thead>
                                 <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        ID Pedido
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Cliente
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Fecha
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Total
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Estado
-                                    </th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                        Acciones
-                                    </th>
+                                    <th>ID Pedido</th>
+                                    <th>Cliente</th>
+                                    <th>Fecha</th>
+                                    <th>Total</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
+                            <tbody>
                                 {filteredOrders.map((order) => (
-                                    <tr key={order.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr key={order.id}>
+                                        <td style={{ fontWeight: 500 }}>
                                             #{order.id.substring(0, 8)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <div className="text-sm font-medium text-gray-900">{order.customerName}</div>
-                                            <div className="text-sm text-gray-500">{order.customerEmail}</div>
+                                        <td>
+                                            <div style={{ fontWeight: 500, color: '#111827' }}>{order.customerName}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#6B7280' }}>{order.customerEmail}</div>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                                        <td>
                                             {new Date(order.orderDate).toLocaleDateString('es-ES')}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
+                                        <td style={{ fontWeight: 600 }}>
                                             €{order.totalAmount.toFixed(2)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(order.status)}`}>
+                                        <td>
+                                            <span className={`status-badge ${getStatusClass(order.status)}`}>
                                                 {order.status}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                        <td>
                                             <Link
                                                 to={`/admin/pedidos/${order.id}`}
-                                                className="text-primary-600 hover:text-primary-900"
+                                                className="orders-action-link"
                                             >
                                                 Ver Detalle
                                             </Link>

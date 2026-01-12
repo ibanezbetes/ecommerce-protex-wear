@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import { AdminStats } from '../types';
 import ProductManagement from '../components/Admin/ProductManagement';
+import OrdersManagement from '../components/Admin/OrdersManagement';
+import OrderDetail from '../components/Admin/OrderDetail';
 import logoWhite from '../assets/logo-w.png';
 import faviconWhite from '../assets/favicon-w.png';
 import '../styles/AdminDashboard.css';
@@ -153,6 +155,7 @@ function AdminDashboard() {
           <Route path="/" element={<DashboardOverview stats={stats} />} />
           <Route path="/productos" element={<ProductManagement />} />
           <Route path="/pedidos" element={<OrdersManagement />} />
+          <Route path="/pedidos/:id" element={<OrderDetail />} />
           <Route path="/usuarios" element={<UsersManagement />} />
           <Route path="/reportes" element={<ReportsView />} />
           <Route path="/configuracion" element={<SettingsView />} />
@@ -276,20 +279,7 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
   );
 }
 
-// Orders Management Component
-function OrdersManagement() {
-  return (
-    <div>
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">Gestión de Pedidos</h1>
-        <p className="admin-page-subtitle">Administra y procesa los pedidos de la tienda</p>
-      </div>
-      <div className="admin-card">
-        <p className="admin-list-subtext">Gestión de pedidos - En desarrollo</p>
-      </div>
-    </div>
-  );
-}
+
 
 // Users Management Component
 function UsersManagement() {

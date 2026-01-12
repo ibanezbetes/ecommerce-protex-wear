@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Order } from '../../services/graphql';
 import { orderOperations } from '../../services/graphql';
 import LoadingSpinner from '../UI/LoadingSpinner';
+import '../../styles/AdminOrders.css';
 
 /**
  * Order Detail Component for Admin Dashboard
@@ -88,30 +89,44 @@ function OrderDetail() {
     const items = order.items ? JSON.parse(order.items as string) : [];
     const shippingAddress = order.shippingAddress ? JSON.parse(order.shippingAddress as string) : {};
 
+    const getStatusClass = (status: string) => {
+        switch (status) {
+            case 'PENDING': return 'status-pending';
+            case 'CONFIRMED': return 'status-confirmed';
+            case 'PROCESSING': return 'status-processing';
+            case 'SHIPPED': return 'status-shipped';
+            case 'DELIVERED': return 'status-delivered';
+            case 'CANCELLED': return 'status-cancelled';
+            case 'REFUNDED': return 'status-refunded';
+            default: return 'status-pending';
+        }
+    };
+
     return (
-        <div className="max-w-4xl mx-auto space-y-6">
+        <div className="orders-container" style={{ maxWidth: '1000px', margin: '0 auto' }}>
             {/* Header */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-6 rounded-lg shadow-sm border">
-                <div className="space-y-1">
+            <div className="order-detail-header-card">
+                <div style={{ flex: 1 }}>
                     <button
                         onClick={() => navigate('/admin/pedidos')}
-                        className="flex items-center gap-1.5 text-gray-500 font-semibold text-sm hover:text-primary-600 mb-2 transition-colors"
+                        className="back-link"
                     >
                         ← Volver a Pedidos
                     </button>
-                    <h2 className="text-2xl font-bold text-gray-900">Pedido #{order.id.substring(0, 12)}...</h2>
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <h2 className="orders-title">Pedido #{order.id.substring(0, 8)}...</h2>
+                    <div className="orders-subtitle">
                         Realizado el {new Date(order.orderDate).toLocaleString('es-ES')}
                     </div>
                 </div>
 
-                <div className="w-full sm:w-auto">
-                    <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase">Estado del Pedido</label>
+                <div style={{ width: '100%', maxWidth: '200px' }}>
+                    <label className="info-label" style={{ marginBottom: '0.5rem', display: 'block' }}>Estado del Pedido</label>
                     <select
                         value={order.status || 'PENDING'}
                         onChange={(e) => updateStatus(e.target.value)}
                         disabled={updating}
-                        className={`block w-full sm:w-48 rounded-lg border shadow-sm focus:ring-2 focus:ring-primary-500 text-sm font-semibold p-2.5 ${getStatusColor(order.status || 'PENDING')}`}
+                        className={`orders-select ${getStatusClass(order.status || 'PENDING')}`}
+                        style={{ fontWeight: 600, padding: '0.5rem' }}
                     >
                         <option value="PENDING">PENDING</option>
                         <option value="CONFIRMED">CONFIRMED</option>
@@ -124,32 +139,30 @@ function OrderDetail() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="order-detail-grid">
                 {/* Customer Details */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Detalles del Cliente</h3>
-                    <div className="space-y-3">
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase">Nombre</p>
-                            <p className="text-sm font-medium text-gray-900">{order.customerName}</p>
-                        </div>
-                        <div>
-                            <p className="text-xs font-semibold text-gray-500 uppercase">Email</p>
-                            <p className="text-sm font-medium text-gray-900">{order.customerEmail}</p>
-                        </div>
-                        {order.customerCompany && (
-                            <div>
-                                <p className="text-xs font-semibold text-gray-500 uppercase">Empresa</p>
-                                <p className="text-sm font-medium text-gray-900">{order.customerCompany}</p>
-                            </div>
-                        )}
+                <div className="detail-card">
+                    <h3 className="detail-card-title">Detalles del Cliente</h3>
+                    <div className="info-group">
+                        <p className="info-label">Nombre</p>
+                        <p className="info-value">{order.customerName}</p>
                     </div>
+                    <div className="info-group">
+                        <p className="info-label">Email</p>
+                        <p className="info-value">{order.customerEmail}</p>
+                    </div>
+                    {order.customerCompany && (
+                        <div className="info-group">
+                            <p className="info-label">Empresa</p>
+                            <p className="info-value">{order.customerCompany}</p>
+                        </div>
+                    )}
                 </div>
 
                 {/* Shipping Address */}
-                <div className="bg-white p-6 rounded-lg shadow-sm border">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Dirección de Envío</h3>
-                    <div className="space-y-1 text-sm text-gray-700">
+                <div className="detail-card">
+                    <h3 className="detail-card-title">Dirección de Envío</h3>
+                    <div className="info-value" style={{ lineHeight: '1.6' }}>
                         <p>{shippingAddress.street}</p>
                         <p>{shippingAddress.city}, {shippingAddress.state}</p>
                         <p>{shippingAddress.postalCode}</p>
@@ -159,27 +172,27 @@ function OrderDetail() {
             </div>
 
             {/* Order Items */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Productos</h3>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead className="bg-gray-50">
+            <div className="detail-card" style={{ marginBottom: '1.5rem' }}>
+                <h3 className="detail-card-title">Productos</h3>
+                <div style={{ overflowX: 'auto' }}>
+                    <table className="orders-table">
+                        <thead>
                             <tr>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">Producto</th>
-                                <th className="px-4 py-2 text-left text-xs font-semibold text-gray-500 uppercase">SKU</th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Cantidad</th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Precio</th>
-                                <th className="px-4 py-2 text-right text-xs font-semibold text-gray-500 uppercase">Total</th>
+                                <th>Producto</th>
+                                <th>SKU</th>
+                                <th style={{ textAlign: 'right' }}>Cantidad</th>
+                                <th style={{ textAlign: 'right' }}>Precio</th>
+                                <th style={{ textAlign: 'right' }}>Total</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-gray-200">
+                        <tbody>
                             {items.map((item: any, index: number) => (
                                 <tr key={index}>
-                                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{item.name}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-600">{item.sku || '-'}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-900 text-right">{item.quantity}</td>
-                                    <td className="px-4 py-3 text-sm text-gray-900 text-right">€{item.price.toFixed(2)}</td>
-                                    <td className="px-4 py-3 text-sm font-semibold text-gray-900 text-right">
+                                    <td style={{ fontWeight: 500 }}>{item.name}</td>
+                                    <td style={{ color: '#6B7280' }}>{item.sku || '-'}</td>
+                                    <td style={{ textAlign: 'right' }}>{item.quantity}</td>
+                                    <td style={{ textAlign: 'right' }}>€{item.price.toFixed(2)}</td>
+                                    <td style={{ textAlign: 'right', fontWeight: 600 }}>
                                         €{(item.quantity * item.price).toFixed(2)}
                                     </td>
                                 </tr>
@@ -189,51 +202,54 @@ function OrderDetail() {
                 </div>
             </div>
 
-            {/* Order Summary */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Resumen del Pedido</h3>
-                <div className="space-y-2">
-                    <div className="flex justify-between text-sm">
-                        <span className="text-gray-600">Subtotal</span>
-                        <span className="font-medium text-gray-900">€{order.subtotal.toFixed(2)}</span>
+            {/* Order Summary & Payment */}
+            <div className="order-detail-grid">
+                {/* Order Summary */}
+                <div className="detail-card">
+                    <h3 className="detail-card-title">Resumen del Pedido</h3>
+
+                    <div className="summary-row">
+                        <span>Subtotal</span>
+                        <span className="summary-value">€{order.subtotal.toFixed(2)}</span>
                     </div>
+
                     {order.taxAmount > 0 && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">IVA</span>
-                            <span className="font-medium text-gray-900">€{order.taxAmount.toFixed(2)}</span>
+                        <div className="summary-row">
+                            <span>IVA</span>
+                            <span className="summary-value">€{order.taxAmount.toFixed(2)}</span>
                         </div>
                     )}
+
                     {order.shippingAmount > 0 && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Envío</span>
-                            <span className="font-medium text-gray-900">€{order.shippingAmount.toFixed(2)}</span>
+                        <div className="summary-row">
+                            <span>Envío</span>
+                            <span className="summary-value">€{order.shippingAmount.toFixed(2)}</span>
                         </div>
                     )}
+
                     {order.discountAmount > 0 && (
-                        <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Descuento</span>
-                            <span className="font-medium text-green-600">-€{order.discountAmount.toFixed(2)}</span>
+                        <div className="summary-row">
+                            <span>Descuento</span>
+                            <span className="summary-value" style={{ color: '#059669' }}>-€{order.discountAmount.toFixed(2)}</span>
                         </div>
                     )}
-                    <div className="border-t border-gray-200 pt-2 flex justify-between">
-                        <span className="text-base font-bold text-gray-900">Total</span>
-                        <span className="text-base font-bold text-gray-900">€{order.totalAmount.toFixed(2)}</span>
+
+                    <div className="summary-row total">
+                        <span>Total</span>
+                        <span>€{order.totalAmount.toFixed(2)}</span>
                     </div>
                 </div>
-            </div>
 
-            {/* Payment Info */}
-            <div className="bg-white p-6 rounded-lg shadow-sm border">
-                <h3 className="text-lg font-bold text-gray-900 mb-4">Información de Pago</h3>
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase">Método de Pago</p>
-                        <p className="text-sm font-medium text-gray-900">{order.paymentMethod || 'No especificado'}</p>
+                {/* Payment Info */}
+                <div className="detail-card">
+                    <h3 className="detail-card-title">Información de Pago</h3>
+                    <div className="info-group">
+                        <p className="info-label">Método de Pago</p>
+                        <p className="info-value">{order.paymentMethod || 'No especificado'}</p>
                     </div>
-                    <div>
-                        <p className="text-xs font-semibold text-gray-500 uppercase">Estado de Pago</p>
-                        <span className={`inline-block px-2 py-1 text-xs font-semibold rounded ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
-                            }`}>
+                    <div className="info-group">
+                        <p className="info-label">Estado de Pago</p>
+                        <span className={`status-badge ${order.paymentStatus === 'PAID' ? 'status-delivered' : 'status-pending'}`}>
                             {order.paymentStatus || 'PENDING'}
                         </span>
                     </div>
