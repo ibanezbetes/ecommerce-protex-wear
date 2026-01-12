@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { uploadData } from 'aws-amplify/storage';
 import { productOperations } from '../../services/graphql';
 import type { Product } from '../../services/graphql';
-import S3Image from './S3Image';
+import S3Image from '../UI/S3Image';
 import {
   Save, X, Upload, Plus, Trash2, Image as ImageIcon,
   Tag, Box, Layers, DollarSign, FileText, Package
