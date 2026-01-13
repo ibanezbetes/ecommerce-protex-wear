@@ -5,6 +5,7 @@ import ProductManagement from '../components/Admin/ProductManagement';
 import OrdersManagement from '../components/Admin/OrdersManagement';
 import OrderDetail from '../components/Admin/OrderDetail';
 import TestingZone from '../components/Admin/TestingZone';
+import ReportsView from '../components/Admin/ReportsView';
 import { orderOperations, productOperations } from '../services/graphql';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import logoWhite from '../assets/logo-w.png';
@@ -359,20 +360,7 @@ function DashboardOverview({ stats, loading, error }: { stats: AdminStats, loadi
 
 
 
-// Reports View Component
-function ReportsView() {
-  return (
-    <div>
-      <div className="admin-page-header">
-        <h1 className="admin-page-title">Reportes</h1>
-        <p className="admin-page-subtitle">Análisis detallado del rendimiento de la tienda</p>
-      </div>
-      <div className="admin-card">
-        <p className="admin-list-subtext">Reportes y analytics - Módulo premium en desarrollo</p>
-      </div>
-    </div>
-  );
-}
+
 
 // Settings View Component
 function SettingsView() {

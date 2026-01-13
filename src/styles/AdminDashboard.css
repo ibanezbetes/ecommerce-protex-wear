@@ -542,3 +542,39 @@
         padding-left: 0.5rem;
     }
 }
+
+/* Action Buttons */
+.admin-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.admin-action-btn.primary {
+    background-color: var(--primary-color, #2563eb);
+    color: white;
+}
+
+.admin-action-btn.primary:hover {
+    background-color: #1d4ed8; /* blue-700 */
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+.admin-action-btn.secondary {
+    background-color: white;
+    border-color: #d1d5db; /* gray-300 */
+    color: #374151; /* gray-700 */
+}
+
+.admin-action-btn.secondary:hover {
+    background-color: #f9fafb; /* gray-50 */
+    border-color: #9ca3af; /* gray-400 */
+    color: #111827; /* gray-900 */
+}
