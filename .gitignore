@@ -46,6 +46,7 @@ jest.config.js
 .kiro/
 .git_local_backup/
 debug-token.js
+debug-scripts/
 
 # OS
 .DS_Store

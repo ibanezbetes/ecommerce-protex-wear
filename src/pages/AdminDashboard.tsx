@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
-import { AdminStats } from '../types';
+import { AdminStats, Order, Product } from '../types';
 import ProductManagement from '../components/Admin/ProductManagement';
 import OrdersManagement from '../components/Admin/OrdersManagement';
 import OrderDetail from '../components/Admin/OrderDetail';
+import { orderOperations, productOperations, userOperations } from '../services/graphql';
+import LoadingSpinner from '../components/UI/LoadingSpinner';
 import logoWhite from '../assets/logo-w.png';
 import faviconWhite from '../assets/favicon-w.png';
 import '../styles/AdminDashboard.css';
@@ -17,15 +19,67 @@ function AdminDashboard() {
   const navigate = useNavigate();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [stats] = useState<AdminStats>({
-    totalOrders: 156,
-    totalRevenue: 12450.75,
-    totalProducts: 89,
-    totalUsers: 234,
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [stats, setStats] = useState<AdminStats>({
+    totalOrders: 0,
+    totalRevenue: 0,
+    totalProducts: 0,
+    totalUsers: 0,
     recentOrders: [],
     topProducts: [],
     salesByMonth: [],
   });
+
+  // Fetch real data on mount
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch products, orders, and users counts
+        const [productsRes, ordersRes, usersRes] = await Promise.all([
+          productOperations.listProducts(undefined, 1000),
+          orderOperations.listAllOrders(undefined, 1000),
+          userOperations.listUsers(undefined, 1000)
+        ]);
+
+        const products = productsRes.data as Product[];
+        const orders = ordersRes.data as Order[];
+        // Users list might need adjustment based on schema/auth
+        const users = usersRes?.data || [];
+
+        // Calculate total revenue from all orders
+        const revenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+
+        // Get 5 most recent orders
+        const recentOrders = [...orders]
+          .sort((a, b) => new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime())
+          .slice(0, 5);
+
+        // Get 5 products as "top" products (for now, eventually use real sales data)
+        const topProducts = products.slice(0, 5);
+
+        setStats({
+          totalOrders: orders.length,
+          totalRevenue: revenue,
+          totalProducts: products.length,
+          totalUsers: users.length,
+          recentOrders: recentOrders as any[], // Casting to match types if needed
+          topProducts: topProducts as any[],
+          salesByMonth: [], // Future: group orders by month
+        });
+      } catch (err: any) {
+        console.error('Error fetching admin stats:', err);
+        setError('No se pudieron cargar las estadísticas reales. Asegúrate de tener permisos de ADMIN.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   // Icons defined as clean SVG components for consistency
   const Icons = {
@@ -69,7 +123,6 @@ function AdminDashboard() {
         />
       )}
       {/* Mobile Toggle */}
-      {/* Mobile Toggle - always visible on mobile */}
       <button
         className="admin-mobile-toggle"
         onClick={toggleSidebar}
@@ -112,10 +165,8 @@ function AdminDashboard() {
 
         {/* Sidebar Footer */}
         <div className="admin-sidebar-footer">
-          {/* Desktop Collapse Toggle */}
           <button className="admin-sidebar-toggle-btn" onClick={toggleCollapse}>
             {isCollapsed ? (
-              // Icon for "Expand" (Sidebar is collapsed)
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="13 17 18 12 13 7"></polyline>
                 <polyline points="6 17 11 12 6 7"></polyline>
@@ -140,7 +191,7 @@ function AdminDashboard() {
             <span className="admin-sidebar-label">Ir a la Tienda</span>
           </Link>
           <button
-            onClick={() => { /* Logout logic here if needed */ navigate('/login'); }}
+            onClick={() => { navigate('/login'); }}
             className="admin-exit-btn primary"
           >
             <span className="admin-btn-icon">{Icons.Logout}</span>
@@ -152,7 +203,7 @@ function AdminDashboard() {
       {/* Main Content */}
       <main className={`admin-main-content ${isCollapsed ? 'collapsed' : ''}`}>
         <Routes>
-          <Route path="/" element={<DashboardOverview stats={stats} />} />
+          <Route path="/" element={<DashboardOverview stats={stats} loading={loading} error={error} />} />
           <Route path="/productos" element={<ProductManagement />} />
           <Route path="/pedidos" element={<OrdersManagement />} />
           <Route path="/pedidos/:id" element={<OrderDetail />} />
@@ -166,13 +217,144 @@ function AdminDashboard() {
 }
 
 // Dashboard Overview Component
-function DashboardOverview({ stats }: { stats: AdminStats }) {
+function DashboardOverview({ stats, loading, error }: { stats: AdminStats, loading: boolean, error: string | null }) {
+  const [creatingOrder, setCreatingOrder] = useState(false);
+  const [orderMessage, setOrderMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const createDemoOrder = async () => {
+    try {
+      setCreatingOrder(true);
+      setOrderMessage(null);
+
+      const testOrder: any = {
+        userId: 'test-user-' + Date.now(),
+        customerEmail: 'daniel.lalanza01@gmail.com',
+        customerName: 'Daniel Lalanza',
+        customerCompany: 'Protex Wear Test',
+
+        items: JSON.stringify([
+          {
+            productId: 'demo-product-1',
+            sku: 'DEMO-001',
+            name: 'Casco de Seguridad Profesional',
+            quantity: 2,
+            price: 45.99
+          },
+          {
+            productId: 'demo-product-2',
+            sku: 'DEMO-002',
+            name: 'Guantes de Protección',
+            quantity: 5,
+            price: 12.50
+          }
+        ]),
+
+        subtotal: 154.48,
+        taxAmount: 32.44,
+        shippingAmount: 8.00,
+        discountAmount: 0,
+        totalAmount: 194.92,
+
+        status: 'PENDING',
+
+        shippingAddress: JSON.stringify({
+          street: 'Calle Mayor 123',
+          city: 'Madrid',
+          state: 'Madrid',
+          postalCode: '28001',
+          country: 'España'
+        }),
+
+        billingAddress: JSON.stringify({
+          street: 'Calle Mayor 123',
+          city: 'Madrid',
+          state: 'Madrid',
+          postalCode: '28001',
+          country: 'España'
+        }),
+
+        shippingMethod: 'Standard',
+        paymentMethod: 'credit_card',
+        paymentStatus: 'PENDING',
+
+        customerNotes: 'Pedido de prueba - Por favor entregar en horario de oficina',
+        adminNotes: 'Pedido de prueba creado automáticamente desde el Admin Panel',
+
+        orderDate: new Date().toISOString()
+      };
+
+      const result = await orderOperations.createOrder(testOrder);
+
+      if (result.errors) {
+        console.error('❌ GraphQL Errors:', result.errors);
+        setOrderMessage({ type: 'error', text: 'Error al crear el pedido: ' + JSON.stringify(result.errors) });
+        return;
+      }
+
+      if (!result.data) {
+        console.error('❌ No data returned');
+        setOrderMessage({ type: 'error', text: 'No se recibieron datos del servidor' });
+        return;
+      }
+
+      console.log('✅ Demo order created:', result.data);
+      setOrderMessage({
+        type: 'success',
+        text: `¡Pedido demo creado exitosamente! ID: ${result.data.id?.substring(0, 8)}... Total: €${result.data.totalAmount}`
+      });
+
+      // Reload page after 2 seconds to show the new order
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
+    } catch (err: any) {
+      console.error('❌ Error creating demo order:', err);
+      setOrderMessage({ type: 'error', text: err.message || 'Error desconocido al crear el pedido' });
+    } finally {
+      setCreatingOrder(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh]">
+        <LoadingSpinner size="lg" text="Cargando estadísticas reales..." />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-6 bg-red-50 border border-red-200 rounded-lg text-red-700">
+        <h3 className="text-lg font-semibold mb-2">Error de Carga</h3>
+        <p>{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div>
       <div className="admin-page-header">
-        <h1 className="admin-page-title">Dashboard General</h1>
-        <p className="admin-page-subtitle">Resumen de actividad y estadísticas clave</p>
+        <div>
+          <h1 className="admin-page-title">Dashboard General</h1>
+          <p className="admin-page-subtitle">Actividad y estadísticas en tiempo real</p>
+        </div>
+        <button
+          onClick={createDemoOrder}
+          disabled={creatingOrder}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          style={{ marginLeft: 'auto' }}
+        >
+          {creatingOrder ? 'Creando...' : '🎯 Crear Pedido Demo'}
+        </button>
       </div>
+
+      {orderMessage && (
+        <div className={`p-4 mb-4 rounded-lg ${orderMessage.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+          <p>{orderMessage.text}</p>
+        </div>
+      )}
 
       {/* Stats Cards */}
       <div className="admin-stats-grid">
@@ -182,7 +364,7 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
           </div>
           <div>
             <p className="admin-stat-label">Ingresos Totales</p>
-            <p className="admin-stat-value">€{stats.totalRevenue.toLocaleString()}</p>
+            <p className="admin-stat-value">€{stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
           </div>
         </div>
 
@@ -224,20 +406,24 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
             <h3 className="admin-card-title">Pedidos Recientes</h3>
           </div>
           <div className="space-y-0">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="admin-list-item">
-                <div>
-                  <p className="admin-list-text">Pedido #ORD-00{i}</p>
-                  <p className="admin-list-subtext">Cliente Demo {i}</p>
+            {stats.recentOrders.length > 0 ? (
+              stats.recentOrders.map((order: any) => (
+                <div key={order.id} className="admin-list-item">
+                  <div>
+                    <p className="admin-list-text">Pedido #{order.id.substring(0, 8)}</p>
+                    <p className="admin-list-subtext">{order.customerName}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="admin-list-text">€{order.totalAmount?.toFixed(2)}</p>
+                    <span className={`admin-status-badge status-${order.status?.toLowerCase()}`}>
+                      {order.status}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="admin-list-text">€{(Math.random() * 200 + 50).toFixed(2)}</p>
-                  <span className="admin-status-badge status-success">
-                    Completado
-                  </span>
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="p-4 text-gray-500 text-center">No hay pedidos registrados</p>
+            )}
           </div>
           <Link to="/admin/pedidos" className="admin-link-btn">
             Ver todos los pedidos →
@@ -246,29 +432,25 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
 
         <div className="admin-card">
           <div className="admin-card-header">
-            <h3 className="admin-card-title">Productos Populares</h3>
+            <h3 className="admin-card-title">Productos en Catálogo</h3>
           </div>
           <div className="space-y-0">
-            {[
-              { name: 'Casco de Seguridad Industrial', sales: 45 },
-              { name: 'Guantes Anticorte', sales: 38 },
-              { name: 'Chaleco Reflectante', sales: 32 },
-            ].map((product, i) => (
-              <div key={i} className="admin-list-item">
-                <div style={{ flex: 1, paddingRight: '1rem' }}>
-                  <p className="admin-list-text">{product.name}</p>
-                  <p className="admin-list-subtext">{product.sales} ventas</p>
-                </div>
-                <div style={{ width: '30%' }}>
-                  <div className="admin-progress-bar-bg">
-                    <div
-                      className="admin-progress-bar-fill"
-                      style={{ width: `${(product.sales / 50) * 100}%` }}
-                    ></div>
+            {stats.topProducts.length > 0 ? (
+              stats.topProducts.map((product: any, i) => (
+                <div key={product.id || i} className="admin-list-item">
+                  <div style={{ flex: 1, paddingRight: '1rem' }}>
+                    <p className="admin-list-text">{product.name}</p>
+                    <p className="admin-list-subtext">{product.sku}</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="admin-list-text">€{product.price?.toFixed(2)}</p>
+                    <p className="admin-list-subtext">Stock: {product.stock}</p>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="p-4 text-gray-500 text-center">No hay productos en el catálogo</p>
+            )}
           </div>
           <Link to="/admin/productos" className="admin-link-btn">
             Gestionar productos →
@@ -279,8 +461,6 @@ function DashboardOverview({ stats }: { stats: AdminStats }) {
   );
 }
 
-
-
 // Users Management Component
 function UsersManagement() {
   return (
@@ -290,7 +470,7 @@ function UsersManagement() {
         <p className="admin-page-subtitle">Administra clientes y roles de usuario</p>
       </div>
       <div className="admin-card">
-        <p className="admin-list-subtext">Gestión de usuarios - En desarrollo</p>
+        <p className="admin-list-subtext">Gestión de usuarios - Funcionalidad del sistema en desarrollo</p>
       </div>
     </div>
   );
@@ -305,7 +485,7 @@ function ReportsView() {
         <p className="admin-page-subtitle">Análisis detallado del rendimiento de la tienda</p>
       </div>
       <div className="admin-card">
-        <p className="admin-list-subtext">Reportes y analytics - En desarrollo</p>
+        <p className="admin-list-subtext">Reportes y analytics - Módulo premium en desarrollo</p>
       </div>
     </div>
   );
@@ -320,7 +500,7 @@ function SettingsView() {
         <p className="admin-page-subtitle">Ajustes generales del sistema</p>
       </div>
       <div className="admin-card">
-        <p className="admin-list-subtext">Configuración del sistema - En desarrollo</p>
+        <p className="admin-list-subtext">Configuración del sistema - Opciones de administración global</p>
       </div>
     </div>
   );
