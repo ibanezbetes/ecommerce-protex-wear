@@ -328,6 +328,26 @@ export const orderOperations = {
       throw error;
     }
   },
+
+  // Delete order (Admin only)
+  async deleteOrder(id: string) {
+    try {
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
+      if (!graphqlClient) throw new Error('GraphQL client not available');
+
+      const response = await graphqlClient.models.Order.delete({ id });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message || "Failed to delete order");
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error deleting order:', error);
+      throw error;
+    }
+  },
 };
 
 // User Operations
