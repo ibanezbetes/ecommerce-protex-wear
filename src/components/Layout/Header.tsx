@@ -1,10 +1,32 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { User, Package, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCartItemCount } from '../../contexts/CartContext';
 import { useProducts } from '../../hooks/useProducts';
 import logo from '../../assets/logo.png';
+import S3Image from '../UI/S3Image';
 import './styles/Header.css';
+
+/**
+ * Static Pages Configuration for Search
+ */
+const STATIC_PAGES = [
+  { name: 'Inicio', path: '/', keywords: ['inicio', 'home', 'principal', 'index'] },
+  { name: 'Contacto', path: '/contacto', keywords: ['contacto', 'email', 'telefono', 'direccion', 'soporte', 'ayuda'] },
+  { name: 'Sobre Nosotros', path: '/sobre-nosotros', keywords: ['empresa', 'quienes', 'somos', 'mision', 'vision', 'historia'] },
+  { name: 'Garantía', path: '/contacto', keywords: ['garantia', 'garantía', 'reparacion', 'devolucion', 'soporte tecnico', 'condiciones'], description: 'Consulta nuestras condiciones de garantía.' },
+  { name: 'Servicios de Renting', path: '/servicios/renting', keywords: ['renting', 'alquiler', 'servicio', 'textil'] },
+  { name: 'Lavandería', path: '/servicios/lavanderia', keywords: ['lavanderia', 'limpieza', 'ropa', 'higiene'] },
+  { name: 'Máquinas Expendedoras', path: '/servicios/maquinas-expendedoras', keywords: ['maquinas', 'vending', 'expendedoras', 'epis'] },
+  { name: 'Stock de Seguridad', path: '/servicios/stock-seguridad', keywords: ['stock', 'seguridad', 'almacen', 'inventario'] },
+  { name: 'Entregas Nominativas', path: '/servicios/entregas-nominativas', keywords: ['entregas', 'reparto', 'personal', 'distribucion'] },
+  { name: 'Personalización', path: '/servicios/personalizacion', keywords: ['personalizacion', 'bordado', 'logo', 'marca', 'serigrafia'] },
+  { name: 'Merchandising', path: '/servicios/merchandising', keywords: ['merchandising', 'regalos', 'promocion', 'marketing'] },
+  { name: 'CEE', path: '/servicios/cee', keywords: ['cee', 'centro', 'especial', 'empleo', 'discapacidad'] },
+  { name: 'Carrito', path: '/carrito', keywords: ['carrito', 'cesta', 'compra', 'finalizar'] },
+  { name: 'Mi Perfil', path: '/perfil', keywords: ['perfil', 'usuario', 'cuenta', 'pedidos'] },
+];
 
 /**
  * Header Component
@@ -27,6 +49,7 @@ function Header() {
   // Search State
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [staticResults, setStaticResults] = useState<typeof STATIC_PAGES>([]);
   const searchRef = React.useRef<HTMLDivElement>(null);
 
   // Real Product Filtering Hook
@@ -43,11 +66,17 @@ function Header() {
   React.useEffect(() => {
     // If empty, clear results (locally managed by hook state essentially, but we can verify)
     if (searchQuery.trim() === '') {
-      // Maybe we can clear results or just do nothing.
-      // useProducts doesn't have clearProducts, but we can search for empty to maybe reset?
-      // Actually, let's just not search if empty.
+      setStaticResults([]);
       return;
     }
+
+    // Filter static pages immediately
+    const lowerQuery = searchQuery.toLowerCase();
+    const staticMatches = STATIC_PAGES.filter(page =>
+      page.name.toLowerCase().includes(lowerQuery) ||
+      page.keywords.some(k => k.toLowerCase().includes(lowerQuery))
+    );
+    setStaticResults(staticMatches);
 
     const timeoutId = setTimeout(() => {
       searchProducts(searchQuery);
@@ -250,14 +279,14 @@ function Header() {
                       className="dropdown-item"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <span className="mr-2">👤</span> Mi Perfil
+                      <User className="w-4 h-4 mr-2" /> Mi Perfil
                     </Link>
                     <Link
                       to="/pedidos"
                       className="dropdown-item"
                       onClick={() => setIsMenuOpen(false)}
                     >
-                      <span className="mr-2">📦</span> Mis Pedidos
+                      <Package className="w-4 h-4 mr-2" /> Mis Pedidos
                     </Link>
                     {user?.role === 'ADMIN' && (
                       <Link
@@ -265,7 +294,7 @@ function Header() {
                         className="dropdown-item"
                         onClick={() => setIsMenuOpen(false)}
                       >
-                        <span className="mr-2">⚙️</span> Panel Admin
+                        <Settings className="w-4 h-4 mr-2" /> Panel Admin
                       </Link>
                     )}
                     <hr className="dropdown-divider" />
@@ -276,7 +305,7 @@ function Header() {
                       }}
                       className="dropdown-item dropdown-item-logout w-full text-left"
                     >
-                      <span className="mr-2">🚪</span> Cerrar Sesión
+                      <LogOut className="w-4 h-4 mr-2" /> Cerrar Sesión
                     </button>
                   </div>
                 )}
@@ -350,14 +379,14 @@ function Header() {
                     {isMobileUserOpen && (
                       <div className="header-mobile-submenu">
                         <Link to="/perfil" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
-                          <span className="mr-3">👤</span> Mi Perfil
+                          <User className="w-4 h-4 mr-3" /> Mi Perfil
                         </Link>
                         <Link to="/pedidos" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
-                          <span className="mr-3">📦</span> Mis Pedidos
+                          <Package className="w-4 h-4 mr-3" /> Mis Pedidos
                         </Link>
                         {user?.role === 'ADMIN' && (
                           <Link to="/admin" className="header-mobile-nav-link" onClick={() => setIsMenuOpen(false)}>
-                            <span className="mr-3">⚙️</span> Panel Admin
+                            <Settings className="w-4 h-4 mr-3" /> Panel Admin
                           </Link>
                         )}
                         <button
@@ -367,7 +396,7 @@ function Header() {
                           }}
                           className="header-mobile-nav-link text-red-600 hover:bg-red-50 hover:text-red-700 w-full"
                         >
-                          <span className="mr-3">🚪</span> Cerrar Sesión
+                          <LogOut className="w-4 h-4 mr-3" /> Cerrar Sesión
                         </button>
                       </div>
                     )}
@@ -496,51 +525,135 @@ function Header() {
                 </button>
               </>
             ) : (
+              // Calculate total matches
               <span>
-                {isSearching ? 'Buscando...' : `${searchResults.length} resultados encontrados`}
+                {isSearching ? 'Buscando...' : `${searchResults.length + staticResults.length} resultados encontrados`}
               </span>
             )}
           </div>
 
           {/* Search Results List */}
           {searchQuery !== '' && (
-            <div className="max-w-[900px] mx-auto mt-4 max-h-[60vh] overflow-y-auto custom-scrollbar">
-              {!isSearching && searchResults.length > 0 ? (
-                <div className="grid grid-cols-1 gap-2">
-                  {searchResults.map((product) => (
-                    <Link
-                      key={product.id}
-                      to={`/productos/${product.id}`}
-                      onClick={() => setIsSearchOpen(false)}
-                      className="flex items-center p-3 hover:bg-gray-50 rounded-lg transition-colors group"
-                    >
-                      <div className="h-12 w-12 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden flex-shrink-0">
-                        {product.imageUrl ? (
-                          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-cover" />
-                        ) : (
-                          <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <div className="max-w-[900px] mx-auto mt-4 max-h-[60vh] overflow-y-auto custom-scrollbar pb-4 space-y-6">
+
+              {/* Static Pages Results */}
+              {staticResults.length > 0 && (
+                <div className="mb-2">
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Páginas y Servicios
+                  </h3>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {staticResults.map((page) => (
+                      <Link
+                        key={page.name}
+                        to={page.path}
+                        onClick={() => setIsSearchOpen(false)}
+                        className="flex items-center p-2.5 bg-white border border-blue-100 hover:border-blue-400 hover:shadow-md rounded-lg transition-all duration-200 group"
+                      >
+                        <div className="h-8 w-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                           </svg>
-                        )}
-                      </div>
-                      <div className="ml-4 flex-grow">
-                        <p className="font-medium text-gray-900 group-hover:text-primary-color">{product.name}</p>
-                        <div className="flex items-center text-sm text-gray-500 mt-0.5">
-                          <span>{product.category}</span>
-                          <span className="mx-2">•</span>
-                          <span className="font-medium text-gray-700">€{product.price.toFixed(2)}</span>
                         </div>
-                      </div>
-                      <svg className="ml-auto h-5 w-5 text-gray-300 group-hover:text-primary-color" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  ))}
+                        <div className="ml-3">
+                          <p className="font-medium text-sm text-gray-900 group-hover:text-blue-700">{page.name}</p>
+                          {page.description && <p className="text-xs text-gray-500">{page.description}</p>}
+                        </div>
+                        <svg className="ml-auto w-4 h-4 text-gray-300 group-hover:text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Product Results */}
+              {!isSearching && searchResults.length > 0 ? (
+                <div>
+                  <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-2 flex items-center gap-2">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                    </svg>
+                    Productos
+                  </h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {searchResults.slice(0, 4).map((product) => {
+                      const displayImageKey = product.imageUrl || (product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls[0] : null);
+
+                      return (
+                        <Link
+                          key={product.id}
+                          to={`/productos/${product.id}`}
+                          onClick={() => setIsSearchOpen(false)}
+                          className="flex items-start p-3 bg-white border border-gray-200 hover:border-primary-color hover:shadow-lg rounded-xl transition-all duration-200 group relative overflow-hidden"
+                        >
+                          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-primary-color to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+                          <div className="h-16 w-16 bg-gray-50 rounded-lg border border-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow">
+                            <S3Image
+                              s3Key={displayImageKey}
+                              alt={product.name}
+                              className="h-full w-full object-cover transform group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                          <div className="ml-4 flex-grow min-w-0">
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1 min-w-0 mr-4">
+                                <p className="font-bold text-gray-900 text-base leading-tight mb-1 group-hover:text-primary-color transition-colors truncate">
+                                  {product.name}
+                                </p>
+                                {product.category && (
+                                  <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-primary-color mb-1">
+                                    {product.category}
+                                  </span>
+                                )}
+                              </div>
+                              <span className="font-bold text-gray-900 text-base whitespace-nowrap bg-gray-50 px-2 py-0.5 rounded-md group-hover:bg-primary-color group-hover:text-white transition-colors duration-200">
+                                €{product.price.toFixed(2)}
+                              </span>
+                            </div>
+
+                            <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed mt-0.5">
+                              {product.description || 'Sin descripción disponible.'}
+                            </p>
+                          </div>
+                          <div className="flex flex-col justify-center h-full ml-2 self-center">
+                            <div className="p-1.5 rounded-full text-gray-400 group-hover:text-primary-color group-hover:bg-blue-50 transition-colors">
+                              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
+
+                  {searchResults.length > 4 && (
+                    <div className="mt-4 text-center">
+                      <button
+                        onClick={() => {
+                          setIsSearchOpen(false);
+                          navigate(`/productos?search=${encodeURIComponent(searchQuery)}`);
+                        }}
+                        className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-color w-full justify-center transition-colors"
+                      >
+                        Ver los {searchResults.length} resultados
+                        <svg className="ml-2 -mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </button>
+                    </div>
+                  )}
                 </div>
               ) : (
-                !isSearching && (
+                !isSearching && staticResults.length === 0 && (
                   <div className="search-no-results">
-                    <p>No se encontraron productos para "{searchQuery}"</p>
+                    <p>No se encontraron productos ni páginas para "{searchQuery}"</p>
                     <button
                       onClick={() => {
                         setIsSearchOpen(false);
