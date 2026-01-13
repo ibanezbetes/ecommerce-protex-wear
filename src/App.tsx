@@ -22,6 +22,7 @@ import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import OrdersPage from './pages/OrdersPage';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
@@ -104,6 +105,11 @@ function AppContent() {
         <Route path="/perfil" element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/pedidos" element={
+          <ProtectedRoute>
+            <OrdersPage />
           </ProtectedRoute>
         } />
 
