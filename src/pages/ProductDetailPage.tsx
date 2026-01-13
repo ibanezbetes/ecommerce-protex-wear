@@ -116,15 +116,17 @@ function ProductDetailPage() {
         {/* Left Column: Gallery */}
         <div className="pdp-gallery">
           <div className="pdp-gallery-main">
-            {product.imageUrls && product.imageUrls[selectedImage] ? (
+            {product.imageUrls && product.imageUrls[selectedImage] && product.imageUrls[selectedImage].trim() !== '' ? (
               <S3Image
                 s3Key={product.imageUrls[selectedImage]}
                 alt={product.name}
+                className="w-full h-full object-contain p-4 bg-white"
               />
-            ) : product.imageUrl ? (
+            ) : product.imageUrl && product.imageUrl.trim() !== '' ? (
               <S3Image
                 s3Key={product.imageUrl}
                 alt={product.name}
+                className="w-full h-full object-contain p-4 bg-white"
               />
             ) : (
               <div className="text-gray-400">
@@ -139,16 +141,19 @@ function ProductDetailPage() {
           {product.imageUrls && product.imageUrls.length > 1 && (
             <div className="pdp-gallery-thumbs">
               {product.imageUrls.map((imageUrl, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(index)}
-                  className={`pdp-thumb-btn ${selectedImage === index ? 'active' : ''}`}
-                >
-                  <S3Image
-                    s3Key={imageUrl}
-                    alt={`${product.name} thumb ${index + 1}`}
-                  />
-                </button>
+                imageUrl && imageUrl.trim() !== '' && (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`pdp-thumb-btn ${selectedImage === index ? 'active' : ''}`}
+                  >
+                    <S3Image
+                      s3Key={imageUrl}
+                      alt={`${product.name} thumb ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                )
               ))}
             </div>
           )}

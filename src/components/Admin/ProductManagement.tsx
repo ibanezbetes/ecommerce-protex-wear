@@ -4,6 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ProductForm from './ProductForm';
 import type { Product } from '../../services/graphql';
+import S3Image from '../UI/S3Image';
 import '../../styles/AdminProducts.css';
 
 /**
@@ -393,11 +394,10 @@ function ProductManagement() {
                         <div className="apm-product-cell">
                           <div className="apm-img-wrapper">
                             {product.imageUrl && product.imageUrl.trim() !== '' ? (
-                              <img
-                                src={product.imageUrl}
+                              <S3Image
+                                s3Key={product.imageUrl}
                                 alt={product.name || 'Producto'}
                                 className="apm-product-img"
-                                loading="lazy"
                               />
                             ) : (
                               <div className="apm-img-placeholder">

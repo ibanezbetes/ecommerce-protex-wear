@@ -279,7 +279,7 @@ function ProductsPage() {
                 )}
 
                 <div className="product-image-container">
-                  {product.imageUrl ? (
+                  {product.imageUrl && product.imageUrl.trim() !== '' ? (
                     <S3Image
                       s3Key={product.imageUrl}
                       alt={product.name}
