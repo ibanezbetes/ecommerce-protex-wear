@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProducts } from '../../hooks/useProducts';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../UI/LoadingSpinner';
@@ -9,12 +9,17 @@ import '../../styles/AdminProducts.css';
 /**
  * Product Management Component for Admin Dashboard
  * Provides CRUD operations for products with real GraphQL integration
+ * Now with advanced filters and sorting
  */
 function ProductManagement() {
   const { user, isAuthenticated } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name-asc');
 
   const {
     products,
@@ -27,9 +32,11 @@ function ProductManagement() {
     deleteProduct,
     refreshProducts,
     loadMore,
+    setFilters,
+    setSort,
   } = useProducts({
     autoFetch: true,
-    limit: 10,
+    limit: 1000,
   });
 
   // Check if user is admin
@@ -41,6 +48,38 @@ function ProductManagement() {
       </div>
     );
   }
+
+  // Apply filters and sorting
+  useEffect(() => {
+    const filters: any = {};
+
+    if (categoryFilter) {
+      filters.category = categoryFilter;
+    }
+
+    if (stockFilter === 'in-stock') {
+      filters.inStock = true;
+    }
+
+    setFilters(filters);
+
+    // Apply sorting
+    const [field, direction] = sortBy.split('-');
+    setSort({ field: field as any, direction: direction as 'asc' | 'desc' });
+  }, [categoryFilter, stockFilter, sortBy, setFilters, setSort]);
+
+  // Filter products client-side for additional filters
+  const filteredProducts = products.filter(product => {
+    // Stock filter
+    if (stockFilter === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
+    if (stockFilter === 'out-of-stock' && product.stock > 0) return false;
+
+    // Status filter
+    if (statusFilter === 'active' && !product.isActive) return false;
+    if (statusFilter === 'inactive' && product.isActive) return false;
+
+    return true;
+  });
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -145,36 +184,146 @@ function ProductManagement() {
 
       {/* Search and Filters */}
       <div className="admin-products-search-card">
-        <form onSubmit={handleSearch} style={{ display: 'contents' }}>
-          <div className="admin-search-input-wrapper">
-            <svg className="admin-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Buscar por nombre, SKU o categoría..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="admin-search-input"
-            />
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} style={{ marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div className="admin-search-input-wrapper" style={{ flex: '1 1 300px' }}>
+              <svg className="admin-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar por nombre, SKU o categoría..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="admin-search-input"
+              />
+            </div>
+            <button type="submit" className="btn-modern btn-modern-primary" style={{ whiteSpace: 'nowrap' }}>
+              Buscar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setCategoryFilter('');
+                setStockFilter('all');
+                setStatusFilter('all');
+                refreshProducts();
+              }}
+              className="btn-modern btn-modern-outline"
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              Limpiar
+            </button>
           </div>
-          <button
-            type="submit"
-            className="btn-modern btn-modern-primary"
-          >
-            Buscar
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchTerm('');
-              refreshProducts();
-            }}
-            className="btn-modern btn-modern-outline"
-          >
-            Limpiar
-          </button>
         </form>
+
+        {/* Compact Filters Row */}
+        <div style={{
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          paddingTop: '1rem',
+          borderTop: '1px solid #e5e7eb'
+        }}>
+          {/* Category Filter */}
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '140px',
+              flex: '1 1 auto',
+              maxWidth: '200px'
+            }}
+          >
+            <option value="">Todas las categorías</option>
+            <option value="Vestuario">Vestuario</option>
+            <option value="Protección Cabeza">Protección Cabeza</option>
+            <option value="Protección Manos">Protección Manos</option>
+            <option value="Calzado Seguridad">Calzado Seguridad</option>
+            <option value="Alta Visibilidad">Alta Visibilidad</option>
+          </select>
+
+          {/* Stock Filter */}
+          <select
+            value={stockFilter}
+            onChange={(e) => setStockFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '130px',
+              flex: '1 1 auto',
+              maxWidth: '180px'
+            }}
+          >
+            <option value="all">Todo el stock</option>
+            <option value="in-stock">En Stock</option>
+            <option value="low-stock">Stock Bajo</option>
+            <option value="out-of-stock">Agotado</option>
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '120px',
+              flex: '1 1 auto',
+              maxWidth: '150px'
+            }}
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+
+          {/* Sort By */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '150px',
+              flex: '1 1 auto',
+              maxWidth: '200px'
+            }}
+          >
+            <option value="name-asc">Nombre (A-Z)</option>
+            <option value="name-desc">Nombre (Z-A)</option>
+            <option value="price-asc">Precio ↑</option>
+            <option value="price-desc">Precio ↓</option>
+            <option value="stock-asc">Stock ↑</option>
+            <option value="stock-desc">Stock ↓</option>
+            <option value="createdAt-desc">Más Recientes</option>
+            <option value="createdAt-asc">Más Antiguos</option>
+          </select>
+
+          {/* Results Count */}
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginLeft: 'auto',
+            whiteSpace: 'nowrap',
+            padding: '0.5rem 0'
+          }}>
+            {filteredProducts.length} de {products.length} productos
+          </div>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -203,7 +352,7 @@ function ProductManagement() {
           <div className="p-8 text-center">
             <LoadingSpinner size="lg" text="Cargando productos..." />
           </div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-4">
               <svg style={{ width: '4rem', height: '4rem', margin: '0 auto' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,13 +360,17 @@ function ProductManagement() {
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No hay productos</h3>
-            <p className="text-gray-600 mb-4">Comienza creando tu primer producto</p>
-            <button
-              onClick={handleCreateProduct}
-              className="btn-modern btn-modern-primary"
-            >
-              Crear Primer Producto
-            </button>
+            <p className="text-gray-600 mb-4">
+              {products.length > 0 ? 'No se encontraron productos con los filtros aplicados' : 'Comienza creando tu primer producto'}
+            </p>
+            {products.length === 0 && (
+              <button
+                onClick={handleCreateProduct}
+                className="btn-modern btn-modern-primary"
+              >
+                Crear Primer Producto
+              </button>
+            )}
           </div>
         ) : (
           <>
@@ -234,7 +387,7 @@ function ProductManagement() {
                   </tr>
                 </thead>
                 <tbody>
-                  {products.map((product) => (
+                  {filteredProducts.map((product) => (
                     <tr key={product.id}>
                       <td>
                         <div className="product-cell">

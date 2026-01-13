@@ -220,6 +220,105 @@ function AdminDashboard() {
 function DashboardOverview({ stats, loading, error }: { stats: AdminStats, loading: boolean, error: string | null }) {
   const [creatingOrder, setCreatingOrder] = useState(false);
   const [orderMessage, setOrderMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [importingProducts, setImportingProducts] = useState(false);
+  const [importProgress, setImportProgress] = useState<{ current: number, total: number, errors: number } | null>(null);
+  const [importMessage, setImportMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+  const importProducts = async () => {
+    try {
+      setImportingProducts(true);
+      setImportMessage(null);
+      setImportProgress(null);
+
+      // Fetch the products JSON file
+      const response = await fetch('/migration/products_source.json');
+      if (!response.ok) {
+        throw new Error('No se pudo cargar el archivo de productos');
+      }
+
+      const products = await response.json();
+      const total = products.length;
+      let imported = 0;
+      let errors = 0;
+
+      console.log(`📦 Iniciando importación de ${total} productos...`);
+
+      // Import products in batches of 5 to avoid overwhelming the API
+      const batchSize = 5;
+      for (let i = 0; i < products.length; i += batchSize) {
+        const batch = products.slice(i, i + batchSize);
+
+        await Promise.all(
+          batch.map(async (product: any) => {
+            try {
+              // Convert specifications to JSON string if it's an object
+              const productData: any = {
+                sku: product.sku,
+                name: product.name,
+                description: product.description || '',
+                price: product.price || 0,
+                stock: product.stock || 0,
+                category: product.category || '',
+                subcategory: product.subcategory || '',
+                brand: product.brand || '',
+                imageUrl: product.imageUrl || '',
+                imageUrls: product.imageUrls || [],
+                specifications: typeof product.specifications === 'object'
+                  ? JSON.stringify(product.specifications)
+                  : product.specifications,
+                isActive: product.isActive !== false,
+                tags: product.tags || []
+              };
+
+              const result = await productOperations.createProduct(productData);
+
+              if (result.errors) {
+                console.error(`❌ Error importing ${product.sku}:`, result.errors);
+                errors++;
+              } else {
+                imported++;
+                console.log(`✅ Imported: ${product.sku} - ${product.name}`);
+              }
+            } catch (err) {
+              console.error(`❌ Error importing ${product.sku}:`, err);
+              errors++;
+            }
+          })
+        );
+
+        // Update progress
+        setImportProgress({
+          current: Math.min(i + batchSize, total),
+          total,
+          errors
+        });
+
+        // Small delay between batches to avoid rate limiting
+        if (i + batchSize < products.length) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+        }
+      }
+
+      console.log(`\n✅ Importación completada: ${imported} productos importados, ${errors} errores`);
+
+      setImportMessage({
+        type: errors === 0 ? 'success' : 'error',
+        text: `Importación completada: ${imported} productos importados${errors > 0 ? `, ${errors} errores` : ''}`
+      });
+
+      // Reload page after 3 seconds to show the new products
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+
+    } catch (err: any) {
+      console.error('❌ Error during import:', err);
+      setImportMessage({ type: 'error', text: err.message || 'Error desconocido durante la importación' });
+    } finally {
+      setImportingProducts(false);
+      setImportProgress(null);
+    }
+  };
 
   const createDemoOrder = async () => {
     try {
@@ -340,15 +439,45 @@ function DashboardOverview({ stats, loading, error }: { stats: AdminStats, loadi
           <h1 className="admin-page-title">Dashboard General</h1>
           <p className="admin-page-subtitle">Actividad y estadísticas en tiempo real</p>
         </div>
-        <button
-          onClick={createDemoOrder}
-          disabled={creatingOrder}
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
-          style={{ marginLeft: 'auto' }}
-        >
-          {creatingOrder ? 'Creando...' : '🎯 Crear Pedido Demo'}
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', marginLeft: 'auto' }}>
+          <button
+            onClick={importProducts}
+            disabled={importingProducts}
+            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          >
+            {importingProducts ? (
+              importProgress ? `📦 ${importProgress.current}/${importProgress.total}` : 'Importando...'
+            ) : '📦 Importar Productos'}
+          </button>
+          <button
+            onClick={createDemoOrder}
+            disabled={creatingOrder}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
+          >
+            {creatingOrder ? 'Creando...' : '🎯 Crear Pedido Demo'}
+          </button>
+        </div>
       </div>
+
+      {importMessage && (
+        <div className={`p-4 mb-4 rounded-lg ${importMessage.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>
+          <p>{importMessage.text}</p>
+          {importProgress && (
+            <div className="mt-2">
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div
+                  className="bg-purple-600 h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(importProgress.current / importProgress.total) * 100}%` }}
+                />
+              </div>
+              <p className="text-sm mt-1">
+                {importProgress.current} de {importProgress.total} productos
+                {importProgress.errors > 0 && ` (${importProgress.errors} errores)`}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {orderMessage && (
         <div className={`p-4 mb-4 rounded-lg ${orderMessage.type === 'success' ? 'bg-green-50 border border-green-200 text-green-700' : 'bg-red-50 border border-red-200 text-red-700'}`}>

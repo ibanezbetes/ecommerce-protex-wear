@@ -175,8 +175,9 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
           const descMatch = product.description && product.description.toLowerCase().includes(lowerTerm);
           const catMatch = product.category && typeof product.category === 'string' && product.category.toLowerCase().includes(lowerTerm);
           const tagsMatch = product.tags && product.tags.some(tag => tag && tag.toLowerCase().includes(lowerTerm));
+          const skuMatch = product.sku && product.sku.toLowerCase().includes(lowerTerm);
 
-          return nameMatch || descMatch || catMatch || tagsMatch;
+          return nameMatch || descMatch || catMatch || tagsMatch || skuMatch;
         });
 
         const sortedResults = sortProducts(searchResults, sort);
