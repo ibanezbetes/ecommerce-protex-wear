@@ -145,8 +145,8 @@ function ProductManagement() {
   if (showForm) {
     return (
       <div>
-        <div className="admin-products-header">
-          <h2 className="admin-products-title">
+        <div className="apm-header">
+          <h2 className="apm-title">
             {editingProduct ? 'Editar Producto' : 'Crear Producto'}
           </h2>
           <button
@@ -169,8 +169,8 @@ function ProductManagement() {
   return (
     <div>
       {/* Header */}
-      <div className="admin-products-header">
-        <h2 className="admin-products-title">Gestión de Productos</h2>
+      <div className="apm-header">
+        <h2 className="apm-title">Gestión de Productos</h2>
         <button
           onClick={handleCreateProduct}
           className="btn-modern btn-modern-primary"
@@ -183,12 +183,12 @@ function ProductManagement() {
       </div>
 
       {/* Search and Filters */}
-      <div className="admin-products-search-card">
+      <div className="apm-search-card">
         {/* Search Bar */}
         <form onSubmit={handleSearch} style={{ marginBottom: '1rem' }}>
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-            <div className="admin-search-input-wrapper" style={{ flex: '1 1 300px' }}>
-              <svg className="admin-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="apm-search-input-wrapper" style={{ flex: '1 1 300px' }}>
+              <svg className="apm-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
               <input
@@ -196,7 +196,7 @@ function ProductManagement() {
                 placeholder="Buscar por nombre, SKU o categoría..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="admin-search-input"
+                className="apm-search-input"
               />
             </div>
             <button type="submit" className="btn-modern btn-modern-primary" style={{ whiteSpace: 'nowrap' }}>
@@ -347,7 +347,7 @@ function ProductManagement() {
       )}
 
       {/* Products Table */}
-      <div className="admin-table-container">
+      <div className="apm-table-container">
         {loading && products.length === 0 ? (
           <div className="p-8 text-center">
             <LoadingSpinner size="lg" text="Cargando productos..." />
@@ -375,79 +375,85 @@ function ProductManagement() {
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="admin-table">
-                <thead>
+              <table className="apm-table">
+                <thead className="apm-main-thead">
                   <tr>
-                    <th>Producto</th>
-                    <th>SKU</th>
-                    <th>Precio</th>
-                    <th>Stock</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                    <th className="apm-th">Producto</th>
+                    <th className="apm-th">SKU</th>
+                    <th className="apm-th">Precio</th>
+                    <th className="apm-th">Stock</th>
+                    <th className="apm-th">Estado</th>
+                    <th className="apm-th">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredProducts.map((product) => (
-                    <tr key={product.id}>
-                      <td>
-                        <div className="product-cell">
-                          <div className="product-image-wrapper">
-                            {product.imageUrl ? (
+                    <tr key={product.id} className="apm-tr">
+                      <td className="apm-td">
+                        <div className="apm-product-cell">
+                          <div className="apm-img-wrapper">
+                            {product.imageUrl && product.imageUrl.trim() !== '' ? (
                               <img
                                 src={product.imageUrl}
-                                alt={product.name}
-                                className="product-image"
+                                alt={product.name || 'Producto'}
+                                className="apm-product-img"
+                                loading="lazy"
                               />
                             ) : (
-                              <div className="product-image-placeholder">
-                                <svg style={{ width: '1.5rem', height: '1.5rem' }} fill="currentColor" viewBox="0 0 20 20">
+                              <div className="apm-img-placeholder">
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
                                   <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                                 </svg>
                               </div>
                             )}
                           </div>
-                          <div className="product-info-text">
-                            <span className="product-name">{product.name}</span>
-                            <span className="product-category">{product.category || 'Sin cat.'}</span>
+                          <div className="apm-info-text">
+                            <span className="apm-product-name">{product.name}</span>
+                            <span className="apm-product-category">{product.category || 'Sin cat.'}</span>
                           </div>
                         </div>
                       </td>
-                      <td>
-                        <span className="sku-text">{product.sku}</span>
+                      <td className="apm-td">
+                        <span className="apm-sku-badge">{product.sku}</span>
                       </td>
-                      <td>
-                        <span className="price-text">€{product.price.toFixed(2)}</span>
+                      <td className="apm-td">
+                        <span className="apm-price">€{product.price.toFixed(2)}</span>
                       </td>
-                      <td>
-                        <span className={`stock-badge ${product.stock > 10 ? 'stock-high' : product.stock > 0 ? 'stock-low' : 'stock-out'
+                      <td className="apm-td">
+                        <span className={`apm-stock-badge ${product.stock > 10 ? 'apm-stock-high' : product.stock > 0 ? 'apm-stock-low' : 'apm-stock-out'
                           }`}>
-                          <span className="stock-dot"></span>
+                          <span className="apm-stock-dot"></span>
                           {product.stock > 0 ? `${product.stock} un.` : 'Agotado'}
                         </span>
                       </td>
-                      <td>
-                        <span className={`status-badge ${product.isActive ? 'status-active' : 'status-inactive'}`}>
+                      <td className="apm-td">
+                        <span className={`apm-status-badge ${product.isActive ? 'apm-status-active' : 'apm-status-inactive'}`}>
                           {product.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td>
-                        <div className="action-buttons">
+                      <td className="apm-td">
+                        <div className="apm-actions">
                           <button
                             onClick={() => handleEditProduct(product)}
-                            className="btn-icon"
+                            className="apm-btn-icon"
                             title="Editar"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" style={{ display: 'block' }}>
-                              <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                             </svg>
                           </button>
                           <button
                             onClick={() => handleDeleteProduct(product)}
-                            className="btn-icon delete"
+                            className="apm-btn-icon delete"
                             title="Eliminar"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" style={{ display: 'block' }}>
-                              <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                             </svg>
                           </button>
                         </div>

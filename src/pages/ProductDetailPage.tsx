@@ -4,29 +4,43 @@ import { useProduct } from '../hooks/useProducts';
 import { useCart } from '../contexts/CartContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import IndustrialSpecifications from '../components/Product/IndustrialSpecifications';
+import S3Image from '../components/UI/S3Image';
+import { ShoppingCart, Heart, Box, ShieldCheck, Truck, CreditCard, FileText, Settings, Tag, ChevronDown } from 'lucide-react';
+import '../styles/ProductDetail.css';
 
 /**
  * Product Detail Page - Individual product view with full details
- * Now connected to real GraphQL API
  */
 function ProductDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { addItem } = useCart();
-  
+
   const { product, loading, error, refreshProduct } = useProduct(id, { autoFetch: true });
-  
+
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const [addingToCart, setAddingToCart] = useState(false);
+  const [isWishlist, setIsWishlist] = useState(false);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    description: true,
+    specs: false,
+    dimensions: false,
+    tags: false
+  });
 
+  const toggleSection = (section: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [section]: !prev[section]
+    }));
+  };
+
+  // ... (handlers keep same logic, just ensuring they exist)
   const handleAddToCart = async () => {
     if (!product) return;
-    
     try {
       setAddingToCart(true);
-      
-      // Convert GraphQL Product to frontend Product type
       const frontendProduct = {
         id: product.id,
         sku: product.sku,
@@ -45,14 +59,11 @@ function ProductDetailPage() {
         createdAt: product.createdAt || new Date().toISOString(),
         updatedAt: product.updatedAt || new Date().toISOString(),
       };
-      
       addItem(frontendProduct, quantity);
-      
-      // Show success message
       alert(`${quantity} unidad(es) de "${product.name}" añadidas al carrito`);
     } catch (err) {
       console.error('Error adding to cart:', err);
-      alert('Error al añadir al carrito. Por favor, inténtalo de nuevo.');
+      alert('Error al añadir al carrito');
     } finally {
       setAddingToCart(false);
     }
@@ -64,9 +75,13 @@ function ProductDetailPage() {
     }
   };
 
+  const toggleWishlist = () => {
+    setIsWishlist(!isWishlist);
+  };
+
   if (loading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="pdp-container">
         <LoadingSpinner size="lg" text="Cargando producto..." />
       </div>
     );
@@ -74,85 +89,64 @@ function ProductDetailPage() {
 
   if (error || !product) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="pdp-container">
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
           <h2 className="text-xl font-semibold text-red-800 mb-2">Error</h2>
           <p className="text-red-600">{error || 'Producto no encontrado'}</p>
-          <div className="mt-4 space-x-2">
-            <button 
-              onClick={() => refreshProduct()} 
-              className="btn btn-outline"
-            >
-              Reintentar
-            </button>
-            <button 
-              onClick={() => navigate('/productos')} 
-              className="btn btn-primary"
-            >
-              Volver al Catálogo
-            </button>
-          </div>
+          <button onClick={() => navigate('/productos')} className="btn btn-primary mt-4">
+            Volver al Catálogo
+          </button>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="pdp-container">
       {/* Breadcrumb */}
-      <nav className="mb-8">
-        <ol className="flex items-center space-x-2 text-sm text-gray-600">
-          <li>
-            <button onClick={() => navigate('/')} className="hover:text-primary-600">
-              Inicio
-            </button>
-          </li>
-          <li>/</li>
-          <li>
-            <button onClick={() => navigate('/productos')} className="hover:text-primary-600">
-              Productos
-            </button>
-          </li>
-          <li>/</li>
-          <li className="text-gray-900 font-medium">{product.name}</li>
-        </ol>
+      <nav className="pdp-breadcrumb">
+        <button onClick={() => navigate('/')}>Inicio</button>
+        <span className="pdp-breadcrumb-separator">/</span>
+        <button onClick={() => navigate('/productos')}>Productos</button>
+        <span className="pdp-breadcrumb-separator">/</span>
+        <span className="pdp-breadcrumb-current">{product.name}</span>
       </nav>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        {/* Product Images */}
-        <div>
-          {/* Main Image */}
-          <div className="aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
+      <div className="pdp-main-grid">
+        {/* Left Column: Gallery */}
+        <div className="pdp-gallery">
+          <div className="pdp-gallery-main">
             {product.imageUrls && product.imageUrls[selectedImage] ? (
-              <img
-                src={product.imageUrls[selectedImage]}
+              <S3Image
+                s3Key={product.imageUrls[selectedImage]}
                 alt={product.name}
-                className="w-full h-full object-cover"
+              />
+            ) : product.imageUrl ? (
+              <S3Image
+                s3Key={product.imageUrl}
+                alt={product.name}
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 20 20">
+              <div className="text-gray-400">
+                <svg width="64" height="64" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                 </svg>
               </div>
             )}
           </div>
 
-          {/* Thumbnail Images */}
+          {/* Thumbnails */}
           {product.imageUrls && product.imageUrls.length > 1 && (
-            <div className="flex space-x-2">
+            <div className="pdp-gallery-thumbs">
               {product.imageUrls.map((imageUrl, index) => (
                 <button
                   key={index}
                   onClick={() => setSelectedImage(index)}
-                  className={`w-20 h-20 rounded-lg overflow-hidden border-2 ${
-                    selectedImage === index ? 'border-primary-500' : 'border-gray-200'
-                  }`}
+                  className={`pdp-thumb-btn ${selectedImage === index ? 'active' : ''}`}
                 >
-                  <img
-                    src={imageUrl}
-                    alt={`${product.name} ${index + 1}`}
-                    className="w-full h-full object-cover"
+                  <S3Image
+                    s3Key={imageUrl}
+                    alt={`${product.name} thumb ${index + 1}`}
                   />
                 </button>
               ))}
@@ -160,139 +154,247 @@ function ProductDetailPage() {
           )}
         </div>
 
-        {/* Product Info */}
-        <div>
-          {/* Header */}
-          <div className="mb-6">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-500 font-medium">{product.sku}</span>
+        {/* Right Column: Key Info & Actions */}
+        <div className="pdp-info">
+
+          <div className="pdp-header">
+            <div className="pdp-meta-row">
+              <span className="pdp-sku">REF: {product.sku}</span>
               {product.category && (
-                <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-sm">
-                  {product.category}
+                <span className="pdp-category-badge">{product.category}</span>
+              )}
+            </div>
+
+            <h1 className="pdp-title">{product.name}</h1>
+
+            <div className="pdp-price-row">
+              <span className="pdp-price">€{product.price.toFixed(2)}</span>
+              {product.stock > 0 ? (
+                <span className="pdp-stock-status in-stock">
+                  <div className="pdp-stock-dot"></div> En Stock ({product.stock})
+                </span>
+              ) : (
+                <span className="pdp-stock-status out-of-stock">
+                  <div className="pdp-stock-dot"></div> Agotado
                 </span>
               )}
             </div>
-            
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
-            
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-3xl font-bold text-primary-600">
-                €{product.price.toFixed(2)}
-              </span>
-              <span className={`text-lg font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {product.stock > 0 ? `${product.stock} en stock` : 'Sin stock'}
-              </span>
+          </div>
+
+          {/* Clean Action Card */}
+          <div className="pdp-actions-card">
+            <div className="pdp-action-row">
+              <div className="pdp-qty-wrapper">
+                <span className="pdp-qty-label">Cantidad</span>
+                <div className="pdp-qty-controls">
+                  <button
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    disabled={quantity <= 1}
+                    className="pdp-qty-btn"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    value={quantity}
+                    readOnly
+                    className="pdp-qty-input"
+                  />
+                  <button
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                    disabled={quantity >= product.stock}
+                    className="pdp-qty-btn"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                {/* Spacer or label could go here if needed, but flex handles it */}
+                <span className="pdp-qty-label" style={{ visibility: 'hidden' }}>Acción</span>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                  <button
+                    onClick={handleAddToCart}
+                    disabled={product.stock === 0 || addingToCart}
+                    className="pdp-add-btn"
+                  >
+                    {addingToCart ? (
+                      <>
+                        <LoadingSpinner size="sm" />
+                        <span>Añadiendo...</span>
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingCart size={20} />
+                        <span>Añadir al Carrito</span>
+                      </>
+                    )}
+                  </button>
+                  <button
+                    className={`pdp-wishlist-btn ${isWishlist ? 'active' : ''}`}
+                    title={isWishlist ? "Quitar de favoritos" : "Añadir a favoritos"}
+                    onClick={toggleWishlist}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                      <path
+                        fill={isWishlist ? "#dc2626" : "none"}
+                        stroke={isWishlist ? "none" : "#9ca3af"}
+                        strokeWidth="2"
+                        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Trust Badges */}
+            <div className="pdp-trust-grid">
+              <div className="pdp-trust-item">
+                <Truck size={18} className="pdp-trust-icon" />
+                <span>Envío Rápido 24/48h</span>
+              </div>
+              <div className="pdp-trust-item">
+                <ShieldCheck size={18} className="pdp-trust-icon" />
+                <span>Garantía de Calidad</span>
+              </div>
+              <div className="pdp-trust-item">
+                <CreditCard size={18} className="pdp-trust-icon" />
+                <span>Pago Seguro</span>
+              </div>
             </div>
           </div>
 
-          {/* Description */}
-          <div className="mb-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-3">Descripción</h3>
-            <div className="text-gray-700 whitespace-pre-line">
-              {product.description}
-            </div>
-          </div>
-
-          {/* Tags */}
-          {product.tags && product.tags.length > 0 && (
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Etiquetas</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag) => (
-                  <span key={tag} className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-sm">
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Quantity and Add to Cart */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4 mb-4">
-              <label className="text-sm font-medium text-gray-700">Cantidad:</label>
-              <div className="flex items-center border border-gray-300 rounded-lg">
-                <button
-                  onClick={() => handleQuantityChange(quantity - 1)}
-                  disabled={quantity <= 1}
-                  className="px-3 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  -
-                </button>
-                <input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => handleQuantityChange(Number(e.target.value))}
-                  min="1"
-                  max={product.stock}
-                  className="w-16 px-3 py-2 text-center border-0 focus:ring-0"
-                />
-                <button
-                  onClick={() => handleQuantityChange(quantity + 1)}
-                  disabled={quantity >= product.stock}
-                  className="px-3 py-2 text-gray-600 hover:text-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            <div className="flex space-x-4">
+          {/* Accordion Sections */}
+          <div className="pdp-accordion">
+            {/* Description */}
+            <div className="pdp-accordion-item">
               <button
-                onClick={handleAddToCart}
-                disabled={product.stock === 0 || addingToCart}
-                className="flex-1 btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                className="pdp-accordion-header"
+                onClick={() => toggleSection('description')}
+                aria-expanded={expandedSections['description']}
               >
-                {addingToCart ? (
-                  <div className="flex items-center justify-center">
-                    <LoadingSpinner size="sm" />
-                    <span className="ml-2">Añadiendo...</span>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                  <FileText size={20} className="text-gray-400" />
+                  <span>Descripción</span>
+                </div>
+                <ChevronDown
+                  size={20}
+                  className={`pdp-accordion-icon ${expandedSections['description'] ? 'open' : ''}`}
+                />
+              </button>
+              {expandedSections['description'] && (
+                <div className="pdp-accordion-content">
+                  <p>{product.description}</p>
+                </div>
+              )}
+            </div>
+
+            {/* Specifications */}
+            {product.specifications && (
+              <div className="pdp-accordion-item">
+                <button
+                  className="pdp-accordion-header"
+                  onClick={() => toggleSection('specs')}
+                  aria-expanded={expandedSections['specs']}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Settings size={20} className="text-gray-400" />
+                    <span>Especificaciones Técnicas</span>
                   </div>
-                ) : (
-                  'Añadir al Carrito'
+                  <ChevronDown
+                    size={20}
+                    className={`pdp-accordion-icon ${expandedSections['specs'] ? 'open' : ''}`}
+                  />
+                </button>
+                {expandedSections['specs'] && (
+                  <div className="pdp-accordion-content">
+                    <IndustrialSpecifications specifications={product.specifications} />
+                  </div>
                 )}
-              </button>
-              <button className="btn btn-outline">
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                Favoritos
-              </button>
-            </div>
-          </div>
-
-          {/* Specifications */}
-          {product.specifications && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Especificaciones Técnicas</h3>
-              <IndustrialSpecifications specifications={product.specifications} />
-            </div>
-          )}
-
-          {/* Dimensions and Weight */}
-          {(product.dimensions || product.weight) && (
-            <div className="mb-8">
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Dimensiones y Peso</h3>
-              <div className="bg-gray-50 rounded-lg p-4">
-                <dl className="grid grid-cols-1 gap-3">
-                  {product.dimensions && (
-                    <div className="flex justify-between py-2 border-b border-gray-200">
-                      <dt className="font-medium text-gray-700">Dimensiones:</dt>
-                      <dd className="text-gray-900">
-                        {product.dimensions.length} × {product.dimensions.width} × {product.dimensions.height} {product.dimensions.unit}
-                      </dd>
-                    </div>
-                  )}
-                  {product.weight && (
-                    <div className="flex justify-between py-2">
-                      <dt className="font-medium text-gray-700">Peso:</dt>
-                      <dd className="text-gray-900">{product.weight} kg</dd>
-                    </div>
-                  )}
-                </dl>
               </div>
-            </div>
-          )}
+            )}
+
+            {/* Dimensions */}
+            {(product.dimensions || product.weight) && (
+              <div className="pdp-accordion-item">
+                <button
+                  className="pdp-accordion-header"
+                  onClick={() => toggleSection('dimensions')}
+                  aria-expanded={expandedSections['dimensions']}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Box size={20} className="text-gray-400" />
+                    <span>Dimensiones y Peso</span>
+                  </div>
+                  <ChevronDown
+                    size={20}
+                    className={`pdp-accordion-icon ${expandedSections['dimensions'] ? 'open' : ''}`}
+                  />
+                </button>
+                {expandedSections['dimensions'] && (
+                  <div className="pdp-accordion-content">
+                    <div className="pdp-specs-box">
+                      <div className="pdp-dimensions-grid">
+                        {product.dimensions && (
+                          <>
+                            <div className="pdp-dim-item">
+                              <dt>Largo</dt>
+                              <dd>{product.dimensions.length} {product.dimensions.unit}</dd>
+                            </div>
+                            <div className="pdp-dim-item">
+                              <dt>Ancho</dt>
+                              <dd>{product.dimensions.width} {product.dimensions.unit}</dd>
+                            </div>
+                            <div className="pdp-dim-item">
+                              <dt>Alto</dt>
+                              <dd>{product.dimensions.height} {product.dimensions.unit}</dd>
+                            </div>
+                          </>
+                        )}
+                        {product.weight && (
+                          <div className="pdp-dim-item">
+                            <dt>Peso</dt>
+                            <dd>{product.weight} kg</dd>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Tags */}
+            {product.tags && product.tags.length > 0 && (
+              <div className="pdp-accordion-item">
+                <button
+                  className="pdp-accordion-header"
+                  onClick={() => toggleSection('tags')}
+                  aria-expanded={expandedSections['tags']}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <Tag size={20} className="text-gray-400" />
+                    <span>Etiquetas</span>
+                  </div>
+                  <ChevronDown
+                    size={20}
+                    className={`pdp-accordion-icon ${expandedSections['tags'] ? 'open' : ''}`}
+                  />
+                </button>
+                {expandedSections['tags'] && (
+                  <div className="pdp-accordion-content">
+                    <div className="pdp-tags-container">
+                      {product.tags.map(tag => (
+                        <span key={tag} className="pdp-tag">#{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
