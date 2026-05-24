@@ -153,6 +153,8 @@ export interface Cart {
   items: CartItem[];
   subtotal: number;
   itemCount: number;
+  discountCode?: string;
+  discountAmount?: number;
 }
 
 // Shipping Types

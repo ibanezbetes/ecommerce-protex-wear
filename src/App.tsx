@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { ToastProvider } from './contexts/ToastContext';
 import Layout from './components/Layout/Layout';
 import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
@@ -23,6 +24,10 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import OrdersPage from './pages/OrdersPage';
+import SuccessPage from './pages/SuccessPage';
+import EmailDemoPage from './pages/EmailDemoPage';
+import { CartDrawer } from './components/Cart/CartDrawer';
+import { AnimatePresence } from 'framer-motion';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
@@ -34,11 +39,13 @@ import DevAuthConfig from './components/Auth/DevAuthConfig';
  */
 function App() {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
-    </AuthProvider>
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </AuthProvider>
+    </ToastProvider>
   );
 }
 
@@ -74,11 +81,21 @@ function AppContent() {
 
   return (
     <Layout showHeader={!shouldHideLayout} showFooter={!shouldHideLayout}>
-      <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<HomePage />} />
-        <Route path="/contacto" element={<ContactPage />} />
-        <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+      <CartDrawer />
+      <AnimatePresence mode='wait'>
+        <Routes location={location} key={location.pathname}>
+          {/* Public Routes */}
+          <Route path="/" element={<HomePage />} />
+          <Route path="/contacto" element={<ContactPage />} />
+          <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+          <Route path="/productos" element={<ProductsPage />} />
+          <Route path="/productos/:id" element={<ProductDetailPage />} />
+          <Route path="/carrito" element={<CartPage />} />
+          <Route path="/success" element={<SuccessPage />} />
+          <Route path="/emails-demo" element={<EmailDemoPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/registro" element={<RegisterPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
 
         {/* Service Routes */}
         <Route path="/servicios/renting" element={<RentingPage />} />
@@ -123,6 +140,7 @@ function AppContent() {
         {/* 404 Page */}
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      </AnimatePresence>
 
       {/* Development Auth Configuration Panel */}
       <DevAuthConfig />
