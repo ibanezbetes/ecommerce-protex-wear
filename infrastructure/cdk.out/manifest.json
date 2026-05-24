@@ -1,0 +1,209 @@
+{
+  "version": "36.0.0",
+  "artifacts": {
+    "EcommerceProtexWearStack.assets": {
+      "type": "cdk:asset-manifest",
+      "properties": {
+        "file": "EcommerceProtexWearStack.assets.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "EcommerceProtexWearStack": {
+      "type": "aws:cloudformation:stack",
+      "environment": "aws://unknown-account/unknown-region",
+      "properties": {
+        "templateFile": "EcommerceProtexWearStack.template.json",
+        "terminationProtection": false,
+        "validateOnSynth": false,
+        "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
+        "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f11dc8788c5d87c8c9491ecd3170d677676416f73a9e3437825a98532448b722.json",
+        "requiresBootstrapStackVersion": 6,
+        "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
+        "additionalDependencies": [
+          "EcommerceProtexWearStack.assets"
+        ],
+        "lookupRole": {
+          "arn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-lookup-role-${AWS::AccountId}-${AWS::Region}",
+          "requiresBootstrapStackVersion": 8,
+          "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version"
+        }
+      },
+      "dependencies": [
+        "EcommerceProtexWearStack.assets"
+      ],
+      "metadata": {
+        "/EcommerceProtexWearStack/ProtexWearTable/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearTableF73247B0"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearUserPool/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearUserPoolFD12D2AD"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearUserPoolClient/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearUserPoolClient99C17BC8"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/ApiLogsRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiApiLogsRole9529F745"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApi2D35C46F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/Schema": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiSchemaCF7F059D"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/DefaultApiKey": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiDefaultApiKey27EA28D4"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/GetProductDataSource/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiGetProductDataSourceServiceRoleCD031B13"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/GetProductDataSource/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiGetProductDataSourceServiceRoleDefaultPolicy45C9911F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/GetProductDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiGetProductDataSource61593C98"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/GetProductResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiGetProductResolver8A307CC8"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/DbDataSource/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiDbDataSourceServiceRole3818109A"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/DbDataSource/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiDbDataSourceServiceRoleDefaultPolicyCEFF38F5"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/DbDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiDbDataSourceE87AF60F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/ListProductsResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiListProductsResolver14DA16A5"
+          }
+        ],
+        "/EcommerceProtexWearStack/GetProductHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetProductHandlerServiceRole92CC83BA"
+          }
+        ],
+        "/EcommerceProtexWearStack/GetProductHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetProductHandlerServiceRoleDefaultPolicy8980ECF6"
+          }
+        ],
+        "/EcommerceProtexWearStack/GetProductHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GetProductHandlerE1A19DE6"
+          }
+        ],
+        "/EcommerceProtexWearStack/GraphQLAPIURL": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GraphQLAPIURL"
+          }
+        ],
+        "/EcommerceProtexWearStack/GraphQLAPIKey": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "GraphQLAPIKey"
+          }
+        ],
+        "/EcommerceProtexWearStack/TableName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "TableName"
+          }
+        ],
+        "/EcommerceProtexWearStack/UserPoolId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolId"
+          }
+        ],
+        "/EcommerceProtexWearStack/UserPoolClientId": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserPoolClientId"
+          }
+        ],
+        "/EcommerceProtexWearStack/CDKMetadata/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadata"
+          }
+        ],
+        "/EcommerceProtexWearStack/CDKMetadata/Condition": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CDKMetadataAvailable"
+          }
+        ],
+        "/EcommerceProtexWearStack/BootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BootstrapVersion"
+          }
+        ],
+        "/EcommerceProtexWearStack/CheckBootstrapVersion": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CheckBootstrapVersion"
+          }
+        ]
+      },
+      "displayName": "EcommerceProtexWearStack"
+    },
+    "Tree": {
+      "type": "cdk:tree",
+      "properties": {
+        "file": "tree.json"
+      }
+    }
+  }
+}
