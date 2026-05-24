@@ -1,0 +1,19 @@
+{
+  "name": "shipping-calculator",
+  "version": "1.0.0",
+  "description": "Shipping cost calculator for Protex Wear orders",
+  "main": "handler.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/node": "^20.11.17",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

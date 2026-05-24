@@ -1,10 +1,10 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { Amplify } from 'aws-amplify';
-import { 
-  signIn, 
-  signUp, 
-  signOut, 
-  getCurrentUser, 
+import {
+  signIn,
+  signUp,
+  signOut,
+  getCurrentUser,
   confirmSignUp,
   confirmSignIn,
   fetchUserAttributes,
@@ -50,7 +50,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         isLoading: true,
         error: null,
       };
-    
+
     case 'AUTH_SUCCESS':
       return {
         ...state,
@@ -60,7 +60,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         error: null,
         passwordChallenge: undefined,
       };
-    
+
     case 'AUTH_ERROR':
       return {
         ...state,
@@ -70,7 +70,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         error: action.payload,
         passwordChallenge: undefined,
       };
-    
+
     case 'AUTH_LOGOUT':
       return {
         user: null,
@@ -79,7 +79,7 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
         error: null,
         passwordChallenge: undefined,
       };
-    
+
     case 'PASSWORD_CHALLENGE_REQUIRED':
       return {
         ...state,
@@ -91,19 +91,19 @@ function authReducer(state: AuthState, action: AuthAction): AuthState {
           email: action.payload.email,
         },
       };
-    
+
     case 'PASSWORD_CHALLENGE_CLEARED':
       return {
         ...state,
         passwordChallenge: undefined,
       };
-    
+
     case 'CLEAR_ERROR':
       return {
         ...state,
         error: null,
       };
-    
+
     default:
       return state;
   }
@@ -139,7 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const checkExistingSession = async () => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Check if Amplify Auth is properly configured
       const config = Amplify.getConfig();
       if (!config.Auth) {
@@ -147,18 +147,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         dispatch({ type: 'AUTH_LOGOUT' });
         return;
       }
-      
+
       // Check if user is authenticated with Amplify
       const currentUser = await getCurrentUser();
-      
+
       if (currentUser) {
         // Fetch user attributes to get profile information
         const attributes = await fetchUserAttributes();
-        
+
+        // Get groups from JWT token using fetchAuthSession
+        const { fetchAuthSession } = await import('aws-amplify/auth');
+        const session = await fetchAuthSession();
+        const groups = session.tokens?.idToken?.payload['cognito:groups'] as string[] | undefined;
+        const isAdmin = groups?.includes('ADMIN') || false;
+
         const user: User = {
           id: currentUser.userId,
           email: attributes.email || '',
-          role: (attributes['custom:role'] as 'ADMIN' | 'CUSTOMER') || 'CUSTOMER',
+          role: isAdmin ? 'ADMIN' : 'CUSTOMER',
           firstName: attributes.given_name || '',
           lastName: attributes.family_name || '',
           company: attributes['custom:company'] || undefined,
@@ -166,14 +172,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        
+
+        console.log('👤 User role determined:', user.role, 'Groups:', groups);
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
       } else {
         dispatch({ type: 'AUTH_LOGOUT' });
       }
     } catch (error: any) {
       console.error('Session check failed:', error);
-      
+
       // If Auth is not configured, force logout and clear any stored session
       if (error.name === 'AuthUserPoolException' || error.message?.includes('Auth UserPool not configured')) {
         console.log('🔄 Auth not configured, clearing stored session...');
@@ -184,7 +191,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           console.log('SignOut failed, continuing with logout...');
         }
       }
-      
+
       dispatch({ type: 'AUTH_LOGOUT' });
     }
   };
@@ -192,25 +199,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: LoginCredentials) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Sign in with Amplify
       const signInInput: SignInInput = {
         username: credentials.email,
         password: credentials.password,
       };
-      
+
+      console.log('🔐 Attempting login with:', { username: credentials.email });
       const signInResult = await signIn(signInInput);
-      
+
       // Check if sign in is complete or if there's a challenge
       if (signInResult.isSignedIn) {
         // User is fully signed in
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
-        
+
+        // Get groups from JWT token
+        const { fetchAuthSession } = await import('aws-amplify/auth');
+        const session = await fetchAuthSession();
+        const groups = session.tokens?.idToken?.payload['cognito:groups'] as string[] | undefined;
+        const isAdmin = groups?.includes('ADMIN') || false;
+
         const user: User = {
           id: currentUser.userId,
           email: attributes.email || credentials.email,
-          role: (attributes['custom:role'] as 'ADMIN' | 'CUSTOMER') || 'CUSTOMER',
+          role: isAdmin ? 'ADMIN' : 'CUSTOMER',
           firstName: attributes.given_name || '',
           lastName: attributes.family_name || '',
           company: attributes['custom:company'] || undefined,
@@ -218,28 +232,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        
+
+        console.log('👤 Login successful - Role:', user.role, 'Groups:', groups);
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
       } else if (signInResult.nextStep) {
         // Handle sign-in challenges
         const { signInStep } = signInResult.nextStep;
-        
+
         if (signInStep === 'CONFIRM_SIGN_IN_WITH_NEW_PASSWORD_REQUIRED') {
           // User needs to set a new password
-          dispatch({ 
-            type: 'PASSWORD_CHALLENGE_REQUIRED', 
-            payload: { 
+          dispatch({
+            type: 'PASSWORD_CHALLENGE_REQUIRED',
+            payload: {
               challengeType: 'NEW_PASSWORD_REQUIRED',
-              email: credentials.email 
-            }
-          });
-        } else if (signInStep === 'FORCE_CHANGE_PASSWORD') {
-          // User is forced to change password
-          dispatch({ 
-            type: 'PASSWORD_CHALLENGE_REQUIRED', 
-            payload: { 
-              challengeType: 'FORCE_CHANGE_PASSWORD',
-              email: credentials.email 
+              email: credentials.email
             }
           });
         } else {
@@ -251,7 +257,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Login error:', error);
       let errorMessage = 'Error de autenticación';
-      
+
       // Handle specific Amplify Auth errors
       if (error.name === 'NotAuthorizedException') {
         errorMessage = 'Credenciales incorrectas';
@@ -264,7 +270,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw new Error(errorMessage);
     }
@@ -273,7 +279,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: RegisterData): Promise<{ needsConfirmation: boolean; email: string }> => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Sign up with Amplify
       const signUpInput: SignUpInput = {
         username: data.email,
@@ -288,15 +294,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           },
         },
       };
-      
+
       const { isSignUpComplete, userId, nextStep } = await signUp(signUpInput);
-      
+
       if (isSignUpComplete) {
         // User is automatically confirmed (via pre-signup trigger)
         // Get user information
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
-        
+
         const user: User = {
           id: userId || currentUser.userId,
           email: data.email,
@@ -308,7 +314,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        
+
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
         return { needsConfirmation: false, email: data.email };
       } else {
@@ -319,7 +325,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Registration error:', error);
       let errorMessage = 'Error en el registro';
-      
+
       // Handle specific Amplify Auth errors
       if (error.name === 'UsernameExistsException') {
         errorMessage = 'Ya existe una cuenta con este correo electrónico';
@@ -330,7 +336,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw new Error(errorMessage);
     }
@@ -339,19 +345,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const confirmRegistration = async (email: string, code: string) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Confirm sign up with verification code
       await confirmSignUp({
         username: email,
         confirmationCode: code,
       });
-      
+
       // After confirmation, the user should sign in
       dispatch({ type: 'AUTH_LOGOUT' });
     } catch (error: any) {
       console.error('Confirmation error:', error);
       let errorMessage = 'Error al confirmar la cuenta';
-      
+
       if (error.name === 'CodeMismatchException') {
         errorMessage = 'Código de verificación incorrecto';
       } else if (error.name === 'ExpiredCodeException') {
@@ -361,7 +367,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw new Error(errorMessage);
     }
@@ -370,21 +376,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const confirmNewPassword = async (newPassword: string) => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Confirm the new password with Amplify
       const confirmResult = await confirmSignIn({
         challengeResponse: newPassword,
       });
-      
+
       if (confirmResult.isSignedIn) {
         // Password change successful, get user information
         const currentUser = await getCurrentUser();
         const attributes = await fetchUserAttributes();
-        
+
+        // Get groups from JWT token
+        const { fetchAuthSession } = await import('aws-amplify/auth');
+        const session = await fetchAuthSession();
+        const groups = session.tokens?.idToken?.payload['cognito:groups'] as string[] | undefined;
+        const isAdmin = groups?.includes('ADMIN') || false;
+
         const user: User = {
           id: currentUser.userId,
           email: attributes.email || state.passwordChallenge?.email || '',
-          role: (attributes['custom:role'] as 'ADMIN' | 'CUSTOMER') || 'CUSTOMER',
+          role: isAdmin ? 'ADMIN' : 'CUSTOMER',
           firstName: attributes.given_name || '',
           lastName: attributes.family_name || '',
           company: attributes['custom:company'] || undefined,
@@ -392,7 +404,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
         };
-        
+
         dispatch({ type: 'AUTH_SUCCESS', payload: user });
       } else {
         throw new Error('Error al confirmar la nueva contraseña');
@@ -400,7 +412,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error: any) {
       console.error('Confirm new password error:', error);
       let errorMessage = 'Error al cambiar la contraseña';
-      
+
       if (error.name === 'InvalidPasswordException') {
         errorMessage = 'La contraseña no cumple con los requisitos de seguridad';
       } else if (error.name === 'NotAuthorizedException') {
@@ -408,7 +420,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       dispatch({ type: 'AUTH_ERROR', payload: errorMessage });
       throw new Error(errorMessage);
     }
@@ -433,15 +445,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshUser = async () => {
     try {
       dispatch({ type: 'AUTH_START' });
-      
+
       // Get current user from Amplify
       const currentUser = await getCurrentUser();
       const attributes = await fetchUserAttributes();
-      
+
+      // Get groups from JWT token
+      const { fetchAuthSession } = await import('aws-amplify/auth');
+      const session = await fetchAuthSession();
+      const groups = session.tokens?.idToken?.payload['cognito:groups'] as string[] | undefined;
+      const isAdmin = groups?.includes('ADMIN') || false;
+
       const user: User = {
         id: currentUser.userId,
         email: attributes.email || '',
-        role: (attributes['custom:role'] as 'ADMIN' | 'CUSTOMER') || 'CUSTOMER',
+        role: isAdmin ? 'ADMIN' : 'CUSTOMER',
         firstName: attributes.given_name || '',
         lastName: attributes.family_name || '',
         company: attributes['custom:company'] || undefined,
@@ -449,7 +467,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
-      
+
       dispatch({ type: 'AUTH_SUCCESS', payload: user });
     } catch (error) {
       console.error('User refresh error:', error);

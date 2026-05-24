@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useProducts } from '../../hooks/useProducts';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../UI/LoadingSpinner';
 import ProductForm from './ProductForm';
 import type { Product } from '../../services/graphql';
+import S3Image from '../UI/S3Image';
+import '../../styles/AdminProducts.css';
 
 /**
  * Product Management Component for Admin Dashboard
  * Provides CRUD operations for products with real GraphQL integration
+ * Now with advanced filters and sorting
  */
 function ProductManagement() {
   const { user, isAuthenticated } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [stockFilter, setStockFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState('name-asc');
 
   const {
     products,
@@ -26,9 +33,11 @@ function ProductManagement() {
     deleteProduct,
     refreshProducts,
     loadMore,
+    setFilters,
+    setSort,
   } = useProducts({
     autoFetch: true,
-    limit: 10,
+    limit: 1000,
   });
 
   // Check if user is admin
@@ -40,6 +49,38 @@ function ProductManagement() {
       </div>
     );
   }
+
+  // Apply filters and sorting
+  useEffect(() => {
+    const filters: any = {};
+
+    if (categoryFilter) {
+      filters.category = categoryFilter;
+    }
+
+    if (stockFilter === 'in-stock') {
+      filters.inStock = true;
+    }
+
+    setFilters(filters);
+
+    // Apply sorting
+    const [field, direction] = sortBy.split('-');
+    setSort({ field: field as any, direction: direction as 'asc' | 'desc' });
+  }, [categoryFilter, stockFilter, sortBy, setFilters, setSort]);
+
+  // Filter products client-side for additional filters
+  const filteredProducts = products.filter(product => {
+    // Stock filter
+    if (stockFilter === 'low-stock' && (product.stock > 10 || product.stock <= 0)) return false;
+    if (stockFilter === 'out-of-stock' && product.stock > 0) return false;
+
+    // Status filter
+    if (statusFilter === 'active' && !product.isActive) return false;
+    if (statusFilter === 'inactive' && product.isActive) return false;
+
+    return true;
+  });
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,18 +146,18 @@ function ProductManagement() {
   if (showForm) {
     return (
       <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">
+        <div className="apm-header">
+          <h2 className="apm-title">
             {editingProduct ? 'Editar Producto' : 'Crear Producto'}
           </h2>
           <button
             onClick={handleFormCancel}
-            className="btn btn-outline"
+            className="btn-modern btn-modern-outline"
           >
             Cancelar
           </button>
         </div>
-        
+
         <ProductForm
           product={editingProduct}
           onSubmit={handleFormSubmit}
@@ -129,48 +170,161 @@ function ProductManagement() {
   return (
     <div>
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-900">Gestión de Productos</h2>
+      <div className="apm-header">
+        <h2 className="apm-title">Gestión de Productos</h2>
         <button
           onClick={handleCreateProduct}
-          className="btn btn-primary"
+          className="btn-modern btn-modern-primary"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{ width: '1.25rem', height: '1.25rem' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          Añadir Producto
+          Nuevo Producto
         </button>
       </div>
 
       {/* Search and Filters */}
-      <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-        <form onSubmit={handleSearch} className="flex space-x-4">
-          <div className="flex-1">
-            <input
-              type="text"
-              placeholder="Buscar productos por nombre, descripción o etiquetas..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            />
+      <div className="apm-search-card">
+        {/* Search Bar */}
+        <form onSubmit={handleSearch} style={{ marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+            <div className="apm-search-input-wrapper" style={{ flex: '1 1 300px' }}>
+              <svg className="apm-search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+              <input
+                type="text"
+                placeholder="Buscar por nombre, SKU o categoría..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="apm-search-input"
+              />
+            </div>
+            <button type="submit" className="btn-modern btn-modern-primary" style={{ whiteSpace: 'nowrap' }}>
+              Buscar
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchTerm('');
+                setCategoryFilter('');
+                setStockFilter('all');
+                setStatusFilter('all');
+                refreshProducts();
+              }}
+              className="btn-modern btn-modern-outline"
+              style={{ whiteSpace: 'nowrap' }}
+            >
+              Limpiar
+            </button>
           </div>
-          <button
-            type="submit"
-            className="btn btn-primary"
-          >
-            Buscar
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setSearchTerm('');
-              refreshProducts();
-            }}
-            className="btn btn-outline"
-          >
-            Limpiar
-          </button>
         </form>
+
+        {/* Compact Filters Row */}
+        <div style={{
+          display: 'flex',
+          gap: '0.75rem',
+          flexWrap: 'wrap',
+          alignItems: 'center',
+          paddingTop: '1rem',
+          borderTop: '1px solid #e5e7eb'
+        }}>
+          {/* Category Filter */}
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '140px',
+              flex: '1 1 auto',
+              maxWidth: '200px'
+            }}
+          >
+            <option value="">Todas las categorías</option>
+            <option value="Vestuario">Vestuario</option>
+            <option value="Protección Cabeza">Protección Cabeza</option>
+            <option value="Protección Manos">Protección Manos</option>
+            <option value="Calzado Seguridad">Calzado Seguridad</option>
+            <option value="Alta Visibilidad">Alta Visibilidad</option>
+          </select>
+
+          {/* Stock Filter */}
+          <select
+            value={stockFilter}
+            onChange={(e) => setStockFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '130px',
+              flex: '1 1 auto',
+              maxWidth: '180px'
+            }}
+          >
+            <option value="all">Todo el stock</option>
+            <option value="in-stock">En Stock</option>
+            <option value="low-stock">Stock Bajo</option>
+            <option value="out-of-stock">Agotado</option>
+          </select>
+
+          {/* Status Filter */}
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '120px',
+              flex: '1 1 auto',
+              maxWidth: '150px'
+            }}
+          >
+            <option value="all">Todos</option>
+            <option value="active">Activos</option>
+            <option value="inactive">Inactivos</option>
+          </select>
+
+          {/* Sort By */}
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            style={{
+              padding: '0.5rem 0.75rem',
+              border: '1px solid #d1d5db',
+              borderRadius: '0.375rem',
+              fontSize: '0.875rem',
+              minWidth: '150px',
+              flex: '1 1 auto',
+              maxWidth: '200px'
+            }}
+          >
+            <option value="name-asc">Nombre (A-Z)</option>
+            <option value="name-desc">Nombre (Z-A)</option>
+            <option value="price-asc">Precio ↑</option>
+            <option value="price-desc">Precio ↓</option>
+            <option value="stock-asc">Stock ↑</option>
+            <option value="stock-desc">Stock ↓</option>
+            <option value="createdAt-desc">Más Recientes</option>
+            <option value="createdAt-asc">Más Antiguos</option>
+          </select>
+
+          {/* Results Count */}
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#6b7280',
+            marginLeft: 'auto',
+            whiteSpace: 'nowrap',
+            padding: '0.5rem 0'
+          }}>
+            {filteredProducts.length} de {products.length} productos
+          </div>
+        </div>
       </div>
 
       {/* Error Message */}
@@ -182,8 +336,8 @@ function ProductManagement() {
             </svg>
             <div>
               <p className="text-sm text-red-600">{error}</p>
-              <button 
-                onClick={() => refreshProducts()} 
+              <button
+                onClick={() => refreshProducts()}
                 className="mt-2 text-sm text-red-700 hover:text-red-900 underline"
               >
                 Reintentar
@@ -194,122 +348,115 @@ function ProductManagement() {
       )}
 
       {/* Products Table */}
-      <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+      <div className="apm-table-container">
         {loading && products.length === 0 ? (
           <div className="p-8 text-center">
             <LoadingSpinner size="lg" text="Cargando productos..." />
           </div>
-        ) : products.length === 0 ? (
+        ) : filteredProducts.length === 0 ? (
           <div className="p-8 text-center">
             <div className="text-gray-400 mb-4">
-              <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg style={{ width: '4rem', height: '4rem', margin: '0 auto' }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
               </svg>
             </div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No hay productos</h3>
-            <p className="text-gray-600 mb-4">Comienza creando tu primer producto</p>
-            <button
-              onClick={handleCreateProduct}
-              className="btn btn-primary"
-            >
-              Crear Primer Producto
-            </button>
+            <p className="text-gray-600 mb-4">
+              {products.length > 0 ? 'No se encontraron productos con los filtros aplicados' : 'Comienza creando tu primer producto'}
+            </p>
+            {products.length === 0 && (
+              <button
+                onClick={handleCreateProduct}
+                className="btn-modern btn-modern-primary"
+              >
+                Crear Primer Producto
+              </button>
+            )}
           </div>
         ) : (
           <>
             <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
+              <table className="apm-table">
+                <thead className="apm-main-thead">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Producto
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      SKU
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Precio
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Stock
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Estado
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Acciones
-                    </th>
+                    <th className="apm-th">Producto</th>
+                    <th className="apm-th">SKU</th>
+                    <th className="apm-th">Precio</th>
+                    <th className="apm-th">Stock</th>
+                    <th className="apm-th">Estado</th>
+                    <th className="apm-th">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {products.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <div className="w-12 h-12 bg-gray-200 rounded-lg mr-4 flex-shrink-0">
-                            {product.imageUrl ? (
-                              <img
-                                src={product.imageUrl}
-                                alt={product.name}
-                                className="w-full h-full object-cover rounded-lg"
+                <tbody>
+                  {filteredProducts.map((product) => (
+                    <tr key={product.id} className="apm-tr">
+                      <td className="apm-td">
+                        <div className="apm-product-cell">
+                          <div className="apm-img-wrapper">
+                            {product.imageUrl && product.imageUrl.trim() !== '' ? (
+                              <S3Image
+                                s3Key={product.imageUrl}
+                                alt={product.name || 'Producto'}
+                                className="apm-product-img"
                               />
                             ) : (
-                              <div className="w-full h-full flex items-center justify-center text-gray-400">
-                                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                              <div className="apm-img-placeholder">
+                                <svg
+                                  width="24"
+                                  height="24"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
                                   <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                                 </svg>
                               </div>
                             )}
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="text-sm font-medium text-gray-900 truncate">
-                              {product.name}
-                            </div>
-                            <div className="text-sm text-gray-500 truncate">
-                              {product.category || 'Sin categoría'}
-                            </div>
+                          <div className="apm-info-text">
+                            <span className="apm-product-name">{product.name}</span>
+                            <span className="apm-product-category">{product.category || 'Sin cat.'}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {product.sku}
+                      <td className="apm-td">
+                        <span className="apm-sku-badge">{product.sku}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        €{product.price.toFixed(2)}
+                      <td className="apm-td">
+                        <span className="apm-price">€{product.price.toFixed(2)}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.stock > 10 
-                            ? 'bg-green-100 text-green-800'
-                            : product.stock > 0
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-red-100 text-red-800'
-                        }`}>
-                          {product.stock} unidades
+                      <td className="apm-td">
+                        <span className={`apm-stock-badge ${product.stock > 10 ? 'apm-stock-high' : product.stock > 0 ? 'apm-stock-low' : 'apm-stock-out'
+                          }`}>
+                          <span className="apm-stock-dot"></span>
+                          {product.stock > 0 ? `${product.stock} un.` : 'Agotado'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          product.isActive 
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                      <td className="apm-td">
+                        <span className={`apm-status-badge ${product.isActive ? 'apm-status-active' : 'apm-status-inactive'}`}>
                           {product.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <button
-                          onClick={() => handleEditProduct(product)}
-                          className="text-primary-600 hover:text-primary-900"
-                        >
-                          Editar
-                        </button>
-                        <button
-                          onClick={() => handleDeleteProduct(product)}
-                          className="text-red-600 hover:text-red-900"
-                        >
-                          Eliminar
-                        </button>
+                      <td className="apm-td">
+                        <div className="apm-actions">
+                          <button
+                            onClick={() => handleEditProduct(product)}
+                            className="apm-btn-icon"
+                            title="Editar"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteProduct(product)}
+                            className="apm-btn-icon delete"
+                            title="Eliminar"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                              <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+                            </svg>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -323,7 +470,7 @@ function ProductManagement() {
                 <button
                   onClick={loadMore}
                   disabled={loading}
-                  className="btn btn-outline disabled:opacity-50"
+                  className="btn-modern btn-modern-outline"
                 >
                   {loading ? (
                     <div className="flex items-center">

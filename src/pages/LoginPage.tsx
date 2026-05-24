@@ -3,6 +3,9 @@ import { Link, useNavigate, useSearchParams, useLocation } from 'react-router-do
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import NewPasswordModal from '../components/Auth/NewPasswordModal';
+import logo from '../assets/logo.png';
+import loginImage from '../assets/hero_corporate_building_blue.png';
+import '../styles/LoginPage.css';
 
 /**
  * Login Page - User authentication
@@ -12,7 +15,7 @@ function LoginPage() {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { login, isAuthenticated, isLoading, error, passwordChallenge, clearPasswordChallenge } = useAuth();
-  
+
   const [formData, setFormData] = useState({
     email: location.state?.email || '',
     password: '',
@@ -40,7 +43,7 @@ function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!formData.email || !formData.password) {
       return;
     }
@@ -51,7 +54,7 @@ function LoginPage() {
         email: formData.email,
         password: formData.password,
       });
-      
+
       // Navigation will be handled by useEffect when isAuthenticated changes
     } catch (err) {
       // Error is handled by AuthContext
@@ -70,69 +73,79 @@ function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        {/* Header */}
-        <div className="text-center">
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Iniciar Sesión
-          </h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Accede a tu cuenta de Protex Wear
-          </p>
-        </div>
+    <div className="login-page">
+      {/* Left Side - Image */}
+      <div className="login-image-section">
+        <img src={loginImage} alt="Protex Wear Office" />
+        <div className="login-image-overlay"></div>
+      </div>
 
-        {/* Login Form */}
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {/* Success Message */}
-        {successMessage && (
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex">
-              <svg className="w-5 h-5 text-green-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <p className="text-sm text-green-600">{successMessage}</p>
-            </div>
+      {/* Right Side - Login Form */}
+      <div className="login-form-section">
+        <div className="login-card">
+          {/* Header */}
+          <div className="login-header">
+            <Link to="/">
+              <img src={logo} alt="Protex Wear" className="login-logo" />
+            </Link>
+            <h2 className="login-title">
+              Bienvenido de nuevo
+            </h2>
+            <p className="login-subtitle">
+              Accede a tu cuenta de Protex Wear
+            </p>
           </div>
-        )}
 
-        {/* Error Message */}
-          {error && (
-            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-              <div className="flex">
-                <svg className="w-5 h-5 text-red-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                </svg>
-                <p className="text-sm text-red-600">{error}</p>
+          {/* Login Form */}
+          <form onSubmit={handleSubmit}>
+            {/* Success Message */}
+            {successMessage && (
+              <div className="alert alert-success mb-6">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm">{successMessage}</p>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          <div className="space-y-4">
-            {/* Email Field */}
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            {/* Error Message */}
+            {error && (
+              <div className="alert alert-error mb-6">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                  <p className="text-sm">{error}</p>
+                </div>
+              </div>
+            )}
+
+            <div className="form-group">
+              <label htmlFor="email" className="form-label">
                 Correo Electrónico
               </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={formData.email}
-                onChange={handleInputChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                placeholder="tu@empresa.com"
-              />
+              <div className="form-input-container">
+                <input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  required
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="tu@empresa.com"
+                />
+              </div>
             </div>
 
-            {/* Password Field */}
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="form-group">
+              <label htmlFor="password" className="form-label">
                 Contraseña
               </label>
-              <div className="relative">
+              <div className="form-input-container">
                 <input
                   id="password"
                   name="password"
@@ -141,13 +154,15 @@ function LoginPage() {
                   required
                   value={formData.password}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="form-input"
                   placeholder="Tu contraseña"
+                  style={{ paddingRight: '2.5rem' }}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600"
+                  className="password-toggle"
+                  aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -162,79 +177,76 @@ function LoginPage() {
                 </button>
               </div>
             </div>
-          </div>
 
-          {/* Remember Me and Forgot Password */}
-          <div className="flex items-center justify-between">
-            <div className="flex items-center">
-              <input
-                id="remember-me"
-                name="remember-me"
-                type="checkbox"
-                className="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded"
-              />
-              <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
-                Recordarme
-              </label>
-            </div>
+            {/* Remember Me and Forgot Password */}
+            <div className="login-options">
+              <div className="remember-me">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                />
+                <label htmlFor="remember-me" style={{ marginBottom: 0, cursor: 'pointer' }}>
+                  Recordarme
+                </label>
+              </div>
 
-            <div className="text-sm">
-              <a href="#" className="font-medium text-primary-600 hover:text-primary-500">
+              <a href="#" className="forgot-password">
                 ¿Olvidaste tu contraseña?
               </a>
             </div>
-          </div>
 
-          {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isSubmitting || !formData.email || !formData.password}
-            className="w-full btn btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? (
-              <div className="flex items-center justify-center">
-                <LoadingSpinner size="sm" />
-                <span className="ml-2">Iniciando sesión...</span>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={isSubmitting || !formData.email || !formData.password}
+              className="btn-login-submit"
+            >
+              {isSubmitting ? (
+                <>
+                  <LoadingSpinner size="sm" />
+                  <span>Iniciando...</span>
+                </>
+              ) : (
+                'Iniciar Sesión'
+              )}
+            </button>
+
+            {/* Demo Credentials */}
+            <div className="demo-credentials">
+              <h3 className="demo-title">Credenciales de Demo:</h3>
+              <div className="demo-item">
+                <strong>Cliente:</strong> cliente@demo.com / password123
               </div>
-            ) : (
-              'Iniciar Sesión'
-            )}
-          </button>
-
-          {/* Demo Credentials */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h3 className="text-sm font-medium text-blue-800 mb-2">Credenciales de Demo:</h3>
-            <div className="text-sm text-blue-700 space-y-1">
-              <p><strong>Cliente:</strong> cliente@demo.com / password123</p>
-              <p><strong>Admin:</strong> admin@demo.com / password123</p>
+              <div className="demo-item">
+                <strong>Admin:</strong> admin@demo.com / password123
+              </div>
             </div>
-          </div>
-        </form>
+          </form>
 
-        {/* Register Link */}
-        <div className="text-center">
-          <p className="text-sm text-gray-600">
+          {/* Register Link */}
+          <div className="register-link-container">
             ¿No tienes cuenta?{' '}
             <Link
               to="/registro"
-              className="font-medium text-primary-600 hover:text-primary-500"
+              className="register-link-text"
             >
               Regístrate aquí
             </Link>
-          </p>
-        </div>
+          </div>
 
-        {/* Back to Home */}
-        <div className="text-center">
-          <Link
-            to="/"
-            className="text-sm text-gray-500 hover:text-gray-700 flex items-center justify-center"
-          >
-            <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Volver al inicio
-          </Link>
+          {/* Back to Home */}
+          <div className="back-home-container">
+            <Link
+              to="/"
+              className="back-home-link"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Volver al inicio
+            </Link>
+          </div>
         </div>
       </div>
 

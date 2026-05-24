@@ -1,33 +1,43 @@
-name: Deploy
+name: Deploy to Amplify
 on:
   push:
     branches: [dev, main]
+
 jobs:
-  deploy-frontend:
+  deploy:
     if: contains(fromJson('["dev","main"]'), github.ref_name)
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/frontend
+    
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm ci && npm run build --if-present
-      - name: Sync to S3 (placeholder)
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build frontend
+        run: npm run build
+        env:
+          CI: false
+      
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: eu-west-1
+      
+      - name: Deploy to Amplify
         run: |
-          echo "Sube ./dist a S3 aquí (aws s3 sync ...)"
-  deploy-backend:
-    if: contains(fromJson('["dev","main"]'), github.ref_name)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - run: npm ci && npm run build --if-present
-      - name: Deploy to EC2 (placeholder)
-        run: |
-          echo "Despliegue a EC2 aquí (scp/rsync/CodeDeploy)"
+          echo "Deploying to AWS Amplify..."
+          # Amplify se despliega automáticamente desde GitHub
+          # Este paso es informativo
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Amplify detectará este push y desplegará automáticamente"

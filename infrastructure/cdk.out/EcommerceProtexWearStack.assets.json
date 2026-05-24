@@ -1,0 +1,32 @@
+{
+  "version": "36.0.0",
+  "files": {
+    "7c39858a4bf9545dc55b50094d79430b7df549e28ebaf3873a3c218750cdf5e1": {
+      "source": {
+        "path": "asset.7c39858a4bf9545dc55b50094d79430b7df549e28ebaf3873a3c218750cdf5e1",
+        "packaging": "zip"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "7c39858a4bf9545dc55b50094d79430b7df549e28ebaf3873a3c218750cdf5e1.zip",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    },
+    "f11dc8788c5d87c8c9491ecd3170d677676416f73a9e3437825a98532448b722": {
+      "source": {
+        "path": "EcommerceProtexWearStack.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "current_account-current_region": {
+          "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
+          "objectKey": "f11dc8788c5d87c8c9491ecd3170d677676416f73a9e3437825a98532448b722.json",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

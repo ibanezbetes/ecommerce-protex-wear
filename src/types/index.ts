@@ -98,19 +98,19 @@ export interface OrderItem {
   totalPrice: number;
 }
 
-export type OrderStatus = 
-  | 'PENDING' 
-  | 'PROCESSING' 
-  | 'SHIPPED' 
-  | 'DELIVERED' 
-  | 'CANCELLED' 
+export type OrderStatus =
+  | 'PENDING'
+  | 'PROCESSING'
+  | 'SHIPPED'
+  | 'DELIVERED'
+  | 'CANCELLED'
   | 'DISPUTED';
 
-export type PaymentStatus = 
-  | 'pending' 
-  | 'succeeded' 
-  | 'failed' 
-  | 'disputed' 
+export type PaymentStatus =
+  | 'pending'
+  | 'succeeded'
+  | 'failed'
+  | 'disputed'
   | 'refunded';
 
 // Address Types
@@ -283,7 +283,7 @@ export interface AdminStats {
   totalOrders: number;
   totalRevenue: number;
   totalProducts: number;
-  totalUsers: number;
+  pendingOrders: number;
   recentOrders: Order[];
   topProducts: Product[];
   salesByMonth: { month: string; sales: number }[];

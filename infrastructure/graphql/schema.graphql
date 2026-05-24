@@ -1,0 +1,58 @@
+type Product @aws_api_key @aws_cognito_user_pools {
+  id: ID!
+  name: String!
+  description: String
+  brand: String!
+  category: String
+  variants: [Variant!]!
+  createdAt: String
+  updatedAt: String
+}
+
+type Variant @aws_api_key @aws_cognito_user_pools {
+  id: ID!
+  sku: String!
+  size: String
+  color: String
+  basePrice: Float!
+  images: [String]
+}
+
+type Query {
+  # Obtener un producto por ID. Usa Lambda resolver para inyectar precio VIP si el usuario está logueado.
+  getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools
+  
+  # Listar productos (con paginación simple y filtro)
+  listProducts(brand: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools
+}
+
+type ProductConnection @aws_api_key @aws_cognito_user_pools {
+  items: [Product!]!
+  nextToken: String
+}
+
+enum PaymentMethod {
+  STANDARD
+  DEFERRED
+}
+
+input CreateOrderInput {
+  type: PaymentMethod!
+  items: [OrderItemInput!]!
+}
+
+input OrderItemInput {
+  productId: ID!
+  variantId: ID!
+  quantity: Int!
+}
+
+type OrderResponse {
+  orderId: ID!
+  checkoutUrl: String
+  status: String!
+}
+
+type Mutation {
+  createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools
+}

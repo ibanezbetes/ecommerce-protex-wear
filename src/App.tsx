@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
 import Layout from './components/Layout/Layout';
@@ -7,12 +7,22 @@ import HomePage from './pages/HomePage';
 import ProductsPage from './pages/ProductsPage';
 import ContactPage from './pages/ContactPage';
 import SobreNosotrosPage from './pages/SobreNosotrosPage';
+import RentingPage from './pages/Services/RentingPage';
+import LavanderiaPage from './pages/Services/LavanderiaPage';
+import MaquinasPage from './pages/Services/MaquinasPage';
+import StockSeguridadPage from './pages/Services/StockSeguridadPage';
+import EntregasNominativasPage from './pages/Services/EntregasNominativasPage';
+import PersonalizacionPage from './pages/Services/PersonalizacionPage';
+import MerchandisingPage from './pages/Services/MerchandisingPage';
+import CeePage from './pages/Services/CeePage';
+
 import ProductDetailPage from './pages/ProductDetailPage';
 import CartPage from './pages/CartPage';
 import CheckoutPage from './pages/CheckoutPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
+import OrdersPage from './pages/OrdersPage';
 import AdminDashboard from './pages/AdminDashboard';
 import NotFoundPage from './pages/NotFoundPage';
 import ProtectedRoute from './components/Auth/ProtectedRoute';
@@ -39,6 +49,11 @@ function App() {
 function AppContent() {
   const { isLoading, isAuthenticated, user } = useAuth();
 
+  const location = useLocation();
+  const isAdminPage = location.pathname.startsWith('/admin');
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/registro';
+  const shouldHideLayout = isAdminPage || isAuthPage;
+
   // Debug logging
   console.log('🔍 AppContent Debug:', { isLoading, isAuthenticated, user });
 
@@ -58,12 +73,23 @@ function AppContent() {
   console.log('🏠 Mostrando contenido principal...');
 
   return (
-    <Layout>
+    <Layout showHeader={!shouldHideLayout} showFooter={!shouldHideLayout}>
       <Routes>
         {/* Public Routes */}
         <Route path="/" element={<HomePage />} />
         <Route path="/contacto" element={<ContactPage />} />
         <Route path="/sobre-nosotros" element={<SobreNosotrosPage />} />
+
+        {/* Service Routes */}
+        <Route path="/servicios/renting" element={<RentingPage />} />
+        <Route path="/servicios/lavanderia" element={<LavanderiaPage />} />
+        <Route path="/servicios/maquinas-expendedoras" element={<MaquinasPage />} />
+        <Route path="/servicios/stock-seguridad" element={<StockSeguridadPage />} />
+        <Route path="/servicios/entregas-nominativas" element={<EntregasNominativasPage />} />
+        <Route path="/servicios/personalizacion" element={<PersonalizacionPage />} />
+        <Route path="/servicios/merchandising" element={<MerchandisingPage />} />
+        <Route path="/servicios/cee" element={<CeePage />} />
+
         <Route path="/productos" element={<ProductsPage />} />
         <Route path="/productos/:id" element={<ProductDetailPage />} />
         <Route path="/carrito" element={<CartPage />} />
@@ -79,6 +105,11 @@ function AppContent() {
         <Route path="/perfil" element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/pedidos" element={
+          <ProtectedRoute>
+            <OrdersPage />
           </ProtectedRoute>
         } />
 

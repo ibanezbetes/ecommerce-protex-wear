@@ -1,4 +1,4 @@
-import { generateClient } from 'aws-amplify/api';
+import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 
 /**
@@ -8,12 +8,14 @@ import type { Schema } from '../../amplify/data/resource';
 
 // Lazy client generation - se genera cuando se necesita
 let client: any = null;
+let authClient: any = null;
 
 function getClient() {
   if (!client) {
     try {
-      client = generateClient<Schema>();
-      console.log('✅ Cliente GraphQL generado exitosamente');
+      // Use userPool as default since amplify_outputs.json now has userPool as defaultAuthMode
+      client = generateClient<Schema>({ authMode: 'userPool' });
+      console.log('✅ Cliente GraphQL generado exitosamente (userPool)');
     } catch (error) {
       console.warn('⚠️ Error generando cliente GraphQL:', error);
       return null;
@@ -21,6 +23,20 @@ function getClient() {
   }
   return client;
 }
+
+function getAuthenticatedClient() {
+  if (!authClient) {
+    try {
+      authClient = generateClient<Schema>({ authMode: 'userPool' });
+      console.log('✅ Cliente GraphQL autenticado generado (userPool)');
+    } catch (error) {
+      console.warn('⚠️ Error generando cliente autenticado:', error);
+      return null;
+    }
+  }
+  return authClient;
+}
+
 
 // Export types for use in components
 export type Product = Schema['Product']['type'];
@@ -51,12 +67,12 @@ export const productOperations = {
   async listProducts(filter?: any, limit?: number, nextToken?: string) {
     try {
       const graphqlClient = getClient();
-      
+
       // Verificar si el cliente está disponible
       if (!graphqlClient || !graphqlClient.models || !graphqlClient.models.Product) {
         throw new Error('GraphQL client not available - client.models.Product is undefined');
       }
-      
+
       console.log('🔍 Usando cliente GraphQL real para listar productos');
       const response = await graphqlClient.models.Product.list({
         filter,
@@ -75,7 +91,7 @@ export const productOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Product.get({ id });
       return response;
     } catch (error) {
@@ -89,7 +105,7 @@ export const productOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Product.productBySku({ sku });
       return response;
     } catch (error) {
@@ -103,10 +119,10 @@ export const productOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
-      const response = await graphqlClient.models.Product.productsByCategory({ 
+
+      const response = await graphqlClient.models.Product.productsByCategory({
         category,
-        limit 
+        limit
       });
       return response;
     } catch (error) {
@@ -118,14 +134,23 @@ export const productOperations = {
   // Create new product (Admin only)
   async createProduct(input: CreateProductInput) {
     try {
-      const graphqlClient = getClient();
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
+      console.log("➕ [API DEBUG] creating product...", input);
       const response = await graphqlClient.models.Product.create({
         ...input,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        console.error("❌ [API DEBUG] GraphQL errors:", response.errors);
+        throw new Error(response.errors[0].message || "Failed to create product");
+      }
+
+      console.log("✅ [API DEBUG] product created successfully");
       return response;
     } catch (error) {
       console.error('Error creating product:', error);
@@ -136,13 +161,22 @@ export const productOperations = {
   // Update product (Admin only)
   async updateProduct(input: UpdateProductInput & { id: string }) {
     try {
-      const graphqlClient = getClient();
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
+      console.log("🔄 [API DEBUG] updating product...", input);
       const response = await graphqlClient.models.Product.update({
         ...input,
         updatedAt: new Date().toISOString(),
       });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        console.error("❌ [API DEBUG] GraphQL errors:", response.errors);
+        throw new Error(response.errors[0].message || "Failed to update product");
+      }
+
+      console.log("✅ [API DEBUG] product updated successfully");
       return response;
     } catch (error) {
       console.error('Error updating product:', error);
@@ -153,10 +187,16 @@ export const productOperations = {
   // Delete product (Admin only)
   async deleteProduct(id: string) {
     try {
-      const graphqlClient = getClient();
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Product.delete({ id });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message || "Failed to delete product");
+      }
+
       return response;
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -169,7 +209,7 @@ export const productOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Product.list({
         filter: {
           or: [
@@ -195,7 +235,7 @@ export const orderOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Order.ordersByUser({
         userId,
         limit,
@@ -211,9 +251,10 @@ export const orderOperations = {
   // List all orders (Admin only)
   async listAllOrders(filter?: any, limit?: number, nextToken?: string) {
     try {
-      const graphqlClient = getClient();
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
+      console.log("🚀 [API DEBUG] listing all orders...");
       const response = await graphqlClient.models.Order.list({
         filter,
         limit,
@@ -231,7 +272,7 @@ export const orderOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Order.get({ id });
       return response;
     } catch (error) {
@@ -245,13 +286,19 @@ export const orderOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Order.create({
         ...input,
         orderDate: new Date().toISOString(),
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message || "Failed to create order");
+      }
+
       return response;
     } catch (error) {
       console.error('Error creating order:', error);
@@ -262,16 +309,42 @@ export const orderOperations = {
   // Update order status (Admin only)
   async updateOrder(input: UpdateOrderInput & { id: string }) {
     try {
-      const graphqlClient = getClient();
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.Order.update({
         ...input,
         updatedAt: new Date().toISOString(),
       });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message || "Failed to update order");
+      }
+
       return response;
     } catch (error) {
       console.error('Error updating order:', error);
+      throw error;
+    }
+  },
+
+  // Delete order (Admin only)
+  async deleteOrder(id: string) {
+    try {
+      const graphqlClient = getAuthenticatedClient(); // Use authenticated client
+      if (!graphqlClient) throw new Error('GraphQL client not available');
+
+      const response = await graphqlClient.models.Order.delete({ id });
+
+      // Check for GraphQL errors
+      if (response.errors && response.errors.length > 0) {
+        throw new Error(response.errors[0].message || "Failed to delete order");
+      }
+
+      return response;
+    } catch (error) {
+      console.error('Error deleting order:', error);
       throw error;
     }
   },
@@ -284,7 +357,7 @@ export const userOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.User.userByEmail({ email });
       return response;
     } catch (error) {
@@ -298,7 +371,7 @@ export const userOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.User.create({
         ...input,
         createdAt: new Date().toISOString(),
@@ -316,7 +389,7 @@ export const userOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.User.update({
         ...input,
         updatedAt: new Date().toISOString(),
@@ -333,7 +406,7 @@ export const userOperations = {
     try {
       const graphqlClient = getClient();
       if (!graphqlClient) throw new Error('GraphQL client not available');
-      
+
       const response = await graphqlClient.models.User.list({
         filter,
         limit,
@@ -354,11 +427,11 @@ export const handleGraphQLError = (error: any): string => {
   if (error?.errors && error.errors.length > 0) {
     return error.errors[0].message;
   }
-  
+
   if (error?.message) {
     return error.message;
   }
-  
+
   return 'Ha ocurrido un error inesperado';
 };
 
