@@ -1,54 +1,233 @@
 'use client';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
+import Image from 'next/image';
 
+/**
+ * Navbar Component (Next.js)
+ * Reemplaza el antiguo Header de React conservando 100% su estética
+ */
 export default function Navbar() {
   const { user, isGuest, logout } = useAuth();
-  
-  const totalItems = useCart(state => state.items.reduce((acc, item) => acc + item.quantity, 0));
+  // Calcular cantidad total de items del carrito de Zustand
+  const cartItemCount = useCart(state => state.items.reduce((acc, item) => acc + item.quantity, 0));
+  const router = useRouter();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const handleLogout = async () => {
+    try {
+      logout();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  const isAuthenticated = !isGuest;
 
   return (
-    <header className="bg-white shadow-sm sticky top-0 z-50">
-      <div className="bg-slate-900 text-xs py-1 px-4 flex justify-between items-center text-slate-300">
-        <span className="hidden sm:inline">Portal B2B/B2C</span>
-        <div className="flex space-x-2">
-          {isGuest ? (
-            <Link href="/login" className="hover:text-white px-2 py-1 rounded bg-slate-800">Acceso VIP (B2B)</Link>
-          ) : (
-            <button onClick={logout} className="hover:text-white px-2 py-1 rounded bg-slate-800">Cerrar Sesión</button>
-          )}
-        </div>
-        <span className="font-mono font-bold text-indigo-400">
-          Hola, {isGuest ? 'Invitado' : user?.name}
-        </span>
-      </div>
+    <header className="bg-white shadow-md sticky top-0 z-50">
+      <div className="container mx-auto px-4">
+        <div className="flex items-center justify-between py-4">
+          {/* Logo */}
+          <Link href="/" className="flex items-center space-x-2">
+            <Image src="/logo.png" alt="Protex Wear" width={200} height={48} className="h-12 w-auto" />
+          </Link>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          <div className="flex items-center">
-            <Link href="/" className="text-2xl font-black text-gray-900 tracking-tighter">
-              PROTEX<span className="text-indigo-600">WEAR</span>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex items-center space-x-8">
+            <Link
+              href="/productos"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
+            >
+              Productos
             </Link>
-          </div>
-          
-          <div className="flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-gray-900 font-medium">
-              Catálogo
+            <Link
+              href="/categorias"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
+            >
+              Categorías
             </Link>
-            
-            <Link href="/checkout" className="relative group flex items-center p-2">
-              <svg className="w-6 h-6 text-gray-700 group-hover:text-indigo-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            <Link
+              href="/sobre-nosotros"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
+            >
+              Sobre Nosotros
+            </Link>
+            <Link
+              href="/contacto"
+              className="text-black hover:text-primary-color transition-colors font-normal"
+              style={{ textDecoration: 'none' }}
+            >
+              Contacto
+            </Link>
+          </nav>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Search */}
+            <div className="hidden md:block">
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  className="w-48 lg:w-64 pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-transparent text-sm"
+                />
+                <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            {/* Cart */}
+            <Link
+              href="/carrito"
+              className="relative p-2 text-gray-700 hover:text-primary-color transition-colors"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 21a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3m-8 0a1.5 1.5 0 1 0 0-3a1.5 1.5 0 0 0 0 3M3.71 5.4h15.214c1.378 0 2.373 1.27 1.995 2.548l-1.654 5.6C19.01 14.408 18.196 15 17.27 15H8.112c-.927 0-1.742-.593-1.996-1.452zm0 0L3 3" />
               </svg>
-              {totalItems > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
-                  {totalItems}
+              {cartItemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary-color text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                  {cartItemCount > 99 ? '99+' : cartItemCount}
                 </span>
               )}
             </Link>
+
+            {/* User Menu */}
+            {isAuthenticated ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="flex items-center space-x-2 text-gray-700 hover:text-primary-color transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-medium">
+                      {user?.name?.charAt(0) || user?.email?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                  <span className="hidden md:block">
+                    {user?.name || 'Usuario'}
+                  </span>
+                  <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+
+                {/* Dropdown Menu */}
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      href="/perfil"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Mi Perfil
+                    </Link>
+                    <Link
+                      href="/pedidos"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      onClick={() => setIsMenuOpen(false)}
+                    >
+                      Mis Pedidos
+                    </Link>
+                    {/* Role check can be added here if Next.js user object supports it */}
+                    <hr className="my-1" />
+                    <button
+                      onClick={() => {
+                        setIsMenuOpen(false);
+                        handleLogout();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                    >
+                      Cerrar Sesión
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-gray-900 font-medium border border-gray-300 rounded-lg hover:border-primary-color hover:bg-gray-50 transition-colors text-center no-underline"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Iniciar Sesión
+                </Link>
+                <Link
+                  href="/registro"
+                  className="btn-primary px-6 py-2"
+                  style={{ textDecoration: 'none' }}
+                >
+                  Registrarse
+                </Link>
+              </div>
+            )}
+
+            {/* Mobile Menu Button */}
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="md:hidden icon-btn"
+            >
+              <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
           </div>
         </div>
+
+        {/* Mobile Navigation */}
+        {isMenuOpen && (
+          <div className="md:hidden py-4 border-t border-gray-200">
+            <nav className="flex flex-col space-y-2">
+              <Link
+                href="/productos"
+                className="text-gray-700 hover:text-primary-color py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Productos
+              </Link>
+              <Link
+                href="/categorias"
+                className="text-gray-700 hover:text-primary-color py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Categorías
+              </Link>
+              <Link
+                href="/sobre-nosotros"
+                className="text-gray-700 hover:text-primary-color py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Sobre Nosotros
+              </Link>
+              <Link
+                href="/contacto"
+                className="text-gray-700 hover:text-primary-color py-2"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Contacto
+              </Link>
+
+              {/* Mobile Search */}
+              <div className="pt-4">
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-color focus:border-transparent"
+                />
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
