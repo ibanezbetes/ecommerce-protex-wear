@@ -5,7 +5,7 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
 import ConfirmRegistration from '../components/Auth/ConfirmRegistration';
 import logo from '../assets/logo.png';
 import loginImage from '../assets/hero_corporate_building_blue.png';
-import '../styles/LoginPage.css'; // Reusing the same styles
+ // Reusing the same styles
 
 /**
  * Register Page - User registration with email confirmation

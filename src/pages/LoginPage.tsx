@@ -5,7 +5,7 @@ import LoadingSpinner from '../components/UI/LoadingSpinner';
 import NewPasswordModal from '../components/Auth/NewPasswordModal';
 import logo from '../assets/logo.png';
 import loginImage from '../assets/hero_corporate_building_blue.png';
-import '../styles/LoginPage.css';
+
 
 /**
  * Login Page - User authentication

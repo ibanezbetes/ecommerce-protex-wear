@@ -5,7 +5,7 @@ import LoadingSpinner from '../UI/LoadingSpinner';
 import ProductForm from './ProductForm';
 import type { Product } from '../../services/graphql';
 import S3Image from '../UI/S3Image';
-import '../../styles/AdminProducts.css';
+
 
 /**
  * Product Management Component for Admin Dashboard

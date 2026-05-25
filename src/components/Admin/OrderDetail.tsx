@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Order } from '../../services/graphql';
 import { orderOperations } from '../../services/graphql';
 import LoadingSpinner from '../UI/LoadingSpinner';
-import '../../styles/AdminOrders.css';
+
 
 /**
  * Order Detail Component for Admin Dashboard

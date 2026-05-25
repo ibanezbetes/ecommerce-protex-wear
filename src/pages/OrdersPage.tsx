@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Link } from 'react-router-dom';
 import { Order, Address } from '../types';
 import { Package, Search, Calendar, MapPin, CreditCard, ChevronRight, Clock, CheckCircle, Truck, XCircle, ShoppingBag } from 'lucide-react';
-import '../styles/OrdersPage.css';
+
 
 /**
  * Orders Page

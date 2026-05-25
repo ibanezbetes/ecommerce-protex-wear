@@ -10,7 +10,7 @@ import { orderOperations, productOperations } from '../services/graphql';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import logoWhite from '../assets/logo-w.png';
 import faviconWhite from '../assets/favicon-w.png';
-import '../styles/AdminDashboard.css';
+
 
 /**
  * Admin Dashboard - Administrative interface

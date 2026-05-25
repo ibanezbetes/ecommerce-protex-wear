@@ -1,45 +1,75 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import heroBg from '../assets/img-home/carrusel.jpg';
-import featureBg from '../assets/img-home/home.jpg';
-import cascoImg from '../assets/casco.jpg';
-import '../styles/HomePage.css';
 
 /**
  * Home Page Component
  * Landing page with hero section, featured products, and company info
  */
 function HomePage() {
-  console.log('üè† HomePage se est√° renderizando...');
-
+  console.log('≠É≈· HomePage se est+Ì renderizando...');
+  
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section
-        className="hero-section"
-        style={{
-          backgroundImage: `linear-gradient(rgba(30, 60, 115, 0.39), rgba(30, 60, 115, 0.5)), url(${heroBg})`
-        }}
-      >
-        <div className="hero-content">
-          <h1 className="hero-title">
-            Protecci√≥n Profesional
+      <section style={{ 
+        background: 'linear-gradient(to right, #2e559e, #1f3c73)', 
+        color: 'white', 
+        padding: '5rem 0' 
+      }}>
+        <div style={{ 
+          maxWidth: '1200px', 
+          margin: '0 auto', 
+          padding: '0 1rem', 
+          textAlign: 'center' 
+        }}>
+          <h1 style={{ 
+            fontSize: '3rem', 
+            fontWeight: 'bold', 
+            marginBottom: '1.5rem' 
+          }}>
+            Protecci+¶n Profesional
           </h1>
-          <p className="hero-description">
-            Equipos de protecci√≥n individual de la m√°s alta calidad para profesionales que no comprometen su seguridad
+          <p style={{ 
+            fontSize: '1.25rem', 
+            marginBottom: '2rem', 
+            maxWidth: '48rem', 
+            margin: '0 auto 2rem auto' 
+          }}>
+            Equipos de protecci+¶n individual de la m+Ìs alta calidad para profesionales que no comprometen su seguridad
           </p>
-          <div className="hero-buttons">
-            <Link
-              to="/productos"
-              className="btn-hero-primary"
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: '1rem', 
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+            <Link 
+              to="/productos" 
+              style={{
+                backgroundColor: '#2e559e',
+                color: 'white',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: '500'
+              }}
             >
               Ver Productos
             </Link>
-            <Link
-              to="/sobre-nosotros"
-              className="btn-hero-outline"
+            <Link 
+              to="/sobre-nosotros" 
+              style={{
+                backgroundColor: 'transparent',
+                color: 'white',
+                padding: '1rem 2rem',
+                borderRadius: '0.5rem',
+                textDecoration: 'none',
+                fontWeight: '500',
+                border: '1px solid white'
+              }}
             >
-              Conoce M√°s
+              Conoce M+Ìs
             </Link>
           </div>
         </div>
@@ -48,23 +78,14 @@ function HomePage() {
       {/* Features Section */}
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="features-intro">
-            <div className="features-intro-text">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                ¬øPor qu√© elegir Protex Wear?
-              </h2>
-              <p className="text-gray-600 text-lg">
-                M√°s de 20 a√±os de experiencia en equipos de protecci√≥n individual,
-                ofreciendo productos certificados y servicio especializado
-              </p>
-            </div>
-            <div className="features-intro-image-container">
-              <img
-                src={featureBg}
-                alt="Profesional con equipo de protecci√≥n"
-                className="features-intro-image"
-              />
-            </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+              -+Por qu+Æ elegir Protex Wear?
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              M+Ìs de 20 a+¶os de experiencia en equipos de protecci+¶n individual, 
+              ofreciendo productos certificados y servicio especializado
+            </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -76,7 +97,7 @@ function HomePage() {
               </div>
               <h3 className="text-xl font-semibold mb-2">Calidad Certificada</h3>
               <p className="text-gray-600">
-                Todos nuestros productos cumplen con las normativas europeas CE y est√°n certificados por organismos oficiales
+                Todos nuestros productos cumplen con las normativas europeas CE y est+Ìn certificados por organismos oficiales
               </p>
             </div>
 
@@ -86,9 +107,9 @@ function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Env√≠o R√°pido</h3>
+              <h3 className="text-xl font-semibold mb-2">Env+°o R+Ìpido</h3>
               <p className="text-gray-600">
-                Entrega en 24-48h en pen√≠nsula. Env√≠o gratuito en pedidos superiores a 100‚Ç¨
+                Entrega en 24-48h en pen+°nsula. Env+°o gratuito en pedidos superiores a 100‘Èº
               </p>
             </div>
 
@@ -98,9 +119,9 @@ function HomePage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192L5.636 18.364M12 12h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Soporte T√©cnico</h3>
+              <h3 className="text-xl font-semibold mb-2">Soporte T+Æcnico</h3>
               <p className="text-gray-600">
-                Asesoramiento especializado para ayudarte a elegir el equipo de protecci√≥n m√°s adecuado
+                Asesoramiento especializado para ayudarte a elegir el equipo de protecci+¶n m+Ìs adecuado
               </p>
             </div>
           </div>
@@ -112,61 +133,55 @@ function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Nuestras Categor√≠as
+              Nuestras Categor+°as
             </h2>
             <p className="text-gray-600 max-w-2xl mx-auto">
-              Amplio cat√°logo de equipos de protecci√≥n individual para todos los sectores profesionales
+              Amplio cat+Ìlogo de equipos de protecci+¶n individual para todos los sectores profesionales
             </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                name: 'ROPA DE TRABAJO',
-                image: cascoImg,
+                name: 'Cascos de Seguridad',
+                image: '/images/categories/cascos.jpg',
+                link: '/productos?categoria=cascos',
+                description: 'Protecci+¶n craneal certificada'
+              },
+              {
+                name: 'Calzado de Seguridad',
+                image: '/images/categories/calzado.jpg',
+                link: '/productos?categoria=calzado',
+                description: 'Botas y zapatos de trabajo'
+              },
+              {
+                name: 'Guantes de Protecci+¶n',
+                image: '/images/categories/guantes.jpg',
+                link: '/productos?categoria=guantes',
+                description: 'Protecci+¶n para las manos'
+              },
+              {
+                name: 'Ropa de Trabajo',
+                image: '/images/categories/ropa.jpg',
                 link: '/productos?categoria=ropa',
                 description: 'Vestuario profesional'
-              },
-              {
-                name: 'CALZADO DE SEGURIDAD',
-                image: cascoImg,
-                link: '/productos?categoria=calzado',
-                description: 'Botas y zapatos de seguridad'
-              },
-              {
-                name: 'GUANTES DE SEGURIDAD',
-                image: cascoImg,
-                link: '/productos?categoria=guantes',
-                description: 'Guantes de seguridad'
-              },
-              {
-                name: 'EPIS',
-                image: cascoImg,
-                link: '/productos?categoria=epis',
-                description: 'EPIS'
               },
             ].map((category, index) => (
               <Link
                 key={index}
                 to={category.link}
-                className="category-item group"
+                className="card group cursor-pointer"
               >
-                {/* Background Image */}
-                <div className="category-bg-container">
-                  <img
-                    src={category.image}
-                    alt={category.name}
-                    className="category-bg-img"
-                  />
-                  <div className="category-gradient" />
+                <div className="aspect-w-16 aspect-h-12 bg-gray-200 rounded-t-lg overflow-hidden">
+                  <div className="w-full h-48 bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">Imagen de {category.name}</span>
+                  </div>
                 </div>
-
-                {/* Content Overlay */}
-                <div className="category-content-overlay">
-                  <h3 className="category-overlay-title">
+                <div className="card-body">
+                  <h3 className="text-lg font-semibold mb-2 group-hover:text-primary-color transition-colors">
                     {category.name}
                   </h3>
-                  <p className="category-overlay-desc">
+                  <p className="text-gray-600 text-sm">
                     {category.description}
                   </p>
                 </div>
@@ -177,20 +192,20 @@ function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="home-cta-section">
-        <div className="home-cta-container">
-          <h2 className="home-cta-title">
-            ¬øNecesitas asesoramiento personalizado?
+      <section className="py-16 bg-primary-color text-white">
+        <div className="container mx-auto px-4 text-center">
+          <h2 className="text-3xl font-bold mb-4">
+            -+Necesitas asesoramiento personalizado?
           </h2>
-          <p className="home-cta-description">
-            Nuestro equipo de expertos est√° aqu√≠ para ayudarte a encontrar
-            el equipo de protecci√≥n perfecto para tu empresa
+          <p className="text-xl mb-8 max-w-2xl mx-auto">
+            Nuestro equipo de expertos est+Ì aqu+° para ayudarte a encontrar 
+            el equipo de protecci+¶n perfecto para tu empresa
           </p>
-          <div className="home-cta-buttons">
-            <Link to="/contacto" className="btn-secondary btn-lg home-cta-btn-contact">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/contacto" className="btn-secondary btn-lg">
               Contactar Ahora
             </Link>
-            <a href="tel:+34900123456" className="btn-outline btn-lg home-cta-btn-call">
+            <a href="tel:+34900123456" className="btn-outline btn-lg">
               Llamar: +34 900 123 456
             </a>
           </div>
@@ -201,3 +216,4 @@ function HomePage() {
 }
 
 export default HomePage;
+

@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/SobreNosotrosPage.css';
+
 import logo3m from '../assets/3m.jpg';
 import logoAnsell from '../assets/Ansell.jpg';
 import logoPortwest from '../assets/Portwest.jpg';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/ServicePage.css';
+
 import personalizacionHeroImg from '../../assets/personalizacion_embroidery_professional.png';
 
 const PersonalizacionPage = () => {

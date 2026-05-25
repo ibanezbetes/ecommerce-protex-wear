@@ -10,14 +10,14 @@ function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-900 text-white">
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer className="bg-gray-900 text-white pt-16 pb-8">
+      <div className="container mx-auto px-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           {/* Company Info */}
           <div>
             <img src={logoWhite} alt="Protex Wear" className="h-12 w-auto mb-4" />
             <p className="text-gray-400 mb-4">
-              Tu tienda especializada en equipos de protección individual y ropa de trabajo profesional.
+              Tu tienda especializada en equipos de protecci├│n individual y ropa de trabajo profesional.
             </p>
             <div className="flex space-x-4">
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
@@ -49,7 +49,7 @@ function Footer() {
               </li>
               <li>
                 <Link to="/productos?categoria=guantes" className="text-gray-400 hover:text-white transition-colors">
-                  Guantes de Protección
+                  Guantes de Protecci├│n
                 </Link>
               </li>
               <li>
@@ -64,7 +64,7 @@ function Footer() {
               </li>
               <li>
                 <Link to="/productos?categoria=respiratoria" className="text-gray-400 hover:text-white transition-colors">
-                  Protección Respiratoria
+                  Protecci├│n Respiratoria
                 </Link>
               </li>
             </ul>
@@ -72,7 +72,7 @@ function Footer() {
 
           {/* Customer Service */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Atención al Cliente</h3>
+            <h3 className="text-lg font-semibold mb-4">Atenci├│n al Cliente</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/contacto" className="text-gray-400 hover:text-white transition-colors">
@@ -86,7 +86,7 @@ function Footer() {
               </li>
               <li>
                 <Link to="/envios" className="text-gray-400 hover:text-white transition-colors">
-                  Información de Envíos
+                  Informaci├│n de Env├¡os
                 </Link>
               </li>
               <li>
@@ -96,7 +96,7 @@ function Footer() {
               </li>
               <li>
                 <Link to="/garantia" className="text-gray-400 hover:text-white transition-colors">
-                  Garantía
+                  Garant├¡a
                 </Link>
               </li>
             </ul>
@@ -114,7 +114,7 @@ function Footer() {
                 <div>
                   <p className="text-gray-400">
                     Calle Ejemplo 123<br />
-                    28001 Madrid, España
+                    28001 Madrid, Espa├▒a
                   </p>
                 </div>
               </div>
@@ -140,7 +140,7 @@ function Footer() {
                 <div>
                   <p className="text-gray-400">
                     Lun - Vie: 9:00 - 18:00<br />
-                    Sáb: 9:00 - 14:00
+                    S├íb: 9:00 - 14:00
                   </p>
                 </div>
               </div>
@@ -152,17 +152,17 @@ function Footer() {
         <div className="border-t border-gray-800 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-              © {currentYear} Protex Wear. Todos los derechos reservados.
+              ┬® {currentYear} Protex Wear. Todos los derechos reservados.
             </div>
             <div className="flex space-x-6 text-sm">
               <Link to="/privacidad" className="text-gray-400 hover:text-white transition-colors">
-                Política de Privacidad
+                Pol├¡tica de Privacidad
               </Link>
               <Link to="/terminos" className="text-gray-400 hover:text-white transition-colors">
-                Términos de Uso
+                T├®rminos de Uso
               </Link>
               <Link to="/cookies" className="text-gray-400 hover:text-white transition-colors">
-                Política de Cookies
+                Pol├¡tica de Cookies
               </Link>
             </div>
           </div>

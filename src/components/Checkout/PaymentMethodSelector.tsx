@@ -12,8 +12,7 @@ interface MethodOption {
   icon: string;
   title: string;
   subtitle: string;
-  iconClass: string;
-  cardClass: string;
+  iconBg: string;
   badges?: string[];
 }
 
@@ -23,8 +22,7 @@ const PAYMENT_METHODS: MethodOption[] = [
     icon: '💳',
     title: 'Tarjeta de Crédito / Débito',
     subtitle: 'Visa, Mastercard, Amex — Pago inmediato y seguro',
-    iconClass: 'card-icon',
-    cardClass: 'card-method',
+    iconBg: 'bg-blue-100 text-blue-600',
     badges: ['Pago instantáneo', 'SSL cifrado'],
   },
   {
@@ -32,8 +30,7 @@ const PAYMENT_METHODS: MethodOption[] = [
     icon: '🏦',
     title: 'Transferencia Bancaria',
     subtitle: 'Pago por transferencia con IBAN — 1-2 días hábiles',
-    iconClass: 'bank-icon',
-    cardClass: 'bank-method',
+    iconBg: 'bg-indigo-100 text-indigo-600',
     badges: ['Sin comisiones'],
   },
   {
@@ -41,21 +38,24 @@ const PAYMENT_METHODS: MethodOption[] = [
     icon: '📱',
     title: 'Bizum',
     subtitle: 'Pago móvil instantáneo desde tu app bancaria',
-    iconClass: 'bizum-icon',
-    cardClass: 'bizum-method',
+    iconBg: 'bg-cyan-100 text-cyan-600',
     badges: ['Pago inmediato', 'Gratis'],
   },
 ];
 
 export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelectorProps) {
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
+    <div className="flex flex-col gap-3.5">
       {PAYMENT_METHODS.map((method, index) => {
         const isSelected = selected === method.id;
         return (
           <div
             key={method.id}
-            className={`payment-method-card ${method.cardClass} ${isSelected ? 'selected' : ''} animate-fade-in-up delay-${(index + 1) * 100}`}
+            className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
+              isSelected 
+                ? 'border-primary-color bg-blue-50/50 shadow-md transform -translate-y-0.5' 
+                : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
+            }`}
             onClick={() => onChange(method.id)}
             role="radio"
             aria-checked={isSelected}
@@ -63,51 +63,36 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
             onKeyDown={(e) => e.key === 'Enter' || e.key === ' ' ? onChange(method.id) : undefined}
           >
             {isSelected && (
-              <div className="payment-selected-badge">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+              <div className="absolute top-0 right-0 w-10 h-10 overflow-hidden">
+                <div className="absolute top-[-20px] right-[-20px] w-10 h-10 bg-primary-color rotate-45 transform origin-center"></div>
+                <svg className="absolute top-1 right-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </div>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', position: 'relative' }}>
-              <div className={`payment-method-icon ${method.iconClass}`}>
+            <div className="flex items-center gap-4 relative">
+              <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 ${method.iconBg}`}>
                 {method.icon}
               </div>
 
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.25rem' }}>
-                  <h4 style={{
-                    margin: 0,
-                    fontSize: '0.9375rem',
-                    fontWeight: 700,
-                    color: isSelected ? '#1a2a4a' : '#374151',
-                    transition: 'color 0.2s ease',
-                  }}>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1">
+                  <h4 className={`m-0 text-[15px] font-bold transition-colors duration-200 ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
                     {method.title}
                   </h4>
                 </div>
-                <p style={{
-                  margin: 0,
-                  fontSize: '0.8125rem',
-                  color: '#6b7280',
-                  lineHeight: 1.4,
-                }}>
+                <p className="m-0 text-[13px] text-gray-500 leading-snug">
                   {method.subtitle}
                 </p>
                 {method.badges && (
-                  <div style={{ display: 'flex', gap: '0.375rem', marginTop: '0.5rem', flexWrap: 'wrap' }}>
+                  <div className="flex gap-1.5 mt-2 flex-wrap">
                     {method.badges.map(badge => (
-                      <span key={badge} style={{
-                        fontSize: '0.6875rem',
-                        fontWeight: 600,
-                        color: isSelected ? '#2e559e' : '#6b7280',
-                        background: isSelected ? 'rgba(46, 85, 158, 0.08)' : '#f3f4f6',
-                        padding: '0.1875rem 0.5rem',
-                        borderRadius: '999px',
-                        transition: 'all 0.2s ease',
-                        letterSpacing: '0.02em',
-                      }}>
+                      <span key={badge} className={`text-[11px] font-semibold px-2 py-0.5 rounded-full transition-all duration-200 tracking-wide ${
+                        isSelected 
+                          ? 'text-primary-color bg-primary-color/10' 
+                          : 'text-gray-500 bg-gray-100'
+                      }`}>
                         {badge}
                       </span>
                     ))}
@@ -116,27 +101,13 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
               </div>
 
               {/* Custom radio */}
-              <div style={{
-                width: '20px',
-                height: '20px',
-                borderRadius: '50%',
-                border: `2px solid ${isSelected ? '#2e559e' : '#d1d5db'}`,
-                background: isSelected ? '#2e559e' : 'white',
-                flexShrink: 0,
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                boxShadow: isSelected ? '0 0 0 4px rgba(46, 85, 158, 0.15)' : 'none',
-              }}>
+              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
+                isSelected 
+                  ? 'border-primary-color bg-primary-color shadow-[0_0_0_4px_rgba(46,85,158,0.15)]' 
+                  : 'border-gray-300 bg-white'
+              }`}>
                 {isSelected && (
-                  <div style={{
-                    width: '8px',
-                    height: '8px',
-                    borderRadius: '50%',
-                    background: 'white',
-                    animation: 'scaleIn 0.15s ease',
-                  }} />
+                  <div className="w-2 h-2 rounded-full bg-white animate-scale-in" />
                 )}
               </div>
             </div>

@@ -8,7 +8,7 @@ import {
   Save, X, Upload, Plus, Trash2, Image as ImageIcon,
   Tag, Box, Layers, DollarSign, FileText, Package
 } from 'lucide-react';
-import '../../styles/AdminProductForm.css';
+
 
 interface ProductFormProps {
   product?: Product | null;

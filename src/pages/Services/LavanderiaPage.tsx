@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/ServicePage.css';
+
 import laundryHeroImg from '../../assets/laundry_service_modern.png';
 
 const LavanderiaPage = () => {

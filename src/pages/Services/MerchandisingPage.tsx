@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/ServicePage.css';
+
 import merchandisingHeroImg from '../../assets/merchandising_corporate_professional.png';
 
 const MerchandisingPage = () => {

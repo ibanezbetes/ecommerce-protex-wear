@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { orderOperations, productOperations } from '../../services/graphql';
 import LoadingSpinner from '../UI/LoadingSpinner';
-import '../../styles/AdminProducts.css'; // Reusing styles
+ // Reusing styles
 
 function TestingZone() {
     const [loading, setLoading] = useState<string | null>(null);

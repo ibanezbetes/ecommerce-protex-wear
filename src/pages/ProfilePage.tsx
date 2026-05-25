@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { User as UserType, Address, Order } from '../types';
 import LoadingSpinner from '../components/UI/LoadingSpinner';
 import { User, MapPin, Package, Settings, Edit2, Trash2, ChevronRight, LogOut, Phone, Mail, Building } from 'lucide-react';
-import '../styles/ProfilePage.css';
+
 
 /**
  * Profile Page - User profile management and order history

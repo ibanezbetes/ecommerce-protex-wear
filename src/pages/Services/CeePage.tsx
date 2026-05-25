@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import '../../styles/ServicePage.css';
+
 import ceeHeroImg from '../../assets/cee_inclusive_team_professional.png';
 
 const CeePage = () => {
