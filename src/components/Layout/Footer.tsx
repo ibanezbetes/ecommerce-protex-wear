@@ -1,6 +1,5 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logoWhite from '../../assets/logo-w.png';
 
 /**
  * Footer Component
@@ -15,7 +14,12 @@ function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div>
-            <img src={logoWhite} alt="Protex Wear" className="h-12 w-auto mb-4" />
+            <div className="flex items-center space-x-2 mb-4">
+              <div className="w-8 h-8 bg-primary-color rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">PW</span>
+              </div>
+              <span className="text-xl font-bold">Protex Wear</span>
+            </div>
             <p className="text-gray-400 mb-4">
               Tu tienda especializada en equipos de protección individual y ropa de trabajo profesional.
             </p>
