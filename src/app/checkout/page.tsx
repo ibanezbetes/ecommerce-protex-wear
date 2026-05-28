@@ -66,7 +66,7 @@ const STEPS = [
   { number: 4, title: 'Confirmar', icon: 'Ô£à' },
 ];
 
-function CheckoutPage() {
+export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { items, subtotal, clearCart, discountCode, discountAmount, applyDiscountCode, removeDiscountCode } = useCart();
