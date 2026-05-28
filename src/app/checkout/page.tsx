@@ -1,5 +1,6 @@
 'use client';
-﻿import React, { useState, useEffect } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
@@ -7,12 +8,18 @@ import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
 import { BizumDetails } from '@/components/Checkout/BizumDetails';
+import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, X, Lock } from 'lucide-react';
+import styles from './page.module.css';
+
 export interface Address {
   id?: string;
   street: string;
   city: string;
   postalCode: string;
   country: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
 }
 
 export interface ShippingOption {
@@ -26,7 +33,6 @@ export interface ShippingOption {
   insuranceIncluded: boolean;
 }
 
-
 type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
 
 const SHIPPING_OPTIONS: ShippingOption[] = [
@@ -36,7 +42,7 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     cost: 5.99,
     currency: 'EUR',
     estimatedDays: 4,
-    description: 'Env├¡o Est├índar',
+    description: 'Envío Estándar',
     trackingIncluded: true,
     insuranceIncluded: false,
   },
@@ -46,26 +52,19 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
     cost: 12.99,
     currency: 'EUR',
     estimatedDays: 1,
-    description: 'Env├¡o Express 24h',
+    description: 'Envío Express 24h',
     trackingIncluded: true,
     insuranceIncluded: true,
   },
 ];
 
-const getDeliveryDate = (daysToAdd: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysToAdd);
-  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
-  return new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
-};
-
 const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 
 const STEPS = [
-  { number: 1, title: 'Direcci├│n', icon: '­ƒôì' },
-  { number: 2, title: 'Env├¡o', icon: '­ƒÜÜ' },
-  { number: 3, title: 'Pago', icon: '­ƒÆ│' },
-  { number: 4, title: 'Confirmar', icon: 'Ô£à' },
+  { number: 1, title: 'Dirección', icon: MapPin },
+  { number: 2, title: 'Envío', icon: Truck },
+  { number: 3, title: 'Pago', icon: CreditCard },
+  { number: 4, title: 'Confirmar', icon: CheckCircle },
 ];
 
 export default function CheckoutPage() {
@@ -73,7 +72,6 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const { items, subtotal, clearCart, discountCode, discountAmount, applyDiscountCode, removeDiscountCode } = useCart();
   const toast = useToast();
-  const showToast = (msg, type) => type === 'error' ? toast.error({title:'Error', message:msg}) : toast.success({title:'Éxito', message:msg});
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -90,703 +88,452 @@ export default function CheckoutPage() {
     company: user?.company || '',
     country: 'ES',
   });
+  
   const [selectedShipping, setSelectedShipping] = useState('standard');
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const shippingOption = SHIPPING_OPTIONS.find(o => o.method === selectedShipping)!;
   const shippingCost = shippingOption?.cost || 0;
-  
   const discountedSubtotal = Math.max(0, subtotal - (discountAmount || 0));
   const tax = discountedSubtotal * 0.21;
-  const total = discountedSubtotal + shippingCost + tax;
+  const total = discountedSubtotal + tax + shippingCost;
 
-  const handleApplyPromo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!promoInput.trim()) return;
-    
-    setIsApplyingPromo(true);
-    const success = await applyDiscountCode(promoInput.trim());
-    setIsApplyingPromo(false);
-    
-    if (success) {
-      showToast('┬íC├│digo aplicado!', 'success');
-      setPromoInput('');
-    } else {
-      showToast('C├│digo no v├ílido', 'error');
-    }
-  };
-
+  // Protect route
   useEffect(() => {
-    if (items.length === 0 && !orderPlaced) router.push('/carrito');
+    if (items.length === 0 && !orderPlaced) {
+      router.push('/');
+    }
   }, [items, router, orderPlaced]);
 
   const handleAddressChange = (field: keyof Address, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
   };
 
-  const isAddressValid = () =>
-    shippingAddress.firstName &&
-    shippingAddress.lastName &&
-    shippingAddress.addressLine1 &&
-    shippingAddress.city &&
-    shippingAddress.postalCode &&
-    shippingAddress.country;
-
-  const handleNextStep = () => {
-    if (currentStep === 1 && !isAddressValid()) {
-      setError('Por favor, rellena todos los campos obligatorios.');
-      return;
+  const validateAddress = () => {
+    const required = ['firstName', 'lastName', 'street', 'city', 'postalCode'];
+    for (const field of required) {
+      if (!shippingAddress[field as keyof Address]) {
+        toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios de la dirección.' });
+        return false;
+      }
     }
-    setError(null);
-    if (currentStep < 4) setCurrentStep(currentStep + 1);
+    return true;
   };
 
-  const handleConfirmOrder = async () => {
-    if (!acceptedTerms) return;
+  const nextStep = () => {
+    if (currentStep === 1 && !validateAddress()) return;
+    setCurrentStep(prev => Math.min(prev + 1, 4));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const prevStep = () => {
+    setCurrentStep(prev => Math.max(prev - 1, 1));
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleApplyPromo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoInput.trim()) return;
+    
+    setIsApplyingPromo(true);
+    try {
+      await applyDiscountCode(promoInput.toUpperCase());
+      toast.success({ title: 'Éxito', message: 'Código aplicado correctamente' });
+      setPromoInput('');
+    } catch (err: any) {
+      toast.error({ title: 'Error', message: err.message || 'Código inválido' });
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
+
+  const handleSimulatedPayment = async () => {
     setIsProcessing(true);
     setError(null);
-
     try {
-      const emailData: any = OrderEmailData = {
-        orderNumber,
-        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-        customerEmail: user?.email || '',
-        items: items.map(item => ({
-          name: item.product.name,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          totalPrice: item.totalPrice,
-        })),
-        subtotal,
-        tax,
-        shippingCost,
-        total,
-        paymentMethod,
-        shippingAddress: {
-          firstName: shippingAddress.firstName || '',
-          lastName: shippingAddress.lastName || '',
-          addressLine1: shippingAddress.addressLine1 || '',
-          postalCode: shippingAddress.postalCode || '',
-          city: shippingAddress.city || '',
-          country: shippingAddress.country || 'ES',
-        },
-        shippingMethod: selectedShipping,
-      };
-
-      await 
-
-      // For all simulated methods, mark as placed
+      // Simulamos latencia de red
+      await new Promise(resolve => setTimeout(resolve, 2000));
       setOrderPlaced(true);
       clearCart();
-      router.push('/success', {
-        state: {
-          orderNumber,
-          paymentMethod,
-          total,
-          customerEmail: user?.email,
-        },
-      });
+      router.push(`/success?order=${orderNumber}`);
     } catch (err: any) {
-      setError(err.message || 'Error al procesar el pedido. Int├®ntalo de nuevo.');
+      setError(err.message || 'Error al procesar el pedido.');
     } finally {
       setIsProcessing(false);
     }
   };
 
-  // Billing items for Stripe
-  const billingItems = items.map(item => ({
-    id: item.productId,
-    productId: item.productId,
-    name: item.product.name,
-    price: item.unitPrice,
-    quantity: item.quantity,
-    image: item.product.imageUrl,
-  }));
+  const handleStripePayment = async () => {
+    setIsProcessing(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          items: items.map(item => ({
+            id: item.variantId || item.productId,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            image: item.image,
+          })),
+          shippingCost,
+          customerEmail: user?.email,
+          orderNumber,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        throw new Error(data.error || 'Error al iniciar el pago');
+      }
+    } catch (err: any) {
+      console.error('Error de pago:', err);
+      // Fallback a pago simulado en modo desarrollo si falla Stripe (por falta de keys)
+      if (process.env.NODE_ENV === 'development') {
+        toast.info({ title: 'Modo dev', message: 'Stripe no configurado. Simulando pago...' });
+        await handleSimulatedPayment();
+      } else {
+        setError(err.message || 'Error de conexión con la pasarela.');
+        setIsProcessing(false);
+      }
+    }
+  };
+
+  const handleSubmitOrder = () => {
+    if (!acceptedTerms) {
+      toast.error({ title: 'Error', message: 'Debes aceptar los términos y condiciones.' });
+      return;
+    }
+    if (paymentMethod === 'card') {
+      handleStripePayment();
+    } else {
+      handleSimulatedPayment();
+    }
+  };
+
+  if (items.length === 0 && !orderPlaced) return null;
 
   return (
-    <div className="checkout-page-bg">
-      {/* Top bar */}
-      <div style={{
-        background: 'linear-gradient(135deg, #1e3a6e, #2e559e)',
-        padding: '1.25rem 0',
-        marginBottom: '2rem',
-      }}>
-        <div className="container" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '1.5rem' }}>­ƒøí´©Å</span>
-            <div>
-              <h1 style={{ margin: 0, color: 'white', fontSize: '1.25rem', fontWeight: 700 }}>
-                Finalizar Compra
-              </h1>
-              <p style={{ margin: 0, color: 'rgba(255,255,255,0.7)', fontSize: '0.8125rem' }}>
-                Proceso seguro con encriptaci├│n SSL
-              </p>
+    <div className={styles.checkoutContainer}>
+      <div className={styles.checkoutLayout}>
+        
+        {/* Left Column - Forms */}
+        <div>
+          {/* Header */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div style={{ background: '#2e559e', padding: '0.5rem', borderRadius: '8px', color: 'white' }}>
+                <ShoppingCart size={24} />
+              </div>
+              <div>
+                <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>Finalizar Compra</h1>
+                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                  <Lock size={14} /> Pago 100% Seguro
+                </p>
+              </div>
             </div>
+            <button className={styles.btnBack} onClick={() => router.push('/carrito')} style={{ padding: '0.5rem 1rem' }}>
+              <ArrowLeft size={16} /> Volver
+            </button>
           </div>
-          <button
-            onClick={() => router.push('/carrito')}
-            style={{
-              background: 'rgba(255,255,255,0.1)',
-              border: '1px solid rgba(255,255,255,0.2)',
-              borderRadius: '8px',
-              color: 'rgba(255,255,255,0.8)',
-              padding: '0.5rem 1rem',
-              fontSize: '0.8125rem',
-              cursor: 'pointer',
-              fontWeight: 500,
-              transition: 'all 0.2s ease',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.375rem',
-            }}
-          >
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <line x1="19" y1="12" x2="5" y2="12"></line>
-              <polyline points="12 19 5 12 12 5"></polyline>
-            </svg>
-            Volver al carrito
-          </button>
-        </div>
-      </div>
 
-      <div className="container" style={{ maxWidth: '72rem', paddingBottom: '4rem' }}>
-        {/* Progress steps */}
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'center', marginBottom: '2.5rem', padding: '0 1rem', maxWidth: '640px', margin: '0 auto 2.5rem' }}>
-          {STEPS.map((step, index) => {
-            const status = currentStep > step.number ? 'completed' : currentStep === step.number ? 'active' : 'pending';
-            return (
-              <React.Fragment key={step.number}>
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, minWidth: 0 }}>
-                  <div
-                    className={`checkout-step-circle ${status}`}
-                    style={{ cursor: status === 'completed' ? 'pointer' : 'default' }}
-                    onClick={() => status === 'completed' && setCurrentStep(step.number)}
-                  >
-                    {status === 'completed' ? (
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    ) : (
-                      <span style={{ fontSize: '0.9375rem' }}>{step.icon}</span>
-                    )}
+          {/* Stepper */}
+          <div className={styles.stepsContainer}>
+            <div className={styles.stepLine} />
+            {STEPS.map((step) => {
+              const Icon = step.icon;
+              const isCompleted = currentStep > step.number;
+              const isActive = currentStep === step.number;
+              
+              let circleClass = styles.stepCircle;
+              if (isActive) circleClass = `${styles.stepCircle} ${styles.stepCircleActive}`;
+              if (isCompleted) circleClass = `${styles.stepCircle} ${styles.stepCircleCompleted}`;
+
+              return (
+                <div key={step.number} className={styles.stepItem}>
+                  <div className={circleClass}>
+                    {isCompleted ? <CheckCircle size={20} /> : <Icon size={20} />}
                   </div>
-                  <span className={`checkout-step-label ${status}`} style={{ marginTop: '0.375rem', fontSize: '0.75rem', textAlign: 'center' }}>
+                  <span className={`${styles.stepLabel} ${isActive ? styles.stepLabelActive : ''}`}>
                     {step.title}
                   </span>
                 </div>
-                {index < STEPS.length - 1 && (
-                  <div
-                    className={`checkout-step-connector ${currentStep > step.number ? 'completed' : 'pending'}`}
-                    style={{ marginTop: '1.375rem' }}
-                  />
-                )}
-              </React.Fragment>
-            );
-          })}
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className="alert alert-error animate-fade-in-up" style={{ maxWidth: '640px', margin: '0 auto 1.5rem', borderRadius: '12px' }}>
-            ÔÜá´©Å {error}
+              );
+            })}
           </div>
-        )}
 
-        <div className="checkout-layout">
-          {/* =============== MAIN FORM =============== */}
-          <div>
-
-            {/* STEP 1: Address */}
-            {currentStep === 1 && (
-              <div className="checkout-card animate-fade-in-up">
-                <div className="checkout-card-title">
-                  <div className="checkout-card-title-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"></path>
-                      <circle cx="12" cy="10" r="3"></circle>
-                    </svg>
-                  </div>
-                  Direcci├│n de Env├¡o
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                  {[
-                    { field: 'firstName' as keyof Address, label: 'Nombre *', placeholder: 'Mar├¡a', cols: 1 },
-                    { field: 'lastName' as keyof Address, label: 'Apellidos *', placeholder: 'Garc├¡a L├│pez', cols: 1 },
-                    { field: 'company' as keyof Address, label: 'Empresa (opcional)', placeholder: 'Empresa S.L.', cols: 2 },
-                    { field: 'addressLine1' as keyof Address, label: 'Direcci├│n *', placeholder: 'Calle Mayor, 15, 2┬║B', cols: 2 },
-                    { field: 'addressLine2' as keyof Address, label: 'Piso, puerta... (opcional)', placeholder: '', cols: 2 },
-                    { field: 'city' as keyof Address, label: 'Ciudad *', placeholder: 'Madrid', cols: 1 },
-                    { field: 'postalCode' as keyof Address, label: 'C├│digo Postal *', placeholder: '28001', cols: 1 },
-                    { field: 'phone' as keyof Address, label: 'Tel├®fono', placeholder: '+34 600 000 000', cols: 2 },
-                  ].map(({ field, label, placeholder, cols }) => (
-                    <div key={field} style={{ gridColumn: `span ${cols}` }}>
-                      <label className="checkout-label">{label}</label>
-                      {field === 'country' ? null : (
-                        <input
-                          type={field === 'phone' ? 'tel' : 'text'}
-                          className="checkout-input"
-                          placeholder={placeholder}
-                          value={(shippingAddress[field] as string) || ''}
-                          onChange={e => handleAddressChange(field, e.target.value)}
-                        />
-                      )}
-                    </div>
-                  ))}
-
-                  {/* Country select */}
-                  <div style={{ gridColumn: 'span 2' }}>
-                    <label className="checkout-label">Pa├¡s *</label>
-                    <select
-                      className="checkout-input"
-                      value={shippingAddress.country || 'ES'}
-                      onChange={e => handleAddressChange('country', e.target.value)}
-                    >
-                      <option value="ES">­ƒç¬­ƒç© Espa├▒a</option>
-                      <option value="PT">­ƒçÁ­ƒç╣ Portugal</option>
-                      <option value="FR">­ƒç½­ƒçÀ Francia</option>
-                      <option value="DE">­ƒç®­ƒç¬ Alemania</option>
-                      <option value="IT">­ƒç«­ƒç╣ Italia</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '1.5rem' }}>
-                  <button className="checkout-next-btn" onClick={handleNextStep}>
-                    Continuar
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </button>
-                </div>
+          {/* Content Area */}
+          <div className={styles.card}>
+            {error && (
+              <div style={{ background: '#fef2f2', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 1.5rem 0', borderRadius: '4px', color: '#991b1b' }}>
+                {error}
               </div>
             )}
 
-            {/* STEP 2: Shipping method */}
-            {currentStep === 2 && (
-              <div className="checkout-card animate-fade-in-up">
-                <div className="checkout-card-title">
-                  <div className="checkout-card-title-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="1" y="3" width="15" height="13"></rect>
-                      <polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon>
-                      <circle cx="5.5" cy="18.5" r="2.5"></circle>
-                      <circle cx="18.5" cy="18.5" r="2.5"></circle>
-                    </svg>
-                  </div>
-                  M├®todo de Env├¡o
+            {currentStep === 1 && (
+              <>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}><MapPin size={22} color="#2e559e" /> Dirección de Envío</h2>
                 </div>
-
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.875rem' }}>
-                  {SHIPPING_OPTIONS.map((option, i) => (
-                    <div
-                      key={option.method}
-                      className={`shipping-option-card ${selectedShipping === option.method ? 'selected' : ''} animate-fade-in-up delay-${(i + 1) * 100}`}
-                      onClick={() => setSelectedShipping(option.method)}
-                    >
-                      {/* Radio */}
-                      <div style={{
-                        width: 20, height: 20,
-                        borderRadius: '50%',
-                        border: `2px solid ${selectedShipping === option.method ? '#2e559e' : '#d1d5db'}`,
-                        background: selectedShipping === option.method ? '#2e559e' : 'white',
-                        flexShrink: 0,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        transition: 'all 0.2s ease',
-                        boxShadow: selectedShipping === option.method ? '0 0 0 4px rgba(46,85,158,0.15)' : 'none',
-                      }}>
-                        {selectedShipping === option.method && (
-                          <div style={{ width: 8, height: 8, borderRadius: '50%', background: 'white' }} />
-                        )}
+                <div className={styles.cardBody}>
+                  <form className={styles.formGrid}>
+                    <div className={styles.formGrid2Cols}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Nombre *</label>
+                        <input className={styles.input} type="text" value={shippingAddress.firstName || ''} onChange={e => handleAddressChange('firstName', e.target.value)} required />
                       </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Apellidos *</label>
+                        <input className={styles.input} type="text" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
+                      </div>
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>Empresa (opcional)</label>
+                      <input className={styles.input} type="text" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>Dirección *</label>
+                      <input className={styles.input} type="text" value={shippingAddress.street || ''} onChange={e => handleAddressChange('street', e.target.value)} placeholder="Calle Principal, 123" required />
+                    </div>
+                    <div className={styles.formGrid2Cols}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Ciudad *</label>
+                        <input className={styles.input} type="text" value={shippingAddress.city || ''} onChange={e => handleAddressChange('city', e.target.value)} required />
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Código Postal *</label>
+                        <input className={styles.input} type="text" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
+                      </div>
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>País *</label>
+                      <select className={styles.input} value={shippingAddress.country || 'ES'} onChange={e => handleAddressChange('country', e.target.value)}>
+                        <option value="ES">España</option>
+                        <option value="PT">Portugal</option>
+                        <option value="FR">Francia</option>
+                        <option value="AD">Andorra</option>
+                      </select>
+                    </div>
+                  </form>
+                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button className={styles.btnNext} onClick={nextStep}>Continuar <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
+                  </div>
+                </div>
+              </>
+            )}
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1 }}>
-                        <span style={{ fontSize: '1.5rem' }}>
-                          {option.method === 'express' ? 'ÔÜí' : '­ƒôª'}
-                        </span>
+            {currentStep === 2 && (
+              <>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}><Truck size={22} color="#2e559e" /> Método de Envío</h2>
+                </div>
+                <div className={styles.cardBody}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {SHIPPING_OPTIONS.map(option => (
+                      <div 
+                        key={option.method} 
+                        className={`${styles.shippingOption} ${selectedShipping === option.method ? styles.shippingOptionActive : ''}`}
+                        onClick={() => setSelectedShipping(option.method)}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', border: '2px solid', borderColor: selectedShipping === option.method ? '#2e559e' : '#d1d5db', background: selectedShipping === option.method ? '#2e559e' : 'transparent' }}>
+                          {selectedShipping === option.method && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />}
+                        </div>
                         <div style={{ flex: 1 }}>
-                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 700, color: '#1a2a4a' }}>
-                              {option.description}
-                            </h4>
-                            <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: selectedShipping === option.method ? '#2e559e' : '#374151' }}>
-                              {option.cost === 0 ? 'GRATIS' : `Ôé¼${option.cost.toFixed(2)}`}
-                            </span>
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.25rem' }}>
-                            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#10b981', fontWeight: 500 }}>
-                              Llega el {getDeliveryDate(option.estimatedDays)}
-                            </p>
-                            <span style={{
-                              fontSize: '0.75rem',
-                              background: '#f3f4f6',
-                              color: '#6b7280',
-                              padding: '0.125rem 0.5rem',
-                              borderRadius: '999px',
-                              fontWeight: 500,
-                            }}>
-                              {option.carrier}
-                            </span>
-                          </div>
+                          <h4 style={{ margin: '0 0 0.25rem', fontWeight: 600, color: '#111827' }}>{option.description}</h4>
+                          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
+                            Recíbelo el {getDeliveryDate(option.estimatedDays)}
+                          </p>
+                        </div>
+                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.125rem' }}>
+                          {option.cost === 0 ? 'Gratis' : `${option.cost.toFixed(2)}€`}
                         </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <button className={styles.btnBack} onClick={prevStep}>Atrás</button>
+                    <button className={styles.btnNext} onClick={nextStep}>Continuar a Pago <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
+                  </div>
                 </div>
-
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
-                  <button className="checkout-back-btn" onClick={() => setCurrentStep(1)}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="19" y1="12" x2="5" y2="12"></line>
-                      <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Atr├ís
-                  </button>
-                  <button className="checkout-next-btn" onClick={handleNextStep}>
-                    Continuar
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </button>
-                </div>
-              </div>
+              </>
             )}
 
-            {/* STEP 3: Payment method */}
             {currentStep === 3 && (
-              <div className="checkout-card animate-fade-in-up">
-                <div className="checkout-card-title">
-                  <div className="checkout-card-title-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <rect x="2" y="5" width="20" height="14" rx="2"></rect>
-                      <line x1="2" y1="10" x2="22" y2="10"></line>
-                    </svg>
-                  </div>
-                  M├®todo de Pago
+              <>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}><CreditCard size={22} color="#2e559e" /> Método de Pago</h2>
                 </div>
+                <div className={styles.cardBody}>
+                  <PaymentMethodSelector 
+                    selectedMethod={paymentMethod} 
+                    onMethodSelect={(m) => setPaymentMethod(m as PaymentMethod)} 
+                  />
+                  
+                  {paymentMethod === 'bank_transfer' && (
+                    <div style={{ marginTop: '1.5rem' }}>
+                      <BankTransferDetails />
+                    </div>
+                  )}
+                  {paymentMethod === 'bizum' && (
+                    <div style={{ marginTop: '1.5rem' }}>
+                      <BizumDetails />
+                    </div>
+                  )}
 
-                <PaymentMethodSelector
-                  selected={paymentMethod}
-                  onChange={setPaymentMethod}
-                />
+                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
+                    <button className={styles.btnBack} onClick={prevStep}>Atrás</button>
+                    <button className={styles.btnNext} onClick={nextStep}>Revisar Pedido <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
+                  </div>
+                </div>
+              </>
+            )}
 
-                {/* Show payment details depending on method */}
-                {paymentMethod === 'bank_transfer' && (
-                  <BankTransferDetails orderNumber={orderNumber} total={total} />
-                )}
-                {paymentMethod === 'bizum' && (
-                  <BizumDetails orderNumber={orderNumber} total={total} />
-                )}
-                {paymentMethod === 'card' && (
-                  <div style={{
-                    marginTop: '1.25rem',
-                    padding: '1rem',
-                    background: 'linear-gradient(135deg, #f0f4ff, #eef2ff)',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(46,85,158,0.12)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    fontSize: '0.875rem',
-                    color: '#2e559e',
-                  }}>
-                    <div style={{
-                      width: 36, height: 36,
-                      background: 'rgba(46,85,158,0.12)',
-                      borderRadius: 10,
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      flexShrink: 0,
-                    }}>
-                      ­ƒöÆ
+            {currentStep === 4 && (
+              <>
+                <div className={styles.cardHeader}>
+                  <h2 className={styles.cardTitle}><CheckCircle size={22} color="#2e559e" /> Confirmar Pedido</h2>
+                </div>
+                <div className={styles.cardBody}>
+                  
+                  <div style={{ background: '#f9fafb', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                    <div>
+                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginBottom: '0.5rem' }}>Enviar a</h4>
+                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>{shippingAddress.firstName} {shippingAddress.lastName}</p>
+                      <p style={{ margin: '0.25rem 0', color: '#4b5563', fontSize: '0.9375rem' }}>{shippingAddress.street}</p>
+                      <p style={{ margin: 0, color: '#4b5563', fontSize: '0.9375rem' }}>{shippingAddress.postalCode} {shippingAddress.city}, {shippingAddress.country}</p>
                     </div>
                     <div>
-                      <p style={{ margin: 0, fontWeight: 600 }}>Pago seguro con Stripe</p>
-                      <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>
-                        Procesar├ís el pago en el siguiente paso. Aceptamos Visa, Mastercard y Amex.
+                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginBottom: '0.5rem' }}>Método de Pago</h4>
+                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>
+                        {paymentMethod === 'card' && 'Tarjeta de Crédito / Débito'}
+                        {paymentMethod === 'bizum' && 'Pago por Bizum'}
+                        {paymentMethod === 'bank_transfer' && 'Transferencia Bancaria'}
                       </p>
+                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginTop: '1rem', marginBottom: '0.5rem' }}>Envío</h4>
+                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>{shippingOption.description}</p>
                     </div>
                   </div>
-                )}
 
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '1.5rem' }}>
-                  <button className="checkout-back-btn" onClick={() => setCurrentStep(2)}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="19" y1="12" x2="5" y2="12"></line>
-                      <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Atr├ís
-                  </button>
-                  <button className="checkout-next-btn" onClick={handleNextStep}>
-                    Revisar pedido
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="5" y1="12" x2="19" y2="12"></line>
-                      <polyline points="12 5 19 12 12 19"></polyline>
-                    </svg>
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* STEP 4: Review & Confirm */}
-            {currentStep === 4 && (
-              <div className="checkout-card animate-fade-in-up">
-                <div className="checkout-card-title">
-                  <div className="checkout-card-title-icon">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M9 11l3 3L22 4"></path>
-                      <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"></path>
-                    </svg>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '2rem' }}>
+                    <input 
+                      type="checkbox" 
+                      id="terms" 
+                      checked={acceptedTerms}
+                      onChange={e => setAcceptedTerms(e.target.checked)}
+                      style={{ marginTop: '0.25rem', width: '1.125rem', height: '1.125rem', cursor: 'pointer' }}
+                    />
+                    <label htmlFor="terms" style={{ fontSize: '0.9375rem', color: '#4b5563', cursor: 'pointer', lineHeight: 1.5 }}>
+                      He leído y acepto los <a href="#" style={{ color: '#2e559e', textDecoration: 'underline' }}>términos y condiciones</a> y la <a href="#" style={{ color: '#2e559e', textDecoration: 'underline' }}>política de privacidad</a>. Entiendo que esta compra implica una obligación de pago.
+                    </label>
                   </div>
-                  Revisi├│n y Confirmaci├│n
-                </div>
 
-                {/* Address review */}
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                    <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#374151' }}>­ƒôì Direcci├│n de env├¡o</h4>
-                    <button onClick={() => setCurrentStep(1)} style={{ background: 'none', border: 'none', color: '#2e559e', fontSize: '0.8125rem', cursor: 'pointer', fontWeight: 600 }}>Editar</button>
-                  </div>
-                  <div className="review-address-card">
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#374151', lineHeight: 1.7 }}>
-                      <strong>{shippingAddress.firstName} {shippingAddress.lastName}</strong><br />
-                      {shippingAddress.addressLine1}<br />
-                      {shippingAddress.postalCode} {shippingAddress.city}, {shippingAddress.country}
-                      {shippingAddress.phone && <><br />{shippingAddress.phone}</>}
-                    </p>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <button className={styles.btnBack} onClick={prevStep} disabled={isProcessing}>Atrás</button>
+                    <button 
+                      className={styles.btnNext} 
+                      onClick={handleSubmitOrder}
+                      disabled={isProcessing || !acceptedTerms}
+                      style={{ background: '#10b981', padding: '1rem 2.5rem' }}
+                    >
+                      {isProcessing ? 'Procesando...' : `Pagar ${total.toFixed(2)}€`}
+                      {!isProcessing && <CheckCircle size={18} />}
+                    </button>
                   </div>
                 </div>
-
-                {/* Shipping review */}
-                <div style={{ marginBottom: '1.25rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                    <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#374151' }}>­ƒÜÜ M├®todo de env├¡o</h4>
-                    <button onClick={() => setCurrentStep(2)} style={{ background: 'none', border: 'none', color: '#2e559e', fontSize: '0.8125rem', cursor: 'pointer', fontWeight: 600 }}>Editar</button>
-                  </div>
-                  <div className="review-address-card">
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#374151' }}>
-                      {shippingOption?.description} ÔÇö <span style={{ color: '#10b981', fontWeight: 600 }}>Llega el {getDeliveryDate(shippingOption?.estimatedDays || 4)}</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Payment review */}
-                <div style={{ marginBottom: '1.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.625rem' }}>
-                    <h4 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 700, color: '#374151' }}>­ƒÆ│ M├®todo de pago</h4>
-                    <button onClick={() => setCurrentStep(3)} style={{ background: 'none', border: 'none', color: '#2e559e', fontSize: '0.8125rem', cursor: 'pointer', fontWeight: 600 }}>Editar</button>
-                  </div>
-                  <div className="review-address-card">
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: '#374151' }}>
-                      {paymentMethod === 'card' && '­ƒÆ│ Tarjeta de Cr├®dito/D├®bito (Stripe)'}
-                      {paymentMethod === 'bank_transfer' && '­ƒÅª Transferencia Bancaria'}
-                      {paymentMethod === 'bizum' && '­ƒô▒ Bizum'}
-                    </p>
-                  </div>
-                </div>
-
-                {/* T&C */}
-                <label style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', cursor: 'pointer', marginBottom: '1.5rem' }}>
-                  <div
-                    style={{
-                      width: 20, height: 20,
-                      border: `2px solid ${acceptedTerms ? '#2e559e' : '#d1d5db'}`,
-                      borderRadius: 5,
-                      background: acceptedTerms ? '#2e559e' : 'white',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      transition: 'all 0.2s ease',
-                      flexShrink: 0,
-                      marginTop: '2px',
-                      cursor: 'pointer',
-                    }}
-                    onClick={() => setAcceptedTerms(!acceptedTerms)}
-                  >
-                    {acceptedTerms && (
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                        <polyline points="20 6 9 17 4 12"></polyline>
-                      </svg>
-                    )}
-                  </div>
-                  <input type="checkbox" checked={acceptedTerms} onChange={e => setAcceptedTerms(e.target.checked)} style={{ display: 'none' }} />
-                  <span style={{ fontSize: '0.875rem', color: '#6b7280', lineHeight: 1.5 }}>
-                    He le├¡do y acepto los{' '}
-                    <a href="#" style={{ color: '#2e559e', fontWeight: 600 }}>T├®rminos y Condiciones</a>{' '}
-                    y la{' '}
-                    <a href="#" style={{ color: '#2e559e', fontWeight: 600 }}>Pol├¡tica de Privacidad</a>.
-                  </span>
-                </label>
-
-                {/* CTA buttons */}
-                <button
-                  className="checkout-confirm-btn"
-                  onClick={handleConfirmOrder}
-                  disabled={!acceptedTerms || isProcessing}
-                >
-                  {isProcessing ? (
-                    <>
-                      <div className="loading" style={{ width: 20, height: 20, borderWidth: 2 }} />
-                      Procesando pedido...
-                    </>
-                  ) : (
-                    <>
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"></path>
-                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                      </svg>
-                      Confirmar Pedido ┬À Ôé¼{total.toFixed(2)}
-                    </>
-                  )}
-                </button>
-
-                {/* Order number display */}
-                <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#9ca3af' }}>
-                    N┬║ de pedido:{' '}
-                    <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#374151' }}>
-                      {orderNumber}
-                    </span>
-                  </p>
-                </div>
-
-                {/* Trust badges */}
-                <div className="trust-badges" style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid #f3f4f6' }}>
-                  {[
-                    { icon: '­ƒöÆ', text: 'SSL 256-bit' },
-                    { icon: '­ƒøí´©Å', text: 'Datos protegidos' },
-                    { icon: 'Ô£à', text: 'Compra garantizada' },
-                    { icon: '­ƒôº', text: 'Confirmaci├│n por email' },
-                  ].map(({ icon, text }) => (
-                    <div key={text} className="trust-badge">
-                      <span>{icon}</span>
-                      {text}
-                    </div>
-                  ))}
-                </div>
-
-                <div style={{ marginTop: '1rem' }}>
-                  <button className="checkout-back-btn" onClick={() => setCurrentStep(3)} style={{ width: '100%', justifyContent: 'center' }}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <line x1="19" y1="12" x2="5" y2="12"></line>
-                      <polyline points="12 19 5 12 12 5"></polyline>
-                    </svg>
-                    Volver al m├®todo de pago
-                  </button>
-                </div>
-              </div>
+              </>
             )}
           </div>
+        </div>
 
-          {/* =============== SIDEBAR SUMMARY =============== */}
-          <div style={{ alignSelf: 'flex-start', position: 'sticky', top: '1.5rem' }}>
-            <div className="checkout-sidebar animate-slide-in-right">
-              <div className="checkout-sidebar-header">
-                <h3 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 700, color: 'white' }}>
-                  Resumen del Pedido
-                </h3>
-              </div>
-
-              <div style={{ padding: '1.25rem 1.5rem' }}>
-                {/* Item list */}
-                <div style={{ marginBottom: '1.25rem' }}>
-                  {items.map(item => (
-                    <div key={item.productId} className="checkout-sidebar-item">
-                      {item.product.imageUrl ? (
-                        <img src={item.product.imageUrl} alt={item.product.name} className="checkout-sidebar-img" />
-                      ) : (
-                        <div className="checkout-sidebar-img" style={{
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          background: 'linear-gradient(135deg, #eef2ff, #e0e7ff)',
-                          fontSize: '1.5rem',
-                        }}>
-                          ­ƒøí´©Å
-                        </div>
-                      )}
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: '0 0 0.25rem', fontSize: '0.875rem', fontWeight: 600, color: '#1a2a4a', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {item.product.name}
-                        </p>
-                        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#6b7280' }}>
-                          {item.quantity} ├ù Ôé¼{item.unitPrice.toFixed(2)}
-                        </p>
-                      </div>
-                      <span style={{ fontSize: '0.9375rem', fontWeight: 700, color: '#2e559e', flexShrink: 0 }}>
-                        Ôé¼{item.totalPrice.toFixed(2)}
-                      </span>
+        {/* Right Column - Order Summary Sidebar */}
+        <div>
+          <div className={styles.sidebar}>
+            <div className={styles.sidebarHeader}>Resumen del Pedido</div>
+            
+            <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+              {items.map(item => (
+                <div key={item.variantId || item.productId} className={styles.sidebarItem}>
+                  {item.image ? (
+                    <img src={item.image} alt={item.name} className={styles.sidebarItemImg} />
+                  ) : (
+                    <div className={styles.sidebarItemImg} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <ShoppingCart color="#9ca3af" />
                     </div>
-                  ))}
-                </div>
-
-                {/* Totals */}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', paddingTop: '1rem', borderTop: '1.5px solid #f3f4f6' }}>
-                  {[
-                    { label: 'Subtotal', value: `Ôé¼${subtotal.toFixed(2)}` },
-                    ...(discountCode ? [{ label: `Descuento (${discountCode})`, value: `-Ôé¼${(discountAmount || 0).toFixed(2)}`, green: true }] : []),
-                    { label: 'IVA (21%)', value: `Ôé¼${tax.toFixed(2)}` },
-                    { label: 'Env├¡o', value: shippingCost === 0 ? '┬íGratis!' : `Ôé¼${shippingCost.toFixed(2)}`, green: shippingCost === 0 },
-                  ].map(({ label, value, green }) => (
-                    <div key={label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.875rem', color: '#6b7280', display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                        {label}
-                        {label.startsWith('Descuento') && (
-                          <button type="button" onClick={() => { removeDiscountCode(); showToast('Descuento eliminado', 'info'); }} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: 0, fontSize: '0.75rem' }}>Ô£ò</button>
-                        )}
-                      </span>
-                      <span style={{ fontSize: '0.875rem', color: green ? '#10b981' : '#374151', fontWeight: green ? 600 : 400 }}>
-                        {value}
-                      </span>
-                    </div>
-                  ))}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '0.875rem', borderTop: '2px solid #f3f4f6', marginTop: '0.25rem' }}>
-                    <span style={{ fontSize: '1.0625rem', fontWeight: 700, color: '#1a2a4a' }}>Total</span>
-                    <span style={{ fontSize: '1.1875rem', fontWeight: 700, color: '#2e559e' }}>Ôé¼{total.toFixed(2)}</span>
+                  )}
+                  <div className={styles.sidebarItemInfo}>
+                    <p className={styles.sidebarItemName}>{item.name}</p>
+                    <p className={styles.sidebarItemPrice}>{item.quantity} × {item.price.toFixed(2)}€</p>
+                  </div>
+                  <div style={{ fontWeight: 600, color: '#111827' }}>
+                    {(item.price * item.quantity).toFixed(2)}€
                   </div>
                 </div>
+              ))}
+            </div>
 
-                {/* Promo Code Input in Checkout */}
-                {!discountCode && (
-                  <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid #f3f4f6' }}>
-                    <form onSubmit={handleApplyPromo} style={{ display: 'flex', gap: '0.5rem' }}>
-                      <input
-                        type="text"
-                        value={promoInput}
-                        onChange={(e) => setPromoInput(e.target.value)}
-                        placeholder="C├│digo descuento"
-                        disabled={isApplyingPromo}
-                        style={{ flex: 1, padding: '0.5rem 0.75rem', border: '1px solid #d1d5db', borderRadius: '6px', fontSize: '0.8125rem', textTransform: 'uppercase' }}
-                      />
-                      <button
-                        type="submit"
-                        disabled={isApplyingPromo || !promoInput.trim()}
-                        style={{ padding: '0.5rem 0.75rem', background: '#1a2a4a', color: 'white', border: 'none', borderRadius: '6px', fontSize: '0.8125rem', fontWeight: 600, cursor: isApplyingPromo || !promoInput.trim() ? 'not-allowed' : 'pointer' }}
-                      >
-                        Aplicar
-                      </button>
-                    </form>
-                  </div>
-                )}
+            <div className={styles.sidebarTotals}>
+              {!discountCode && (
+                <form onSubmit={handleApplyPromo} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                  <input
+                    className={styles.input}
+                    type="text"
+                    value={promoInput}
+                    onChange={(e) => setPromoInput(e.target.value)}
+                    placeholder="Código descuento"
+                    disabled={isApplyingPromo}
+                    style={{ textTransform: 'uppercase', padding: '0.625rem 1rem' }}
+                  />
+                  <button type="submit" disabled={isApplyingPromo || !promoInput.trim()} style={{ background: '#4b5563', color: 'white', border: 'none', borderRadius: '8px', padding: '0 1rem', fontWeight: 600, cursor: 'pointer' }}>
+                    Aplicar
+                  </button>
+                </form>
+              )}
 
-                {/* Security note */}
-                <div style={{
-                  marginTop: '1.25rem',
-                  padding: '0.875rem',
-                  background: '#f8faff',
-                  borderRadius: '10px',
-                  border: '1px solid rgba(46,85,158,0.08)',
-                  textAlign: 'center',
-                }}>
-                  <p style={{ margin: 0, fontSize: '0.75rem', color: '#6b7280' }}>
-                    ­ƒöÆ Transacci├│n segura ┬À Datos cifrados
-                  </p>
-                </div>
+              <div className={styles.sidebarTotalRow}>
+                <span>Subtotal</span>
+                <span>{subtotal.toFixed(2)}€</span>
               </div>
+              
+              {discountCode && (
+                <div className={styles.sidebarTotalRow} style={{ color: '#10b981', fontWeight: 500 }}>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    Descuento ({discountCode})
+                    <button onClick={removeDiscountCode} style={{ background: 'none', border: 'none', color: '#ef4444', padding: 0, cursor: 'pointer' }}><X size={14} /></button>
+                  </span>
+                  <span>-{discountAmount?.toFixed(2)}€</span>
+                </div>
+              )}
+              
+              <div className={styles.sidebarTotalRow}>
+                <span>IVA (21%)</span>
+                <span>{tax.toFixed(2)}€</span>
+              </div>
+              
+              <div className={styles.sidebarTotalRow}>
+                <span>Envío</span>
+                <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit', fontWeight: shippingCost === 0 ? 600 : 400 }}>
+                  {shippingCost === 0 ? 'Gratis' : `${shippingCost.toFixed(2)}€`}
+                </span>
+              </div>
+
+              <div className={styles.sidebarTotalFinal}>
+                <span>Total</span>
+                <span style={{ color: '#2e559e', fontSize: '1.5rem' }}>{total.toFixed(2)}€</span>
+              </div>
+            </div>
+
+            <div className={styles.trustBadges}>
+              <div className={styles.trustBadgeText}><ShieldCheck size={16} color="#10b981" /> Garantía de Devolución de 30 Días</div>
+              <div className={styles.trustBadgeText}><Lock size={16} color="#10b981" /> Pago Seguro con Encriptación SSL</div>
             </div>
           </div>
         </div>
+
       </div>
     </div>
   );
 }
-
-
