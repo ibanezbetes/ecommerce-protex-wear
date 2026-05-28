@@ -3,6 +3,7 @@ import { useEffect, useState, use } from 'react';
 import { graphqlFetch } from '@/services/graphqlClient';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
+import { useToast } from '@/components/Feedback/ToastProvider';
 import styles from './page.module.css';
 
 interface ProductVariant {
@@ -51,6 +52,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const { user } = useAuth();
   const addItem = useCart((state) => state.addItem);
+  const toast = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
@@ -101,7 +103,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       quantity: 1,
       image: mainImage,
     });
-    alert('A\u00f1adido al carrito con \u00e9xito!');
+    toast.success({
+      title: 'Producto a\u00f1adido',
+      message: 'Se ha a\u00f1adido un producto al carrito.',
+    });
   };
 
   return (

@@ -1,8 +1,10 @@
 'use client';
 import React, { useState } from 'react';
+import { useToast } from '@/components/Feedback/ToastProvider';
 import styles from './page.module.css';
 
 const ContactPage = () => {
+  const toast = useToast();
   const [formData, setFormData] = useState({
     nombre: '',
     email: '',
@@ -30,7 +32,10 @@ const ContactPage = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Form data submitted:', formData);
-    alert('Gracias por contactarnos. Nos pondremos en contacto contigo pronto.');
+    toast.success({
+      title: 'Consulta enviada',
+      message: 'Gracias por contactarnos. Nos pondremos en contacto contigo pronto.',
+    });
   };
 
   return (

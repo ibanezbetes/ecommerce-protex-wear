@@ -5,11 +5,13 @@ import { useCart } from '@/store/useCart';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
 import { BizumDetails } from '@/components/Checkout/BizumDetails';
+import { useToast } from '@/components/Feedback/ToastProvider';
 import styles from './page.module.css';
 
 export default function CheckoutPage() {
   const { user, isGuest } = useAuth();
   const { items, cartTotal, clearCart } = useCart();
+  const toast = useToast();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [orderPlaced, setOrderPlaced] = useState(false);
@@ -39,7 +41,10 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Error de pago:', error);
-      alert('No se pudo iniciar el proceso de pago con Stripe.');
+      toast.error({
+        title: 'No se pudo iniciar el pago',
+        message: 'Revisa tu conexion o intenta de nuevo en unos segundos.',
+      });
     } finally {
       setLoading(false);
     }
@@ -51,6 +56,10 @@ export default function CheckoutPage() {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       setOrderPlaced(true);
       clearCart();
+      toast.success({
+        title: 'Pedido registrado',
+        message: 'Hemos guardado tu pedido correctamente.',
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -62,8 +71,11 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      alert('Pedido confirmado exitosamente (Pago Diferido)!');
       clearCart();
+      toast.success({
+        title: 'Pedido confirmado',
+        message: 'El pedido con pago diferido se ha confirmado correctamente.',
+      });
     } catch (error) {
       console.error(error);
     } finally {
