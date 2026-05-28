@@ -119,7 +119,7 @@ export default function CheckoutPage() {
 
   useEffect(() => {
     if (items.length === 0 && !orderPlaced) router.push('/carrito');
-  }, [items, navigate, orderPlaced]);
+  }, [items, router, orderPlaced]);
 
   const handleAddressChange = (field: keyof Address, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
