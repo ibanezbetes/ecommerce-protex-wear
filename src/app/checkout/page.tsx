@@ -100,6 +100,24 @@ const CREATE_ORDER_MUTATION = `
   }
 `;
 
+const UPDATE_ORDER_STATUS_MUTATION = `
+  mutation UpdateOrderStatus($orderId: ID!, $status: String!) {
+    updateOrderStatus(orderId: $orderId, status: $status) {
+      orderId
+      status
+    }
+  }
+`;
+
+const DECREMENT_STOCK_MUTATION = `
+  mutation DecrementProductStock($productId: ID!, $quantity: Int!) {
+    decrementProductStock(productId: $productId, quantity: $quantity) {
+      id
+      stock
+    }
+  }
+`;
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
@@ -127,6 +145,8 @@ export default function CheckoutPage() {
   // Fallback Address Autocomplete States
   const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
+
 
   const handleSelectSuggestion = (suggestion: string) => {
     const parts = suggestion.split(',').map(p => p.trim());
@@ -444,6 +464,33 @@ export default function CheckoutPage() {
         // 1.5s simulation for standard payment authorization wait time
         await new Promise(resolve => setTimeout(resolve, 1500));
 
+        // Actualizar estado del pedido en AppSync a CONFIRMADO
+        try {
+          const graphqlClient = await import('@/services/graphqlClient');
+          await graphqlClient.graphqlFetch(UPDATE_ORDER_STATUS_MUTATION, {
+            orderId: actualOrderId,
+            status: 'CONFIRMADO'
+          });
+          console.log(`[Sandbox] Pedido ${actualOrderId} actualizado a CONFIRMADO en AppSync.`);
+        } catch (dbErr) {
+          console.warn(`[Sandbox] Fallo al actualizar estado del pedido ${actualOrderId} a CONFIRMADO en AppSync:`, dbErr);
+        }
+
+        // Decrementar stock de los productos comprados en AppSync
+        try {
+          const graphqlClient = await import('@/services/graphqlClient');
+          for (const item of items) {
+            console.log(`[Sandbox] Decrementando stock: Producto ${item.productId}, Cantidad: ${item.quantity}`);
+            await graphqlClient.graphqlFetch(DECREMENT_STOCK_MUTATION, {
+              productId: item.productId,
+              quantity: item.quantity
+            });
+          }
+          console.log('[Sandbox] Stock decrementado correctamente para todos los artículos del pedido.');
+        } catch (stockErr) {
+          console.warn('[Sandbox] Fallo al decrementar el stock en AppSync:', stockErr);
+        }
+
         try {
           await sendOrderEmail(actualOrderId);
         } catch (emailErr) {
@@ -574,34 +621,76 @@ export default function CheckoutPage() {
                           const val = e.target.value;
                           handleAddressChange('street', val);
                           
-                          // Fallback mock address search if Google API key is missing
+                          if (searchTimeoutRef.current) {
+                            clearTimeout(searchTimeoutRef.current);
+                          }
+
                           if (val.trim().length >= 1) {
-                            const mockAddresses = [
-                              "Calle de Alcalá, 12, Madrid, 28014, España",
-                              "Paseo de la Castellana, 100, Madrid, 28046, España",
-                              "Gran Vía, 45, Madrid, 28013, España",
-                              "Avinguda Diagonal, 400, Barcelona, 08037, España",
-                              "La Rambla, 80, Barcelona, 08002, España",
-                              "Calle Sierpes, 14, Sevilla, 41004, España",
-                              "Calle Colón, 25, Valencia, 46004, España",
-                              "Calle Larios, 8, Málaga, 29005, España",
-                              "Calle Uría, 15, Oviedo, 33003, España",
-                              "Calle Estafeta, 10, Pamplona, 31001, España",
-                              "Calle Mayor, 4, Madrid, 28013, España",
-                              "Paseo de Gracia, 20, Barcelona, 08007, España",
-                              "Avenida de la Constitución, 18, Sevilla, 41001, España",
-                              "Calle Alfonso I, 22, Zaragoza, 50003, España",
-                              "Calle Poeta Querol, 5, Valencia, 46002, España",
-                              "Avenida de Anaga, 12, Santa Cruz de Tenerife, 38001, España",
-                              "Calle Triana, 60, Las Palmas de Gran Canaria, 35002, España",
-                              "Paseo Marítimo, 15, Palma de Mallorca, 07014, España",
-                              "Calle Jaime III, 2, Palma de Mallorca, 07012, España"
-                            ];
-                            const filtered = mockAddresses.filter(addr => 
-                              addr.toLowerCase().includes(val.toLowerCase())
-                            );
-                            setAddressSuggestions(filtered);
-                            setShowSuggestions(filtered.length > 0);
+                            searchTimeoutRef.current = setTimeout(async () => {
+                              try {
+                                const res = await fetch(
+                                  `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=es,ad,pt,fr&format=json&addressdetails=1&limit=6`,
+                                  {
+                                    headers: {
+                                      'Accept-Language': 'es-ES,es;q=0.9',
+                                    }
+                                  }
+                                );
+                                if (!res.ok) throw new Error('API Nominatim no disponible');
+                                const data = await res.json();
+                                
+                                if (Array.isArray(data) && data.length > 0) {
+                                  const suggestions = data.map((item: any) => {
+                                    const addr = item.address || {};
+                                    const road = addr.road || addr.pedestrian || addr.path || addr.suburb || addr.neighbourhood || addr.industrial || addr.state_district || '';
+                                    const houseNumber = addr.house_number || '';
+                                    const city = addr.city || addr.town || addr.village || addr.municipality || addr.suburb || addr.county || '';
+                                    const postcode = addr.postcode || '';
+                                    
+                                    if (!road && !city) {
+                                      return item.display_name;
+                                    }
+                                    
+                                    return `${road}, ${houseNumber}, ${city}, ${postcode}, España`;
+                                  }).filter(Boolean);
+
+                                  if (suggestions.length > 0) {
+                                    setAddressSuggestions(suggestions);
+                                    setShowSuggestions(true);
+                                    return;
+                                  }
+                                }
+                                throw new Error('Sin resultados reales');
+                              } catch (err) {
+                                console.warn('Buscando con fallback local debido a error en Nominatim:', err);
+                                const mockAddresses = [
+                                  "Calle de Alcalá, 12, Madrid, 28014, España",
+                                  "Paseo de la Castellana, 100, Madrid, 28046, España",
+                                  "Gran Vía, 45, Madrid, 28013, España",
+                                  "Avinguda Diagonal, 400, Barcelona, 08037, España",
+                                  "La Rambla, 80, Barcelona, 08002, España",
+                                  "Calle Sierpes, 14, Sevilla, 41004, España",
+                                  "Calle Colón, 25, Valencia, 46004, España",
+                                  "Calle Larios, 8, Málaga, 29005, España",
+                                  "Calle Uría, 15, Oviedo, 33003, España",
+                                  "Calle Estafeta, 10, Pamplona, 31001, España",
+                                  "Calle Mayor, 4, Madrid, 28013, España",
+                                  "Paseo de Gracia, 20, Barcelona, 08007, España",
+                                  "Avenida de la Constitución, 18, Sevilla, 41001, España",
+                                  "Calle Alfonso I, 22, Zaragoza, 50003, España",
+                                  "Calle Poeta Querol, 5, Valencia, 46002, España",
+                                  "Avenida de Anaga, 12, Santa Cruz de Tenerife, 38001, España",
+                                  "Calle Triana, 60, Las Palmas de Gran Canaria, 35002, España",
+                                  "Paseo Marítimo, 15, Palma de Mallorca, 07014, España",
+                                  "Calle Jaime III, 2, Palma de Mallorca, 07012, España"
+                                ];
+                                const filtered = mockAddresses.filter(addr => 
+                                  addr.toLowerCase().includes(val.toLowerCase())
+                                );
+                                setAddressSuggestions(filtered);
+                                setShowSuggestions(filtered.length > 0);
+                              }
+                            }, 400);
                           } else {
                             setAddressSuggestions([]);
                             setShowSuggestions(false);
