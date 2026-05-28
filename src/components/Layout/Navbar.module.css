@@ -1,5 +1,6 @@
 .header {
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  backdrop-filter: saturate(160%) blur(10px);
 }
 
 .inner {
@@ -13,6 +14,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1.5rem;
+  min-height: 76px;
 }
 
 .brand {
@@ -27,6 +29,11 @@
   width: 112px !important;
   height: auto !important;
   max-width: 112px !important;
+  transition: transform 0.2s ease;
+}
+
+.brand:hover .logo {
+  transform: translateY(-1px);
 }
 
 .nav {
@@ -57,6 +64,29 @@
   text-decoration: none;
 }
 
+.link {
+  position: relative;
+  color: var(--gray-800);
+  font-size: 0.96rem;
+  font-weight: 600;
+  line-height: 1;
+  padding: 0.6rem 0;
+}
+
+.link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0.2rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--primary-color);
+  opacity: 0;
+  transform: scaleX(0.45);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
 .link:hover,
 .mobileLink:hover,
 .loginButton:hover,
@@ -65,6 +95,15 @@
 .userButton:hover,
 .dropdownLink:hover {
   transform: translateY(-1px);
+}
+
+.link:hover {
+  color: var(--primary-color);
+}
+
+.link:hover::after {
+  opacity: 1;
+  transform: scaleX(1);
 }
 
 .search {
@@ -82,6 +121,13 @@
   justify-content: flex-end;
   gap: 0.75rem;
   flex: 0 0 auto;
+}
+
+.authActions {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding-left: 0.25rem;
 }
 
 .iconButton {
@@ -105,35 +151,45 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--gray-300);
-  border-radius: 0.75rem;
-  background: white;
-  color: var(--gray-900);
-  font-weight: 500;
-  min-height: 42px;
+  min-height: 44px;
+  padding: 0.75rem 1.05rem;
+  border: 1px solid rgba(46, 85, 158, 0.24);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+  color: var(--primary-dark);
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.65);
 }
 
 .loginButton:hover {
-  border-color: var(--primary-color);
-  background: var(--gray-100);
+  border-color: rgba(46, 85, 158, 0.5);
+  background: #eef3fb;
+  color: var(--primary-dark);
+  box-shadow: var(--shadow-sm);
 }
 
 .registerButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-height: 44px;
+  padding: 0.75rem 1.25rem;
   border: 0;
-  border-radius: 0.75rem;
-  background: var(--primary-color);
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
   color: white;
-  font-weight: 600;
-  box-shadow: var(--shadow-sm);
-  min-height: 42px;
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 10px 22px rgba(46, 85, 158, 0.22);
 }
 
 .registerButton:hover {
-  background: var(--primary-dark);
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #142d57 100%);
   color: white;
+  box-shadow: 0 14px 28px rgba(46, 85, 158, 0.28);
 }
 
 .userButton {
@@ -167,6 +223,15 @@
   color: var(--gray-700);
 }
 
+.loginButton:focus-visible,
+.registerButton:focus-visible,
+.link:focus-visible,
+.iconButton:focus-visible,
+.userButton:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 3px;
+}
+
 @media (max-width: 768px) {
   .brand {
     width: auto;
@@ -186,6 +251,16 @@
     width: 100%;
     justify-content: flex-end;
     flex-wrap: wrap;
+  }
+
+  .authActions {
+    gap: 0.5rem;
+  }
+
+  .loginButton,
+  .registerButton {
+    min-height: 42px;
+    padding: 0.72rem 0.95rem;
   }
 
   .mobileToggle {

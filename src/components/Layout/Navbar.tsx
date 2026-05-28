@@ -34,7 +34,7 @@ export default function Navbar() {
         <div className={`${styles.row} py-4`}>
           {/* Logo */}
           <Link href="/" className={styles.brand}>
-            <Image src="/logo.png" alt="Protex Wear" width={120} height={34} className={styles.logo} />
+            <Image src="/logo.png" alt="Protex Wear" width={120} height={34} className={styles.logo} priority />
           </Link>
 
           {/* Desktop Navigation */}
@@ -140,17 +140,17 @@ export default function Navbar() {
                 )}
               </div>
             ) : (
-              <div className="flex items-center gap-3">
+              <div className={styles.authActions}>
                 <Link
                   href="/login"
-                  className={`${styles.loginButton} px-4 py-2 text-gray-900 font-medium border border-gray-300 rounded-lg hover:border-primary-color hover:bg-gray-50 transition-colors text-center no-underline`}
+                  className={styles.loginButton}
                   style={{ textDecoration: 'none' }}
                 >
                   Iniciar Sesión
                 </Link>
                 <Link
                   href="/register"
-                  className={`${styles.registerButton} px-6 py-2`}
+                  className={styles.registerButton}
                   style={{ textDecoration: 'none' }}
                 >
                   Registrarse
