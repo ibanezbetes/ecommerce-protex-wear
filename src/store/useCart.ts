@@ -5,7 +5,7 @@ import { create } from 'zustand';
  * ============================================================================
  *
  * Gestiona los artículos del carrito, el estado del drawer (abierto/cerrado),
- * y proporciona totales calculados.
+ * y proporciona totales calculados correctamente en cada mutación del estado.
  *
  * Cada artículo se identifica por `variantId` (no por `productId`),
  * porque un mismo producto puede tener varias tallas/colores.
@@ -38,6 +38,19 @@ interface CartState {
   items: CartItem[];
   /** Controla si el drawer del carrito está visible */
   isCartOpen: boolean;
+  /** Total del carrito (suma de precio × cantidad de cada artículo) */
+  cartTotal: number;
+  /** Subtotal antes de impuestos (actualmente igual a cartTotal) */
+  subtotal: number;
+  /** Número total de unidades en el carrito */
+  itemCount: number;
+  
+  // Custom discount properties
+  discountCode: string | null;
+  discountAmount: number | null;
+  applyDiscountCode: (code: string) => Promise<void>;
+  removeDiscountCode: () => void;
+
   /** Añade un artículo. Si ya existe (mismo variantId), suma la cantidad. */
   addItem: (item: CartItem) => void;
   /** Elimina un artículo del carrito por su variantId */
@@ -50,71 +63,66 @@ interface CartState {
   openCart: () => void;
   /** Cierra el drawer del carrito */
   closeCart: () => void;
-  /** Total del carrito (suma de precio × cantidad de cada artículo) */
-  get cartTotal(): number;
-  /** Subtotal antes de impuestos (actualmente igual a cartTotal) */
-  get subtotal(): number;
-  /** Número total de unidades en el carrito */
-  get itemCount(): number;
 }
 
-/**
- * Hook de Zustand para gestionar el carrito de compras.
- *
- * @example
- * ```tsx
- * const { items, addItem, openCart, cartTotal } = useCart();
- *
- * // Añadir un producto:
- * addItem({ productId: '01001', variantId: '01001-M-RED', name: 'Camiseta M Roja', price: 9.99, quantity: 1 });
- * ```
- */
+const computeTotals = (items: CartItem[]) => {
+  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
+  return { cartTotal, subtotal: cartTotal, itemCount };
+};
+
 export const useCart = create<CartState>((set, get) => ({
   items: [],
   isCartOpen: false,
+  cartTotal: 0,
+  subtotal: 0,
+  itemCount: 0,
+  
+  discountCode: null,
+  discountAmount: null,
+
+  applyDiscountCode: async (code: string) => {
+    // Simulated discount logic for presentation
+    if (code === 'PROTEX10') {
+      set({ discountCode: code, discountAmount: 10 });
+    } else {
+      throw new Error('Código no válido');
+    }
+  },
+  
+  removeDiscountCode: () => {
+    set({ discountCode: null, discountAmount: null });
+  },
 
   addItem: (newItem) => set((state) => {
+    let newItems;
     const existing = state.items.find(i => i.variantId === newItem.variantId);
     if (existing) {
-      // Si la variante ya está en el carrito, incrementar la cantidad
-      return {
-        items: state.items.map(i =>
-          i.variantId === newItem.variantId
-            ? { ...i, quantity: i.quantity + newItem.quantity }
-            : i
-        ),
-        isCartOpen: true,
-      };
+      newItems = state.items.map(i =>
+        i.variantId === newItem.variantId
+          ? { ...i, quantity: i.quantity + newItem.quantity }
+          : i
+      );
+    } else {
+      newItems = [...state.items, newItem];
     }
-    // Si es una variante nueva, añadirla al final
-    return { items: [...state.items, newItem], isCartOpen: true };
+    return { items: newItems, isCartOpen: true, ...computeTotals(newItems) };
   }),
 
-  removeItem: (variantId) => set((state) => ({
-    items: state.items.filter(i => i.variantId !== variantId),
-  })),
+  removeItem: (variantId) => set((state) => {
+    const newItems = state.items.filter(i => i.variantId !== variantId);
+    return { items: newItems, ...computeTotals(newItems) };
+  }),
 
-  updateQuantity: (variantId, quantity) => set((state) => ({
-    items: state.items.map(i =>
+  updateQuantity: (variantId, quantity) => set((state) => {
+    const newItems = state.items.map(i =>
       i.variantId === variantId ? { ...i, quantity } : i
-    ),
-  })),
+    );
+    return { items: newItems, ...computeTotals(newItems) };
+  }),
 
-  clearCart: () => set({ items: [], isCartOpen: false }),
+  clearCart: () => set({ items: [], isCartOpen: false, cartTotal: 0, subtotal: 0, itemCount: 0, discountCode: null, discountAmount: null }),
 
   openCart: () => set({ isCartOpen: true }),
   closeCart: () => set({ isCartOpen: false }),
-
-  get cartTotal() {
-    return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
-  },
-
-  get subtotal() {
-    // Actualmente igual a cartTotal. Aquí se aplicarían descuentos en el futuro.
-    return get().cartTotal;
-  },
-
-  get itemCount() {
-    return get().items.reduce((count, item) => count + item.quantity, 0);
-  },
 }));

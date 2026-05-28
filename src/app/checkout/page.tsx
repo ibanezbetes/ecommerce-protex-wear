@@ -58,6 +58,13 @@ const SHIPPING_OPTIONS: ShippingOption[] = [
   },
 ];
 
+const getDeliveryDate = (daysToAdd: number) => {
+  const date = new Date();
+  date.setDate(date.getDate() + daysToAdd);
+  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
+  return new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
+};
+
 const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 
 const STEPS = [
