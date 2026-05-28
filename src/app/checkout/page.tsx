@@ -59,6 +59,8 @@ const getDeliveryDate = (daysToAdd: number) => {
   return new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
 };
 
+const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+
 const STEPS = [
   { number: 1, title: 'Direcci├│n', icon: '­ƒôì' },
   { number: 2, title: 'Env├¡o', icon: '­ƒÜÜ' },
