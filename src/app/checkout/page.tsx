@@ -163,7 +163,7 @@ export default function CheckoutPage() {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setOrderPlaced(true);
       clearCart();
-      router.push(`/success?order=${orderNumber}`);
+      router.push(`/checkout/success?order=${orderNumber}`);
     } catch (err: any) {
       setError(err.message || 'Error al procesar el pedido.');
     } finally {
@@ -382,12 +382,12 @@ export default function CheckoutPage() {
                   
                   {paymentMethod === 'bank_transfer' && (
                     <div style={{ marginTop: '1.5rem' }}>
-                      <BankTransferDetails />
+                      <BankTransferDetails orderNumber={orderNumber} total={total} />
                     </div>
                   )}
                   {paymentMethod === 'bizum' && (
                     <div style={{ marginTop: '1.5rem' }}>
-                      <BizumDetails />
+                      <BizumDetails orderNumber={orderNumber} total={total} />
                     </div>
                   )}
 
