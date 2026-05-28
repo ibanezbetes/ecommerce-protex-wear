@@ -376,8 +376,8 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.cardBody}>
                   <PaymentMethodSelector 
-                    selectedMethod={paymentMethod} 
-                    onMethodSelect={(m) => setPaymentMethod(m as PaymentMethod)} 
+                    selected={paymentMethod} 
+                    onChange={(m) => setPaymentMethod(m as PaymentMethod)} 
                   />
                   
                   {paymentMethod === 'bank_transfer' && (

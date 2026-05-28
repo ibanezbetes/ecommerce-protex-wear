@@ -6,47 +6,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Falta STRIPE_SECRET_KEY en las variables de entorno' }, { status: 500 });
   }
   
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-04-30.basil',
+  });
   
   try {
-    const { items, orderId, userEmail } = await request.json();
+    const { items, shippingCost, customerEmail, orderNumber } = await request.json();
 
-    const lineItems = items.map((item: any) => ({
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item: any) => ({
       price_data: {
         currency: 'eur',
         product_data: {
           name: item.name,
+          ...(item.image ? { images: [item.image] } : {}),
           metadata: {
-            productId: item.productId,
-            variantId: item.variantId,
-          }
+            productId: item.id,
+          },
         },
-        unit_amount: Math.round(item.price * 100), 
+        unit_amount: Math.round(item.price * 100),
       },
       quantity: item.quantity,
     }));
 
+    // Add shipping as a separate line item
+    if (shippingCost && shippingCost > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'Gastos de envío',
+          },
+          unit_amount: Math.round(shippingCost * 100),
+        },
+        quantity: 1,
+      });
+    }
+
     const session = await stripe.checkout.sessions.create({
-      // 'bizum' es un método de pago válido en Stripe para España,
-      // pero no está incluido en las definiciones de tipos del SDK todavía.
-      payment_method_types: ['card', 'bizum', 'customer_balance'] as any[],
-      payment_method_options: {
-        customer_balance: {
-          funding_type: 'bank_transfer',
-          bank_transfer: {
-            type: 'eu_bank_transfer',
-            eu_bank_transfer: {
-              country: 'ES', 
-            }
-          }
-        }
-      },
+      payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
-      customer_email: userEmail || undefined, 
-      client_reference_id: orderId, 
+      customer_email: customerEmail || undefined,
+      client_reference_id: orderNumber,
+      metadata: {
+        orderNumber: orderNumber || '',
+      },
+      // Allows billing address collection
+      billing_address_collection: 'auto',
+      // Prefill customer info in Stripe's hosted page
+      locale: 'es',
     });
 
     return NextResponse.json({ url: session.url });
