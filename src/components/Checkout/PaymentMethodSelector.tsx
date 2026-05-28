@@ -1,6 +1,6 @@
 import React from 'react';
 
-type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
+export type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
 
 interface PaymentMethodSelectorProps {
   selected: PaymentMethod;
@@ -30,7 +30,7 @@ const PAYMENT_METHODS: MethodOption[] = [
     icon: '🏦',
     title: 'Transferencia Bancaria',
     subtitle: 'Pago por transferencia con IBAN — 1-2 días hábiles',
-    iconBg: 'bg-indigo-100 text-indigo-600',
+    iconBg: 'bg-emerald-100 text-emerald-600',
     badges: ['Sin comisiones'],
   },
   {
@@ -46,14 +46,14 @@ const PAYMENT_METHODS: MethodOption[] = [
 export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelectorProps) {
   return (
     <div className="flex flex-col gap-3.5">
-      {PAYMENT_METHODS.map((method, index) => {
+      {PAYMENT_METHODS.map((method) => {
         const isSelected = selected === method.id;
         return (
           <div
             key={method.id}
             className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
               isSelected 
-                ? 'border-primary-color bg-blue-50/50 shadow-md transform -translate-y-0.5' 
+                ? 'border-indigo-600 bg-indigo-50/50 shadow-md transform -translate-y-0.5' 
                 : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
             }`}
             onClick={() => onChange(method.id)}
@@ -64,7 +64,7 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
           >
             {isSelected && (
               <div className="absolute top-0 right-0 w-10 h-10 overflow-hidden">
-                <div className="absolute top-[-20px] right-[-20px] w-10 h-10 bg-primary-color rotate-45 transform origin-center"></div>
+                <div className="absolute -top-5 -right-5 w-10 h-10 bg-indigo-600 rotate-45 transform origin-center"></div>
                 <svg className="absolute top-1 right-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
@@ -90,7 +90,7 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
                     {method.badges.map(badge => (
                       <span key={badge} className={`text-[11px] font-semibold px-2 py-0.5 rounded-full transition-all duration-200 tracking-wide ${
                         isSelected 
-                          ? 'text-primary-color bg-primary-color/10' 
+                          ? 'text-indigo-700 bg-indigo-100' 
                           : 'text-gray-500 bg-gray-100'
                       }`}>
                         {badge}
@@ -103,11 +103,11 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
               {/* Custom radio */}
               <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
                 isSelected 
-                  ? 'border-primary-color bg-primary-color shadow-[0_0_0_4px_rgba(46,85,158,0.15)]' 
+                  ? 'border-indigo-600 bg-indigo-600 shadow-[0_0_0_4px_rgba(79,70,229,0.15)]' 
                   : 'border-gray-300 bg-white'
               }`}>
                 {isSelected && (
-                  <div className="w-2 h-2 rounded-full bg-white animate-scale-in" />
+                  <div className="w-2 h-2 rounded-full bg-white" />
                 )}
               </div>
             </div>
