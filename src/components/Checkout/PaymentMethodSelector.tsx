@@ -1,4 +1,5 @@
 import React from 'react';
+import styles from './PaymentMethodSelector.module.css';
 
 export type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
 
@@ -12,87 +13,68 @@ interface MethodOption {
   icon: string;
   title: string;
   subtitle: string;
-  iconBg: string;
   badges?: string[];
 }
 
 const PAYMENT_METHODS: MethodOption[] = [
   {
     id: 'card',
-    icon: '💳',
-    title: 'Tarjeta de Crédito / Débito',
-    subtitle: 'Visa, Mastercard, Amex — Pago inmediato y seguro',
-    iconBg: 'bg-blue-100 text-blue-600',
-    badges: ['Pago instantáneo', 'SSL cifrado'],
+    icon: 'CARD',
+    title: 'Tarjeta de Cr\u00e9dito / D\u00e9bito',
+    subtitle: 'Visa, Mastercard, Amex. Pago inmediato y seguro',
+    badges: ['Pago instant\u00e1neo', 'SSL cifrado'],
   },
   {
     id: 'bank_transfer',
-    icon: '🏦',
+    icon: 'IBAN',
     title: 'Transferencia Bancaria',
-    subtitle: 'Pago por transferencia con IBAN — 1-2 días hábiles',
-    iconBg: 'bg-emerald-100 text-emerald-600',
+    subtitle: 'Pago por transferencia con IBAN. 1-2 d\u00edas h\u00e1biles',
     badges: ['Sin comisiones'],
   },
   {
     id: 'bizum',
-    icon: '📱',
+    icon: 'BZ',
     title: 'Bizum',
-    subtitle: 'Pago móvil instantáneo desde tu app bancaria',
-    iconBg: 'bg-cyan-100 text-cyan-600',
+    subtitle: 'Pago m\u00f3vil instant\u00e1neo desde tu app bancaria',
     badges: ['Pago inmediato', 'Gratis'],
   },
 ];
 
 export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelectorProps) {
   return (
-    <div className="flex flex-col gap-3.5">
+    <div className={styles.methods} role="radiogroup" aria-label="Metodo de pago">
       {PAYMENT_METHODS.map((method) => {
         const isSelected = selected === method.id;
         return (
           <div
             key={method.id}
-            className={`relative p-4 rounded-xl border-2 transition-all duration-300 cursor-pointer overflow-hidden ${
-              isSelected 
-                ? 'border-indigo-600 bg-indigo-50/50 shadow-md transform -translate-y-0.5' 
-                : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-            }`}
+            className={`${styles.option} ${isSelected ? styles.selected : ''}`}
             onClick={() => onChange(method.id)}
             role="radio"
             aria-checked={isSelected}
             tabIndex={0}
-            onKeyDown={(e) => e.key === 'Enter' || e.key === ' ' ? onChange(method.id) : undefined}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') onChange(method.id);
+            }}
           >
             {isSelected && (
-              <div className="absolute top-0 right-0 w-10 h-10 overflow-hidden">
-                <div className="absolute -top-5 -right-5 w-10 h-10 bg-indigo-600 rotate-45 transform origin-center"></div>
-                <svg className="absolute top-1 right-1" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
-                  <polyline points="20 6 9 17 4 12"></polyline>
+              <div className={styles.checkCorner}>
+                <svg className={styles.check} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                  <polyline points="20 6 9 17 4 12" />
                 </svg>
               </div>
             )}
 
-            <div className="flex items-center gap-4 relative">
-              <div className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl flex-shrink-0 ${method.iconBg}`}>
-                {method.icon}
-              </div>
+            <div className={styles.row}>
+              <div className={styles.icon}>{method.icon}</div>
 
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap mb-1">
-                  <h4 className={`m-0 text-[15px] font-bold transition-colors duration-200 ${isSelected ? 'text-gray-900' : 'text-gray-700'}`}>
-                    {method.title}
-                  </h4>
-                </div>
-                <p className="m-0 text-[13px] text-gray-500 leading-snug">
-                  {method.subtitle}
-                </p>
+              <div className={styles.content}>
+                <h4 className={styles.title}>{method.title}</h4>
+                <p className={styles.subtitle}>{method.subtitle}</p>
                 {method.badges && (
-                  <div className="flex gap-1.5 mt-2 flex-wrap">
-                    {method.badges.map(badge => (
-                      <span key={badge} className={`text-[11px] font-semibold px-2 py-0.5 rounded-full transition-all duration-200 tracking-wide ${
-                        isSelected 
-                          ? 'text-indigo-700 bg-indigo-100' 
-                          : 'text-gray-500 bg-gray-100'
-                      }`}>
+                  <div className={styles.badges}>
+                    {method.badges.map((badge) => (
+                      <span key={badge} className={styles.badge}>
                         {badge}
                       </span>
                     ))}
@@ -100,15 +82,8 @@ export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelec
                 )}
               </div>
 
-              {/* Custom radio */}
-              <div className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-all duration-300 ${
-                isSelected 
-                  ? 'border-indigo-600 bg-indigo-600 shadow-[0_0_0_4px_rgba(79,70,229,0.15)]' 
-                  : 'border-gray-300 bg-white'
-              }`}>
-                {isSelected && (
-                  <div className="w-2 h-2 rounded-full bg-white" />
-                )}
+              <div className={styles.radio}>
+                {isSelected && <div className={styles.dot} />}
               </div>
             </div>
           </div>

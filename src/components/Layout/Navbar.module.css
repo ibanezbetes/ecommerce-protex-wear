@@ -1,0 +1,200 @@
+.header {
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.inner {
+  width: min(1280px, calc(100% - 2.5rem));
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.brand {
+  width: 150px;
+  padding-right: 0;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.logo {
+  width: 112px !important;
+  height: auto !important;
+  max-width: 112px !important;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.75rem;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.link,
+.mobileLink,
+.loginButton,
+.registerButton,
+.userButton,
+.iconButton,
+.dropdownLink {
+  transition: transform 0.2s ease, color 0.2s ease, background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.link,
+.mobileLink,
+.loginButton,
+.registerButton,
+.userButton,
+.dropdownLink {
+  text-decoration: none;
+}
+
+.link:hover,
+.mobileLink:hover,
+.loginButton:hover,
+.registerButton:hover,
+.iconButton:hover,
+.userButton:hover,
+.dropdownLink:hover {
+  transform: translateY(-1px);
+}
+
+.search {
+  display: none;
+}
+
+.searchInput {
+  width: 100%;
+  min-width: 150px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  flex: 0 0 auto;
+}
+
+.iconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: var(--gray-700);
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  background: var(--gray-100);
+  color: var(--gray-900);
+}
+
+.loginButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gray-300);
+  border-radius: 0.75rem;
+  background: white;
+  color: var(--gray-900);
+  font-weight: 500;
+  min-height: 42px;
+}
+
+.loginButton:hover {
+  border-color: var(--primary-color);
+  background: var(--gray-100);
+}
+
+.registerButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+  min-height: 42px;
+}
+
+.registerButton:hover {
+  background: var(--primary-dark);
+  color: white;
+}
+
+.userButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 0;
+  background: transparent;
+  color: var(--gray-700);
+}
+
+.mobileToggle {
+  display: none;
+}
+
+.mobilePanel {
+  padding-bottom: 1rem;
+}
+
+.mobileLink {
+  display: block;
+  color: var(--gray-700);
+}
+
+.mobileSearch {
+  width: 100%;
+}
+
+.dropdownLink {
+  display: block;
+  color: var(--gray-700);
+}
+
+@media (max-width: 768px) {
+  .brand {
+    width: auto;
+    padding-right: 0;
+  }
+
+  .row {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .actions {
+    width: 100%;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .mobileToggle {
+    display: inline-flex;
+  }
+}
+
+@media (max-width: 1024px) {
+  .nav {
+    gap: 1.25rem;
+  }
+}

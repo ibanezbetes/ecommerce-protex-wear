@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/store/useAuth';
+import styles from './layout.module.css';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -48,17 +49,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   };
 
   return (
-    <div className="admin-dashboard-container">
+    <div className={styles.dashboardContainer}>
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
-          className="admin-sidebar-overlay visible"
+          className={`${styles.sidebarOverlay} ${styles.visible}`}
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
       {/* Mobile Toggle */}
       <button
-        className="admin-mobile-toggle"
+        className={styles.mobileToggle}
         onClick={toggleSidebar}
         aria-label={isSidebarOpen ? "Cerrar menú" : "Abrir menú"}
       >
@@ -69,26 +70,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       </button>
 
       {/* Sidebar */}
-      <aside className={`admin-sidebar ${isSidebarOpen ? 'open' : ''} ${isCollapsed ? 'collapsed' : ''}`}>
-        <div className="admin-sidebar-header">
+      <aside className={`${styles.sidebar} ${isSidebarOpen ? styles.open : ''} ${isCollapsed ? styles.collapsed : ''}`}>
+        <div className={styles.sidebarHeader}>
           {/* Logo placeholder, replacing with standard <img> later if needed */}
-          <div className="admin-sidebar-logo bg-white/20 w-8 h-8 rounded flex items-center justify-center font-bold text-white shrink-0">
+          <div className={styles.sidebarLogo}>
             PW
           </div>
-          <span className="admin-sidebar-brand">Admin Panel</span>
+          <span className={styles.sidebarBrand}>Admin Panel</span>
         </div>
 
-        <nav className="admin-sidebar-nav">
-          <ul className="admin-sidebar-list">
+        <nav className={styles.sidebarNav}>
+          <ul className={styles.sidebarList}>
             {sidebarItems.map((item) => (
               <li key={item.path}>
                 <Link
                   href={item.path}
-                  className={`admin-nav-item ${isActive(item.path, item.exact) ? 'active' : ''}`}
+                  className={`${styles.navItem} ${isActive(item.path, item.exact) ? styles.navItemActive : ''}`}
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  <span className="admin-nav-icon">{item.icon}</span>
-                  <span className="admin-sidebar-label">{item.label}</span>
+                  <span className={styles.navIcon}>{item.icon}</span>
+                  <span className={styles.sidebarLabel}>{item.label}</span>
                 </Link>
               </li>
             ))}
@@ -96,44 +97,44 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </nav>
 
         {/* Sidebar Footer */}
-        <div className="admin-sidebar-footer">
-          <button className="admin-sidebar-toggle-btn" onClick={toggleCollapse}>
+        <div className={styles.sidebarFooter}>
+          <button className={styles.sidebarToggleBtn} onClick={toggleCollapse}>
             {isCollapsed ? (
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="13 17 18 12 13 7"></polyline>
                 <polyline points="6 17 11 12 6 7"></polyline>
               </svg>
             ) : (
-              <div className="admin-toggle-content">
+              <div className={styles.toggleContent}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <polyline points="11 17 6 12 11 7"></polyline>
                   <polyline points="18 17 13 12 18 7"></polyline>
                 </svg>
-                <span className="admin-sidebar-label">Contraer menú</span>
+                <span className={styles.sidebarLabel}>Contraer menú</span>
               </div>
             )}
           </button>
 
-          <Link href="/" className="admin-exit-btn">
-            <span className="admin-btn-icon">{Icons.BackHome}</span>
-            <span className="admin-sidebar-label">Volver al Inicio</span>
+          <Link href="/" className={styles.exitBtn}>
+            <span className={styles.btnIcon}>{Icons.BackHome}</span>
+            <span className={styles.sidebarLabel}>Volver al Inicio</span>
           </Link>
-          <Link href="/productos" className="admin-exit-btn">
-            <span className="admin-btn-icon">{Icons.Shop}</span>
-            <span className="admin-sidebar-label">Ir a la Tienda</span>
+          <Link href="/productos" className={styles.exitBtn}>
+            <span className={styles.btnIcon}>{Icons.Shop}</span>
+            <span className={styles.sidebarLabel}>Ir a la Tienda</span>
           </Link>
           <button
             onClick={handleLogout}
-            className="admin-exit-btn primary"
+            className={`${styles.exitBtn} ${styles.primary}`}
           >
-            <span className="admin-btn-icon">{Icons.Logout}</span>
-            <span className="admin-sidebar-label">Cerrar Sesión</span>
+            <span className={styles.btnIcon}>{Icons.Logout}</span>
+            <span className={styles.sidebarLabel}>Cerrar Sesión</span>
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className={`admin-main-content ${isCollapsed ? 'collapsed' : ''}`}>
+      <main className={`${styles.mainContent} ${isCollapsed ? styles.collapsed : ''}`}>
         {children}
       </main>
     </div>

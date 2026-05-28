@@ -2,12 +2,13 @@
 import { useState } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
-import { PaymentMethodSelector, PaymentMethod } from '@/components/checkout/PaymentMethodSelector';
-import { BankTransferDetails } from '@/components/checkout/BankTransferDetails';
-import { BizumDetails } from '@/components/checkout/BizumDetails';
+import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
+import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
+import { BizumDetails } from '@/components/Checkout/BizumDetails';
+import styles from './page.module.css';
 
 export default function CheckoutPage() {
-  const { user, isGuest, logout } = useAuth();
+  const { user, isGuest } = useAuth();
   const { items, cartTotal, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
@@ -19,15 +20,13 @@ export default function CheckoutPage() {
   const handleStripePayment = async () => {
     setLoading(true);
     try {
-      const dummyOrderId = orderNumber; 
-
       const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           items,
-          orderId: dummyOrderId,
-          userEmail: user?.email
+          orderId: orderNumber,
+          userEmail: user?.email,
         }),
       });
 
@@ -49,8 +48,7 @@ export default function CheckoutPage() {
   const handleManualPayment = async () => {
     setLoading(true);
     try {
-      // Here you would typically save the order to your database as "pending"
-      await new Promise(r => setTimeout(r, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       setOrderPlaced(true);
       clearCart();
     } catch (error) {
@@ -63,9 +61,8 @@ export default function CheckoutPage() {
   const handleDeferredPayment = async () => {
     setLoading(true);
     try {
-      console.log('Confirmando pedido con Pago Diferido (VIP)...');
-      await new Promise(r => setTimeout(r, 1000));
-      alert('¡Pedido confirmado exitosamente (Pago Diferido)!');
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      alert('Pedido confirmado exitosamente (Pago Diferido)!');
       clearCart();
     } catch (error) {
       console.error(error);
@@ -76,20 +73,17 @@ export default function CheckoutPage() {
 
   if (orderPlaced) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div className="max-w-md w-full bg-white shadow rounded-lg p-8 text-center animate-fade-in-up">
-          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
-            ✓
+      <div className={styles.successPage}>
+        <div className={styles.successPanel}>
+          <div className={styles.successIcon}>✓</div>
+          <h2 className={styles.successTitle}>Pedido registrado</h2>
+          <p className={styles.successText}>
+            Tu n&uacute;mero de pedido es: <strong>{orderNumber}</strong>
+          </p>
+          <div className={styles.note}>
+            Hemos guardado tu pedido. Por favor, realiza el pago seg&uacute;n las instrucciones proporcionadas para que podamos procesarlo.
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">¡Pedido Registrado!</h2>
-          <p className="text-gray-600 mb-6">Tu número de pedido es: <strong className="font-mono text-gray-900">{orderNumber}</strong></p>
-          <div className="text-left bg-gray-50 p-4 rounded-lg border border-gray-100 text-sm text-gray-700 mb-6">
-            <p>Hemos guardado tu pedido. Por favor, realiza el pago según las instrucciones proporcionadas para que podamos procesarlo.</p>
-          </div>
-          <button
-            onClick={() => window.location.href = '/'}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700"
-          >
+          <button onClick={() => window.location.href = '/'} className={styles.button}>
             Volver a la tienda
           </button>
         </div>
@@ -98,52 +92,53 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-extrabold text-gray-900 mb-8">Checkout</h1>
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Checkout</h1>
 
-        <div className="bg-white shadow overflow-hidden sm:rounded-lg">
-          <div className="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 className="text-lg leading-6 font-medium text-gray-900">Resumen del Pedido</h3>
+        <div className={styles.panel}>
+          <div className={styles.panelHeader}>
+            <h3>Resumen del Pedido</h3>
           </div>
-          <ul className="divide-y divide-gray-200 px-4 py-3">
+
+          <ul className={styles.items}>
             {items.map((item) => (
-              <li key={item.variantId} className="py-4 flex justify-between">
+              <li key={item.variantId} className={styles.item}>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">{item.name}</p>
-                  <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>
+                  <p className={styles.itemName}>{item.name}</p>
+                  <p className={styles.itemMeta}>Cantidad: {item.quantity}</p>
                 </div>
-                <div className="text-sm font-medium text-gray-900">
-                  {(item.price * item.quantity).toFixed(2)}€
+                <div className={styles.itemPrice}>
+                  {(item.price * item.quantity).toFixed(2)}&euro;
                 </div>
               </li>
             ))}
           </ul>
-          
-          <div className="px-4 py-5 bg-gray-50 flex justify-between border-t border-gray-200">
-            <span className="text-base font-bold text-gray-900">Total a pagar</span>
-            <span className="text-xl font-bold text-gray-900">{cartTotal.toFixed(2)}€</span>
+
+          <div className={styles.total}>
+            <span>Total a pagar</span>
+            <span className={styles.totalPrice}>{cartTotal.toFixed(2)}&euro;</span>
           </div>
 
-          <div className="px-4 py-6">
+          <div className={styles.payment}>
             {isVip ? (
-              <div className="bg-indigo-50 p-6 rounded-lg border border-indigo-100">
-                <h4 className="text-indigo-800 font-semibold mb-2">✨ Facturación Diferida Activada</h4>
-                <p className="text-indigo-600 text-sm mb-4">
+              <div className={styles.vipBox}>
+                <h4 className={styles.vipTitle}>Facturaci&oacute;n diferida activada</h4>
+                <p className={styles.vipText}>
                   Como cliente B2B autorizado, puedes confirmar el pedido ahora sin realizar el pago inmediato.
                 </p>
                 <button
                   onClick={handleDeferredPayment}
                   disabled={loading || items.length === 0}
-                  className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+                  className={styles.button}
                 >
                   {loading ? 'Procesando...' : 'Confirmar Pedido (Pago Diferido)'}
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-6">
+              <div className={styles.paymentStack}>
                 <div>
-                  <h4 className="text-lg font-medium text-gray-900 mb-4">Método de Pago</h4>
+                  <h4 className={styles.sectionTitle}>M&eacute;todo de Pago</h4>
                   <PaymentMethodSelector selected={paymentMethod} onChange={setPaymentMethod} />
                 </div>
 
@@ -154,12 +149,12 @@ export default function CheckoutPage() {
                   <BizumDetails orderNumber={orderNumber} total={cartTotal} />
                 )}
 
-                <div className="pt-4 border-t border-gray-200">
+                <div className={styles.divider}>
                   {paymentMethod === 'card' ? (
                     <button
                       onClick={handleStripePayment}
                       disabled={loading || items.length === 0}
-                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900 disabled:opacity-50 transition-colors"
+                      className={`${styles.button} ${styles.buttonDark}`}
                     >
                       {loading ? 'Procesando...' : 'Pagar de forma segura (Stripe)'}
                     </button>
@@ -167,7 +162,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={handleManualPayment}
                       disabled={loading || items.length === 0}
-                      className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors"
+                      className={styles.button}
                     >
                       {loading ? 'Procesando...' : 'Confirmar Pedido'}
                     </button>
