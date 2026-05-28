@@ -864,6 +864,64 @@ button:disabled {
 .lg\:col-span-2 { grid-column: span 2 / span 2; }
 .lg\:col-span-1 { grid-column: span 1 / span 1; }
 
+/* Helper utility classes for Legal Pages (Tailwind-like layout fixes in Vanilla CSS) */
+.min-h-screen {
+  min-height: 100vh;
+}
+.flex {
+  display: flex;
+}
+.flex-col {
+  flex-direction: column;
+}
+.flex-1 {
+  flex: 1 1 0%;
+}
+.max-w-7xl {
+  max-width: 80rem; /* 1280px */
+}
+.max-w-4xl {
+  max-width: 56rem; /* 896px */
+}
+.mx-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+.w-full {
+  width: 100%;
+}
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
+.relative {
+  position: relative;
+}
+.z-10 {
+  z-index: 10;
+}
+.hidden {
+  display: none;
+}
+.space-y-1 > :not([hidden]) ~ :not([hidden]) {
+  margin-top: 0.25rem;
+}
+@media (min-width: 1024px) {
+  .lg\:block {
+    display: block;
+  }
+}
+@media (min-width: 768px) {
+  .md\:py-16 {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+  }
+}
+
 /* Premium Legal Pages Design System */
 .legal-wrapper {
   background-color: #f7f9fc;

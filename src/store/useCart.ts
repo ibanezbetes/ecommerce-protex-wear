@@ -161,11 +161,25 @@ export const useCart = create<CartState>()(
     }),
     {
       name: 'protex-cart-storage',
-      // only persist items, discountCode
+      // persist cart items, discounts and totals
       partialize: (state) => ({
         items: state.items,
         discountCode: state.discountCode,
+        cartTotal: state.cartTotal,
+        subtotal: state.subtotal,
+        itemCount: state.itemCount,
+        discountAmount: state.discountAmount,
       }),
+      // Automatically recalculate on rehydration to prevent any stale 0.00€ totals
+      onRehydrateStorage: () => (state, error) => {
+        if (state && !error) {
+          const totals = computeTotals(state.items, state.discountCode);
+          state.cartTotal = totals.cartTotal;
+          state.subtotal = totals.subtotal;
+          state.itemCount = totals.itemCount;
+          state.discountAmount = totals.discountAmount;
+        }
+      }
     }
   )
 );
