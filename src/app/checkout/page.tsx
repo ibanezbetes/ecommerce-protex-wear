@@ -466,6 +466,7 @@ export default function CheckoutPage() {
         );
         sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
 
+        setOrderPlaced(true);
         clearCart();
         router.push(`/checkout/success?order=${actualOrderId}&sandbox=true`);
       }
@@ -482,6 +483,7 @@ export default function CheckoutPage() {
         );
         sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
 
+        setOrderPlaced(true);
         clearCart();
         router.push(`/checkout/success?order=${actualOrderId}`);
       } catch (err: any) {
