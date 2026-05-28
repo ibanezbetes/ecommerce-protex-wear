@@ -100,23 +100,6 @@ const CREATE_ORDER_MUTATION = `
   }
 `;
 
-const UPDATE_ORDER_STATUS_MUTATION = `
-  mutation UpdateOrderStatus($orderId: ID!, $status: String!) {
-    updateOrderStatus(orderId: $orderId, status: $status) {
-      orderId
-      status
-    }
-  }
-`;
-
-const DECREMENT_STOCK_MUTATION = `
-  mutation DecrementProductStock($productId: ID!, $quantity: Int!) {
-    decrementProductStock(productId: $productId, quantity: $quantity) {
-      id
-      stock
-    }
-  }
-`;
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -464,32 +447,11 @@ export default function CheckoutPage() {
         // 1.5s simulation for standard payment authorization wait time
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // Actualizar estado del pedido en AppSync a CONFIRMADO
-        try {
-          const graphqlClient = await import('@/services/graphqlClient');
-          await graphqlClient.graphqlFetch(UPDATE_ORDER_STATUS_MUTATION, {
-            orderId: actualOrderId,
-            status: 'CONFIRMADO'
-          });
-          console.log(`[Sandbox] Pedido ${actualOrderId} actualizado a CONFIRMADO en AppSync.`);
-        } catch (dbErr) {
-          console.warn(`[Sandbox] Fallo al actualizar estado del pedido ${actualOrderId} a CONFIRMADO en AppSync:`, dbErr);
-        }
-
-        // Decrementar stock de los productos comprados en AppSync
-        try {
-          const graphqlClient = await import('@/services/graphqlClient');
-          for (const item of items) {
-            console.log(`[Sandbox] Decrementando stock: Producto ${item.productId}, Cantidad: ${item.quantity}`);
-            await graphqlClient.graphqlFetch(DECREMENT_STOCK_MUTATION, {
-              productId: item.productId,
-              quantity: item.quantity
-            });
-          }
-          console.log('[Sandbox] Stock decrementado correctamente para todos los artículos del pedido.');
-        } catch (stockErr) {
-          console.warn('[Sandbox] Fallo al decrementar el stock en AppSync:', stockErr);
-        }
+        // Simular actualización de estado de pedido y stock (AWS AppSync/Amplify no exponen estas mutaciones públicamente en schema.graphql)
+        console.log(`[Sandbox Simulation] Actualizando estado del pedido ${actualOrderId} a CONFIRMADO.`);
+        items.forEach(item => {
+          console.log(`[Sandbox Simulation] Reduciendo stock del producto ${item.productId} en cantidad: ${item.quantity}`);
+        });
 
         try {
           await sendOrderEmail(actualOrderId);
