@@ -155,12 +155,43 @@ export default function CheckoutPage() {
     }
   };
 
+  const sendOrderEmail = async () => {
+    try {
+      await fetch('/api/send-order-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderNumber,
+          customerName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim() || 'Cliente',
+          customerEmail: user?.email || '',
+          items: items.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
+          subtotal,
+          tax,
+          shippingCost,
+          total,
+          paymentMethod,
+          shippingAddress: {
+            firstName: shippingAddress.firstName || '',
+            lastName: shippingAddress.lastName || '',
+            street: shippingAddress.street || '',
+            city: shippingAddress.city || '',
+            postalCode: shippingAddress.postalCode || '',
+            country: shippingAddress.country || 'ES',
+          },
+          shippingMethod: selectedShipping,
+        }),
+      });
+    } catch (e) {
+      console.warn('No se pudo enviar el email de confirmación:', e);
+    }
+  };
+
   const handleSimulatedPayment = async () => {
     setIsProcessing(true);
     setError(null);
     try {
-      // Simulamos latencia de red
       await new Promise(resolve => setTimeout(resolve, 2000));
+      await sendOrderEmail();
       setOrderPlaced(true);
       clearCart();
       router.push(`/checkout/success?order=${orderNumber}`);
@@ -198,15 +229,9 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Error al iniciar el pago');
       }
     } catch (err: any) {
-      console.error('Error de pago:', err);
-      // Fallback a pago simulado en modo desarrollo si falla Stripe (por falta de keys)
-      if (process.env.NODE_ENV === 'development') {
-        toast.info({ title: 'Modo dev', message: 'Stripe no configurado. Simulando pago...' });
-        await handleSimulatedPayment();
-      } else {
-        setError(err.message || 'Error de conexión con la pasarela.');
-        setIsProcessing(false);
-      }
+      console.error('Error de pago Stripe:', err);
+      setError('Error al conectar con la pasarela de pago. Inténtalo de nuevo o elige otro método.');
+      setIsProcessing(false);
     }
   };
 

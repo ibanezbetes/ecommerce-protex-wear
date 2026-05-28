@@ -6,9 +6,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Falta STRIPE_SECRET_KEY en las variables de entorno' }, { status: 500 });
   }
   
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-04-30.basil',
-  });
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
   
   try {
     const { items, shippingCost, customerEmail, orderNumber } = await request.json();
