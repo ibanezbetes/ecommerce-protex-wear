@@ -11,7 +11,7 @@ export async function POST(request: Request) {
   try {
     const { items, shippingCost, customerEmail, orderNumber } = await request.json();
 
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map((item: any) => ({
+    const lineItems: any[] = items.map((item: any) => ({
       price_data: {
         currency: 'eur',
         product_data: {

@@ -1,7 +1,8 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 /* ============================================================================
- * useCart — Store Global del Carrito de Compras (Zustand)
+ * useCart — Store Global del Carrito de Compras (Zustand con Persistencia)
  * ============================================================================
  *
  * Gestiona los artículos del carrito, el estado del drawer (abierto/cerrado),
@@ -65,64 +66,107 @@ interface CartState {
   closeCart: () => void;
 }
 
-const computeTotals = (items: CartItem[]) => {
-  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
-  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
-  return { cartTotal, subtotal: cartTotal, itemCount };
+const SUPPORTED_DISCOUNTS: Record<string, { type: 'percentage' | 'fixed'; value: number }> = {
+  VERANO20: { type: 'percentage', value: 20 },
+  PROTEX10: { type: 'fixed', value: 10 },
+  PROTEX20: { type: 'percentage', value: 20 },
 };
 
-export const useCart = create<CartState>((set, get) => ({
-  items: [],
-  isCartOpen: false,
-  cartTotal: 0,
-  subtotal: 0,
-  itemCount: 0,
+const computeTotals = (items: CartItem[], discountCode: string | null) => {
+  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
   
-  discountCode: null,
-  discountAmount: null,
-
-  applyDiscountCode: async (code: string) => {
-    // Simulated discount logic for presentation
-    if (code === 'PROTEX10') {
-      set({ discountCode: code, discountAmount: 10 });
-    } else {
-      throw new Error('Código no válido');
+  let discountAmount = 0;
+  if (discountCode) {
+    const promo = SUPPORTED_DISCOUNTS[discountCode];
+    if (promo) {
+      if (promo.type === 'percentage') {
+        discountAmount = parseFloat((cartTotal * (promo.value / 100)).toFixed(2));
+      } else {
+        discountAmount = Math.min(promo.value, cartTotal);
+      }
     }
-  },
-  
-  removeDiscountCode: () => {
-    set({ discountCode: null, discountAmount: null });
-  },
+  }
 
-  addItem: (newItem) => set((state) => {
-    let newItems;
-    const existing = state.items.find(i => i.variantId === newItem.variantId);
-    if (existing) {
-      newItems = state.items.map(i =>
-        i.variantId === newItem.variantId
-          ? { ...i, quantity: i.quantity + newItem.quantity }
-          : i
-      );
-    } else {
-      newItems = [...state.items, newItem];
+  return { 
+    cartTotal, 
+    subtotal: cartTotal, 
+    itemCount,
+    discountAmount: discountCode ? discountAmount : null
+  };
+};
+
+export const useCart = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      isCartOpen: false,
+      cartTotal: 0,
+      subtotal: 0,
+      itemCount: 0,
+      
+      discountCode: null,
+      discountAmount: null,
+
+      applyDiscountCode: async (code: string) => {
+        const cleanCode = code.trim().toUpperCase();
+        const promo = SUPPORTED_DISCOUNTS[cleanCode];
+        if (promo) {
+          const { items } = get();
+          const totals = computeTotals(items, cleanCode);
+          set({ 
+            discountCode: cleanCode, 
+            discountAmount: totals.discountAmount 
+          });
+        } else {
+          throw new Error('Código de descuento no válido');
+        }
+      },
+      
+      removeDiscountCode: () => {
+        set({ discountCode: null, discountAmount: null });
+      },
+
+      addItem: (newItem) => set((state) => {
+        let newItems;
+        const existing = state.items.find(i => i.variantId === newItem.variantId);
+        if (existing) {
+          newItems = state.items.map(i =>
+            i.variantId === newItem.variantId
+              ? { ...i, quantity: i.quantity + newItem.quantity }
+              : i
+          );
+        } else {
+          newItems = [...state.items, newItem];
+        }
+        return { items: newItems, isCartOpen: true, ...computeTotals(newItems, state.discountCode) };
+      }),
+
+      removeItem: (variantId) => set((state) => {
+        const newItems = state.items.filter(i => i.variantId !== variantId);
+        return { items: newItems, ...computeTotals(newItems, state.discountCode) };
+      }),
+
+      updateQuantity: (variantId, quantity) => set((state) => {
+        const newItems = state.items.map(i =>
+          i.variantId === variantId ? { ...i, quantity } : i
+        );
+        return { items: newItems, ...computeTotals(newItems, state.discountCode) };
+      }),
+
+      clearCart: () => set({ items: [], isCartOpen: false, cartTotal: 0, subtotal: 0, itemCount: 0, discountCode: null, discountAmount: null }),
+
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
+    }),
+    {
+      name: 'protex-cart-storage',
+      // only persist items, discountCode
+      partialize: (state) => ({
+        items: state.items,
+        discountCode: state.discountCode,
+      }),
     }
-    return { items: newItems, isCartOpen: true, ...computeTotals(newItems) };
-  }),
+  )
+);
 
-  removeItem: (variantId) => set((state) => {
-    const newItems = state.items.filter(i => i.variantId !== variantId);
-    return { items: newItems, ...computeTotals(newItems) };
-  }),
-
-  updateQuantity: (variantId, quantity) => set((state) => {
-    const newItems = state.items.map(i =>
-      i.variantId === variantId ? { ...i, quantity } : i
-    );
-    return { items: newItems, ...computeTotals(newItems) };
-  }),
-
-  clearCart: () => set({ items: [], isCartOpen: false, cartTotal: 0, subtotal: 0, itemCount: 0, discountCode: null, discountAmount: null }),
-
-  openCart: () => set({ isCartOpen: true }),
-  closeCart: () => set({ isCartOpen: false }),
-}));

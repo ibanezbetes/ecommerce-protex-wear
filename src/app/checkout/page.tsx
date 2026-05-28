@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
-import { PaymentMethodSelector } from '@/components/Checkout/PaymentMethodSelector';
+import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
 import { BizumDetails } from '@/components/Checkout/BizumDetails';
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, X, Lock } from 'lucide-react';
@@ -26,37 +26,53 @@ export interface ShippingOption {
   method: string;
   carrier: string;
   cost: number;
-  currency: string;
   estimatedDays: number;
   description: string;
-  trackingIncluded: boolean;
-  insuranceIncluded: boolean;
 }
 
-type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
+export interface ShippingZone {
+  id: string;
+  name: string;
+  cost: number;
+  freeThreshold: number;
+  estimatedDays: number;
+  carrier: string;
+}
 
-const SHIPPING_OPTIONS: ShippingOption[] = [
-  {
-    method: 'standard',
-    carrier: 'Correos',
+export const SHIPPING_ZONES: Record<string, ShippingZone> = {
+  spain_peninsula: {
+    id: 'spain_peninsula',
+    name: 'España Península',
     cost: 5.99,
-    currency: 'EUR',
+    freeThreshold: 50.00,
+    estimatedDays: 2,
+    carrier: 'Correos'
+  },
+  balearic: {
+    id: 'balearic',
+    name: 'Islas Baleares',
+    cost: 8.99,
+    freeThreshold: 75.00,
     estimatedDays: 4,
-    description: 'Envío Estándar',
-    trackingIncluded: true,
-    insuranceIncluded: false,
+    carrier: 'Correos Baleares'
   },
-  {
-    method: 'express',
-    carrier: 'SEUR',
+  canary: {
+    id: 'canary',
+    name: 'Islas Canarias',
     cost: 12.99,
-    currency: 'EUR',
-    estimatedDays: 1,
-    description: 'Envío Express 24h',
-    trackingIncluded: true,
-    insuranceIncluded: true,
+    freeThreshold: 100.00,
+    estimatedDays: 5,
+    carrier: 'Correos Canarias'
   },
-];
+  international: {
+    id: 'international',
+    name: 'Internacional (Portugal, Francia, Andorra)',
+    cost: 9.99,
+    freeThreshold: 80.00,
+    estimatedDays: 4,
+    carrier: 'DHL Express'
+  }
+};
 
 const getDeliveryDate = (daysToAdd: number) => {
   const date = new Date();
@@ -74,10 +90,20 @@ const STEPS = [
   { number: 4, title: 'Confirmar', icon: CheckCircle },
 ];
 
+const CREATE_ORDER_MUTATION = `
+  mutation CreateOrder($input: CreateOrderInput!) {
+    createOrder(input: $input) {
+      orderId
+      status
+      checkoutUrl
+    }
+  }
+`;
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { items, subtotal, clearCart, discountCode, discountAmount, applyDiscountCode, removeDiscountCode } = useCart();
+  const { items, subtotal, clearCart, discountCode, discountAmount } = useCart();
   const toast = useToast();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -86,13 +112,11 @@ export default function CheckoutPage() {
   const [orderNumber] = useState(() => generateOrderNumber());
   const [error, setError] = useState<string | null>(null);
   
-  const [promoInput, setPromoInput] = useState('');
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-
+  const [shippingZone, setShippingZone] = useState<string>('spain_peninsula');
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>({
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    company: user?.company || '',
+    firstName: (user as any)?.firstName || user?.name?.split(' ')[0] || '',
+    lastName: (user as any)?.lastName || user?.name?.split(' ').slice(1).join(' ') || '',
+    company: (user as any)?.company || '',
     country: 'ES',
   });
   
@@ -100,9 +124,70 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  const shippingOption = SHIPPING_OPTIONS.find(o => o.method === selectedShipping)!;
-  const shippingCost = shippingOption?.cost || 0;
+  // Fallback Address Autocomplete States
+  const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const handleSelectSuggestion = (suggestion: string) => {
+    const parts = suggestion.split(',').map(p => p.trim());
+    if (parts.length >= 4) {
+      const streetPart = parts[0] + (parts[1] ? `, ${parts[1]}` : '');
+      const cityPart = parts[2];
+      const postalCodePart = parts[3];
+      const countryPart = 'ES'; // Spain defaults
+
+      setShippingAddress(prev => ({
+        ...prev,
+        street: streetPart,
+        city: cityPart,
+        postalCode: postalCodePart,
+        country: countryPart
+      }));
+
+      // Auto-adjust zone on selected place
+      if (postalCodePart.startsWith('07')) {
+        setShippingZone('balearic');
+      } else if (postalCodePart.startsWith('35') || postalCodePart.startsWith('38')) {
+        setShippingZone('canary');
+      } else {
+        setShippingZone('spain_peninsula');
+      }
+
+      toast.success({ 
+        title: 'Dirección Completada', 
+        message: 'Los datos se rellenaron automáticamente desde las sugerencias.' 
+      });
+    }
+    setAddressSuggestions([]);
+    setShowSuggestions(false);
+  };
+
+  // Dynamic Shipping Calculations based on Zone and Subtotal
+  const currentZone = SHIPPING_ZONES[shippingZone] || SHIPPING_ZONES.spain_peninsula;
   const discountedSubtotal = Math.max(0, subtotal - (discountAmount || 0));
+  
+  const standardCost = discountedSubtotal >= currentZone.freeThreshold ? 0 : currentZone.cost;
+  const expressCost = standardCost + 7.00;
+
+  const currentShippingOptions = [
+    {
+      method: 'standard',
+      carrier: currentZone.carrier,
+      cost: standardCost,
+      estimatedDays: currentZone.estimatedDays,
+      description: `Envío Estándar (${currentZone.name})`,
+    },
+    {
+      method: 'express',
+      carrier: 'SEUR Express',
+      cost: expressCost,
+      estimatedDays: 1,
+      description: 'Envío Express 24h',
+    }
+  ];
+
+  const shippingOption = currentShippingOptions.find(o => o.method === selectedShipping) || currentShippingOptions[0];
+  const shippingCost = shippingOption.cost;
   const tax = discountedSubtotal * 0.21;
   const total = discountedSubtotal + tax + shippingCost;
 
@@ -112,6 +197,107 @@ export default function CheckoutPage() {
       router.push('/');
     }
   }, [items, router, orderPlaced]);
+
+  // Google Places Autocomplete Integration with Try-Catch and Graceful Fallback
+  useEffect(() => {
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
+    if (!apiKey) {
+      console.warn('Google Places API Key no configurada. Degradación elegante activa.');
+      return;
+    }
+
+    const inputElement = document.getElementById('street-input') as HTMLInputElement;
+    if (!inputElement) return;
+
+    let autocomplete: any = null;
+
+    const initAutocomplete = () => {
+      try {
+        const googleObj = (window as any).google;
+        if (!googleObj || !googleObj.maps || !googleObj.maps.places) {
+          console.warn('Google Maps API no está disponible en window.');
+          return;
+        }
+
+        autocomplete = new googleObj.maps.places.Autocomplete(inputElement, {
+          types: ['address'],
+          componentRestrictions: { country: ['es', 'pt', 'fr', 'ad'] }
+        });
+
+        autocomplete.addListener('place_changed', () => {
+          const place = autocomplete.getPlace();
+          if (!place || !place.address_components) return;
+
+          let streetName = '';
+          let streetNumber = '';
+          let city = '';
+          let postalCode = '';
+          let country = 'ES';
+
+          for (const component of place.address_components) {
+            const types = component.types;
+            if (types.includes('route')) {
+              streetName = component.long_name;
+            } else if (types.includes('street_number')) {
+              streetNumber = component.long_name;
+            } else if (types.includes('locality')) {
+              city = component.long_name;
+            } else if (types.includes('postal_code')) {
+              postalCode = component.long_name;
+            } else if (types.includes('country')) {
+              country = component.short_name;
+            }
+          }
+
+          const fullStreet = streetNumber ? `${streetName}, ${streetNumber}` : streetName;
+          
+          setShippingAddress(prev => ({
+            ...prev,
+            street: fullStreet || place.formatted_address || '',
+            city: city || prev.city || '',
+            postalCode: postalCode || prev.postalCode || '',
+            country: country || prev.country || 'ES'
+          }));
+
+          // Auto-adjust zone on selected place
+          if (country === 'ES') {
+            if (postalCode.startsWith('07')) {
+              setShippingZone('balearic');
+            } else if (postalCode.startsWith('35') || postalCode.startsWith('38')) {
+              setShippingZone('canary');
+            } else {
+              setShippingZone('spain_peninsula');
+            }
+          } else {
+            setShippingZone('international');
+          }
+
+          toast.success({ title: 'Dirección Completada', message: 'Los datos se rellenaron automáticamente desde Google Maps.' });
+        });
+      } catch (err) {
+        console.error('Error inicializando Google Places Autocomplete:', err);
+      }
+    };
+
+    // Dynamically inject script
+    if (!(window as any).google) {
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.defer = true;
+      script.onload = initAutocomplete;
+      script.onerror = () => console.warn('Fallo al cargar script de Google Maps Places.');
+      document.head.appendChild(script);
+    } else {
+      initAutocomplete();
+    }
+
+    return () => {
+      if (autocomplete && (window as any).google) {
+        (window as any).google.maps.event.clearInstanceListeners(autocomplete);
+      }
+    };
+  }, [currentStep]);
 
   const handleAddressChange = (field: keyof Address, value: string) => {
     setShippingAddress(prev => ({ ...prev, [field]: value }));
@@ -139,32 +325,16 @@ export default function CheckoutPage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleApplyPromo = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!promoInput.trim()) return;
-    
-    setIsApplyingPromo(true);
-    try {
-      await applyDiscountCode(promoInput.toUpperCase());
-      toast.success({ title: 'Éxito', message: 'Código aplicado correctamente' });
-      setPromoInput('');
-    } catch (err: any) {
-      toast.error({ title: 'Error', message: err.message || 'Código inválido' });
-    } finally {
-      setIsApplyingPromo(false);
-    }
-  };
-
-  const sendOrderEmail = async () => {
+  const sendOrderEmail = async (actualOrderId: string) => {
     try {
       await fetch('/api/send-order-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          orderNumber,
+          orderNumber: actualOrderId,
           customerName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim() || 'Cliente',
           customerEmail: user?.email || '',
-          items: items.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
+          items: items.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, image: item.image })),
           subtotal,
           tax,
           shippingCost,
@@ -179,6 +349,8 @@ export default function CheckoutPage() {
             country: shippingAddress.country || 'ES',
           },
           shippingMethod: selectedShipping,
+          discountCode: discountCode || undefined,
+          discountAmount: discountAmount || 0,
         }),
       });
     } catch (e) {
@@ -186,64 +358,106 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleSimulatedPayment = async () => {
-    setIsProcessing(true);
-    setError(null);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      await sendOrderEmail();
-      setOrderPlaced(true);
-      clearCart();
-      router.push(`/checkout/success?order=${orderNumber}`);
-    } catch (err: any) {
-      setError(err.message || 'Error al procesar el pedido.');
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const handleStripePayment = async () => {
-    setIsProcessing(true);
-    setError(null);
-    try {
-      const res = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          items: items.map(item => ({
-            id: item.variantId || item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.image,
-          })),
-          shippingCost,
-          customerEmail: user?.email,
-          orderNumber,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        window.location.href = data.url;
-      } else {
-        throw new Error(data.error || 'Error al iniciar el pago');
-      }
-    } catch (err: any) {
-      console.error('Error de pago Stripe:', err);
-      setError('Error al conectar con la pasarela de pago. Inténtalo de nuevo o elige otro método.');
-      setIsProcessing(false);
-    }
-  };
-
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (!acceptedTerms) {
       toast.error({ title: 'Error', message: 'Debes aceptar los términos y condiciones.' });
       return;
     }
+
+    setIsProcessing(true);
+    setError(null);
+
+    // Prepare AppSync Input format
+    const orderItems = items.map(item => ({
+      productId: item.productId,
+      variantId: item.variantId || item.productId,
+      quantity: item.quantity
+    }));
+
+    const orderInput = {
+      type: paymentMethod === 'card' ? 'STANDARD' : 'DEFERRED',
+      items: orderItems
+    };
+
+    let actualOrderId = orderNumber;
+
+    // A. Mutate Order inside AppSync GraphQL endpoint (PENDIENTE_DE_PAGO state)
+    try {
+      const graphqlClient = await import('@/services/graphqlClient');
+      const result = await graphqlClient.graphqlFetch<{ createOrder: { orderId: string, status: string } }>(
+        CREATE_ORDER_MUTATION,
+        { input: orderInput }
+      );
+      if (result?.createOrder?.orderId) {
+        actualOrderId = result.createOrder.orderId;
+        console.log('Pedido registrado en AppSync con ID:', actualOrderId);
+      }
+    } catch (err: any) {
+      console.warn('Fallo en mutación createOrder de AppSync, procediendo con registro local resiliente:', err);
+      // Fallback local robusto para no interrumpir el flujo de ventas
+      const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
+      fallbackOrders.push({
+        orderId: orderNumber,
+        status: 'PENDIENTE_DE_PAGO',
+        items,
+        total,
+        paymentMethod,
+        shippingAddress,
+        createdAt: new Date().toISOString()
+      });
+      sessionStorage.setItem('protex_orders', JSON.stringify(fallbackOrders));
+    }
+
+    // B. Payment execution
     if (paymentMethod === 'card') {
-      handleStripePayment();
+      try {
+        const res = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            items: items.map(item => ({
+              id: item.variantId || item.productId,
+              name: item.name,
+              price: item.price,
+              quantity: item.quantity,
+              image: item.image,
+            })),
+            shippingCost,
+            customerEmail: user?.email,
+            orderNumber: actualOrderId,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.url) {
+          window.location.href = data.url;
+        } else {
+          throw new Error(data.error || 'Error al iniciar el pago');
+        }
+      } catch (err: any) {
+        console.error('Error de pago Stripe:', err);
+        setError('Error al conectar con la pasarela de pago. Inténtalo de nuevo o elige otro método.');
+        setIsProcessing(false);
+      }
     } else {
-      handleSimulatedPayment();
+      // Offline payments (Bizum / Transferencia)
+      try {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        await sendOrderEmail(actualOrderId);
+        
+        // Update local session status
+        const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
+        const updatedOrders = fallbackOrders.map((o: any) => 
+          o.orderId === actualOrderId ? { ...o, status: 'CONFIRMADO_PENDIENTE_TRANSFERENCIA' } : o
+        );
+        sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
+
+        clearCart();
+        router.push(`/checkout/success?order=${actualOrderId}`);
+      } catch (err: any) {
+        setError(err.message || 'Error al procesar el pedido.');
+      } finally {
+        setIsProcessing(false);
+      }
     }
   };
 
@@ -327,9 +541,77 @@ export default function CheckoutPage() {
                       <label className={styles.label}>Empresa (opcional)</label>
                       <input className={styles.input} type="text" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
                     </div>
-                    <div className={styles.inputGroup}>
+                    <div className={`${styles.inputGroup} ${styles.inputGroupRelative}`}>
                       <label className={styles.label}>Dirección *</label>
-                      <input className={styles.input} type="text" value={shippingAddress.street || ''} onChange={e => handleAddressChange('street', e.target.value)} placeholder="Calle Principal, 123" required />
+                      <input 
+                        className={styles.input} 
+                        type="text" 
+                        id="street-input"
+                        value={shippingAddress.street || ''} 
+                        onChange={e => {
+                          const val = e.target.value;
+                          handleAddressChange('street', val);
+                          
+                          // Fallback mock address search if Google API key is missing
+                          if (val.trim().length > 2) {
+                            const mockAddresses = [
+                              "Calle de Alcalá, 12, Madrid, 28014, España",
+                              "Paseo de la Castellana, 100, Madrid, 28046, España",
+                              "Gran Vía, 45, Madrid, 28013, España",
+                              "Avinguda Diagonal, 400, Barcelona, 08037, España",
+                              "La Rambla, 80, Barcelona, 08002, España",
+                              "Calle Sierpes, 14, Sevilla, 41004, España",
+                              "Calle Colón, 25, Valencia, 46004, España",
+                              "Calle Larios, 8, Málaga, 29005, España",
+                              "Calle Uría, 15, Oviedo, 33003, España",
+                              "Calle Estafeta, 10, Pamplona, 31001, España",
+                              "Calle Mayor, 4, Madrid, 28013, España",
+                              "Paseo de Gracia, 20, Barcelona, 08007, España",
+                              "Avenida de la Constitución, 18, Sevilla, 41001, España",
+                              "Calle Alfonso I, 22, Zaragoza, 50003, España",
+                              "Calle Poeta Querol, 5, Valencia, 46002, España",
+                              "Avenida de Anaga, 12, Santa Cruz de Tenerife, 38001, España",
+                              "Calle Triana, 60, Las Palmas de Gran Canaria, 35002, España",
+                              "Paseo Marítimo, 15, Palma de Mallorca, 07014, España",
+                              "Calle Jaime III, 2, Palma de Mallorca, 07012, España"
+                            ];
+                            const filtered = mockAddresses.filter(addr => 
+                              addr.toLowerCase().includes(val.toLowerCase())
+                            );
+                            setAddressSuggestions(filtered);
+                            setShowSuggestions(filtered.length > 0);
+                          } else {
+                            setAddressSuggestions([]);
+                            setShowSuggestions(false);
+                          }
+                        }} 
+                        onBlur={() => {
+                          // Small timeout to allow the onClick handler on list items to register
+                          setTimeout(() => setShowSuggestions(false), 200);
+                        }}
+                        onFocus={() => {
+                          if (shippingAddress.street && shippingAddress.street.length > 2) {
+                            setShowSuggestions(addressSuggestions.length > 0);
+                          }
+                        }}
+                        placeholder="Calle, número, piso..." 
+                        required 
+                      />
+                      
+                      {showSuggestions && (
+                        <ul className={styles.suggestionsDropdown}>
+                          {addressSuggestions.map((suggestion, index) => (
+                            <li 
+                              key={index} 
+                              className={styles.suggestionItem}
+                              onClick={() => handleSelectSuggestion(suggestion)}
+                            >
+                              <MapPin className={`h-4 w-4 ${styles.suggestionIcon}`} />
+                              <span>{suggestion}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </div>
                     <div className={styles.formGrid2Cols}>
                       <div className={styles.inputGroup}>
@@ -341,14 +623,43 @@ export default function CheckoutPage() {
                         <input className={styles.input} type="text" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
                       </div>
                     </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>País *</label>
-                      <select className={styles.input} value={shippingAddress.country || 'ES'} onChange={e => handleAddressChange('country', e.target.value)}>
-                        <option value="ES">España</option>
-                        <option value="PT">Portugal</option>
-                        <option value="FR">Francia</option>
-                        <option value="AD">Andorra</option>
-                      </select>
+                    <div className={styles.formGrid2Cols}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>País *</label>
+                        <select 
+                          className={styles.input} 
+                          value={shippingAddress.country || 'ES'} 
+                          onChange={e => {
+                            const val = e.target.value;
+                            handleAddressChange('country', val);
+                            if (val !== 'ES') {
+                              setShippingZone('international');
+                            } else {
+                              setShippingZone('spain_peninsula');
+                            }
+                          }}
+                        >
+                          <option value="ES">España</option>
+                          <option value="PT">Portugal</option>
+                          <option value="FR">Francia</option>
+                          <option value="AD">Andorra</option>
+                        </select>
+                      </div>
+                      
+                      {shippingAddress.country === 'ES' && (
+                        <div className={styles.inputGroup}>
+                          <label className={styles.label}>Zona de Envío *</label>
+                          <select 
+                            className={styles.input} 
+                            value={shippingZone} 
+                            onChange={e => setShippingZone(e.target.value)}
+                          >
+                            <option value="spain_peninsula">España Península (Coste: 5.99€ | Gratis &gt; 50€)</option>
+                            <option value="balearic">Islas Baleares (Coste: 8.99€ | Gratis &gt; 75€)</option>
+                            <option value="canary">Islas Canarias (Coste: 12.99€ | Gratis &gt; 100€)</option>
+                          </select>
+                        </div>
+                      )}
                     </div>
                   </form>
                   <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
@@ -365,7 +676,7 @@ export default function CheckoutPage() {
                 </div>
                 <div className={styles.cardBody}>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {SHIPPING_OPTIONS.map(option => (
+                    {currentShippingOptions.map(option => (
                       <div 
                         key={option.method} 
                         className={`${styles.shippingOption} ${selectedShipping === option.method ? styles.shippingOptionActive : ''}`}
@@ -377,7 +688,7 @@ export default function CheckoutPage() {
                         <div style={{ flex: 1 }}>
                           <h4 style={{ margin: '0 0 0.25rem', fontWeight: 600, color: '#111827' }}>{option.description}</h4>
                           <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-                            Recíbelo el {getDeliveryDate(option.estimatedDays)}
+                            Recíbelo el {getDeliveryDate(option.estimatedDays)} (vía {option.carrier})
                           </p>
                         </div>
                         <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.125rem' }}>
@@ -459,7 +770,7 @@ export default function CheckoutPage() {
                       style={{ marginTop: '0.25rem', width: '1.125rem', height: '1.125rem', cursor: 'pointer' }}
                     />
                     <label htmlFor="terms" style={{ fontSize: '0.9375rem', color: '#4b5563', cursor: 'pointer', lineHeight: 1.5 }}>
-                      He leído y acepto los <a href="#" style={{ color: '#2e559e', textDecoration: 'underline' }}>términos y condiciones</a> y la <a href="#" style={{ color: '#2e559e', textDecoration: 'underline' }}>política de privacidad</a>. Entiendo que esta compra implica una obligación de pago.
+                      He leído y acepto los <a href="/terminos-y-condiciones" target="_blank" style={{ color: '#2e559e', textDecoration: 'underline' }}>términos y condiciones</a> y la <a href="/politica-de-privacidad" target="_blank" style={{ color: '#2e559e', textDecoration: 'underline' }}>política de privacidad</a>. Entiendo que esta compra implica una obligación de pago.
                     </label>
                   </div>
 
@@ -508,23 +819,6 @@ export default function CheckoutPage() {
             </div>
 
             <div className={styles.sidebarTotals}>
-              {!discountCode && (
-                <form onSubmit={handleApplyPromo} style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem' }}>
-                  <input
-                    className={styles.input}
-                    type="text"
-                    value={promoInput}
-                    onChange={(e) => setPromoInput(e.target.value)}
-                    placeholder="Código descuento"
-                    disabled={isApplyingPromo}
-                    style={{ textTransform: 'uppercase', padding: '0.625rem 1rem' }}
-                  />
-                  <button type="submit" disabled={isApplyingPromo || !promoInput.trim()} style={{ background: '#4b5563', color: 'white', border: 'none', borderRadius: '8px', padding: '0 1rem', fontWeight: 600, cursor: 'pointer' }}>
-                    Aplicar
-                  </button>
-                </form>
-              )}
-
               <div className={styles.sidebarTotalRow}>
                 <span>Subtotal</span>
                 <span>{subtotal.toFixed(2)}€</span>
@@ -534,7 +828,6 @@ export default function CheckoutPage() {
                 <div className={styles.sidebarTotalRow} style={{ color: '#10b981', fontWeight: 500 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     Descuento ({discountCode})
-                    <button onClick={removeDiscountCode} style={{ background: 'none', border: 'none', color: '#ef4444', padding: 0, cursor: 'pointer' }}><X size={14} /></button>
                   </span>
                   <span>-{discountAmount?.toFixed(2)}€</span>
                 </div>

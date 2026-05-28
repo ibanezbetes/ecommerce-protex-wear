@@ -63,7 +63,7 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Atencin al Cliente</h3>
+            <h3 className={styles.columnTitle}>Atención al Cliente</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/contacto" className={styles.link}>
@@ -71,13 +71,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/ayuda" className={styles.link}>
-                  Centro de Ayuda
+                <Link href="/devoluciones" className={styles.link}>
+                  Política de Devoluciones
                 </Link>
               </li>
               <li>
                 <Link href="/envios" className={styles.link}>
-                  Informacin de Envos
+                  Información de Envíos
                 </Link>
               </li>
             </ul>
@@ -117,11 +117,11 @@ export default function Footer() {
                {currentYear} Protex Wear. Todos los derechos reservados.
             </div>
             <div className={`${styles.legal} flex space-x-6 text-sm`}>
-              <Link href="/privacidad" className={styles.legalLink}>
-                Poltica de Privacidad
+              <Link href="/politica-de-privacidad" className={styles.legalLink}>
+                Política de Privacidad
               </Link>
-              <Link href="/terminos" className={styles.legalLink}>
-                Trminos de Uso
+              <Link href="/terminos-y-condiciones" className={styles.legalLink}>
+                Términos y Condiciones
               </Link>
             </div>
           </div>
