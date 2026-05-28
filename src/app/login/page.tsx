@@ -5,6 +5,7 @@ import { useAuth } from '@/store/useAuth';
 import { useRouter } from 'next/navigation';
 import { CognitoIdentityProviderClient, InitiateAuthCommand } from '@aws-sdk/client-cognito-identity-provider';
 import Link from 'next/link';
+import Image from 'next/image';
 import styles from '../auth.module.css';
 
 export default function LoginPage() {
@@ -69,56 +70,77 @@ export default function LoginPage() {
 
   return (
     <div className={styles.page}>
-      <div className={styles.panel}>
-        <div className={styles.header}>
-          <h2 className={styles.title}>Acceso Clientes B2B</h2>
-          <p className={styles.subtitle}>
-            Inicia sesi&oacute;n con las credenciales que te proporcion&oacute; el administrador.
+      <section className={styles.visualSide} aria-label="Protex Wear profesional">
+        <div className={styles.visualContent}>
+          <span className={styles.eyebrow}>Acceso profesional</span>
+          <h1 className={styles.visualTitle}>Protecci&oacute;n para equipos que no paran.</h1>
+          <p className={styles.visualText}>
+            Accede a tus condiciones B2B, recupera pedidos y gestiona compras de equipamiento laboral con la misma seguridad que exiges en obra.
           </p>
         </div>
+      </section>
 
-        {error && <div className={styles.error}>{error}</div>}
-
-        <form className={styles.form} onSubmit={handleLogin}>
-          <div className={styles.fieldStack}>
-            <div>
-              <label className="sr-only" htmlFor="email">Email</label>
-              <input
-                id="email"
-                type="email"
-                required
-                className={styles.input}
-                placeholder="Direcci\u00f3n de email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            <div>
-              <label className="sr-only" htmlFor="password">Contrase&ntilde;a</label>
-              <input
-                id="password"
-                type="password"
-                required
-                className={styles.input}
-                placeholder="Contrase\u00f1a"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
+      <section className={styles.formSide}>
+        <div className={styles.panel}>
+          <div className={styles.topBar}>
+            <Link href="/" className={styles.logoLink} aria-label="Protex Wear">
+              <Image src="/logo.png" alt="Protex Wear" width={132} height={38} className={styles.logo} priority />
+            </Link>
+            <Link href="/" className={styles.backLink}>
+              Volver a Protex Wear
+            </Link>
           </div>
 
-          <button type="submit" disabled={loading} className={styles.button}>
-            {loading ? 'Verificando...' : 'Iniciar Sesi\u00f3n'}
-          </button>
-        </form>
+          <div className={styles.header}>
+            <h2 className={styles.title}>Acceso Clientes B2B</h2>
+            <p className={styles.subtitle}>
+              Inicia sesi&oacute;n con las credenciales que te proporcion&oacute; el administrador.
+            </p>
+          </div>
 
-        <p className={styles.footerText}>
-          &iquest;No tienes cuenta?{' '}
-          <Link href="/register" className={styles.link}>
-            Reg&iacute;strate aqu&iacute;
-          </Link>
-        </p>
-      </div>
+          {error && <div className={styles.error}>{error}</div>}
+
+          <form className={styles.form} onSubmit={handleLogin}>
+            <div className={styles.fieldStack}>
+              <div>
+                <label className="sr-only" htmlFor="email">Email</label>
+                <input
+                  id="email"
+                  type="email"
+                  required
+                  className={styles.input}
+                  placeholder="Direcci\u00f3n de email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </div>
+              <div>
+                <label className="sr-only" htmlFor="password">Contrase&ntilde;a</label>
+                <input
+                  id="password"
+                  type="password"
+                  required
+                  className={styles.input}
+                  placeholder="Contrase\u00f1a"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+              </div>
+            </div>
+
+            <button type="submit" disabled={loading} className={styles.button}>
+              {loading ? 'Verificando...' : 'Iniciar Sesi\u00f3n'}
+            </button>
+          </form>
+
+          <p className={styles.footerText}>
+            &iquest;No tienes cuenta?{' '}
+            <Link href="/register" className={styles.link}>
+              Reg&iacute;strate aqu&iacute;
+            </Link>
+          </p>
+        </div>
+      </section>
     </div>
   );
 }
