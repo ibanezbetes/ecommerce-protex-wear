@@ -515,7 +515,17 @@ export default function CheckoutPage() {
                 </p>
               </div>
             </div>
-            <button className={styles.btnBack} onClick={() => router.push('/carrito')} style={{ padding: '0.5rem 1rem' }}>
+            <button 
+              className={styles.btnBack} 
+              onClick={() => {
+                if (typeof window !== 'undefined' && window.history.length > 1) {
+                  router.back();
+                } else {
+                  router.push('/productos');
+                }
+              }} 
+              style={{ padding: '0.5rem 1rem' }}
+            >
               <ArrowLeft size={16} /> Volver
             </button>
           </div>
