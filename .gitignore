@@ -1,79 +1,55 @@
-# Node / general
-node_modules/
-dist/
-build/
-.build/
-.cache/
-.env
-.env.*
-*.log
+# ============================================================================
+# .gitignore — Protex Wear (Next.js)
+# ============================================================================
+
+# --- Dependencias ---
+/node_modules
+infrastructure/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# --- Testing ---
+/coverage
+
+# --- Next.js ---
+/.next/
+/out/
+
+# --- Producción ---
+/build
+/dist
+
+# --- AWS Amplify (artefactos generados) ---
+.amplify/
+infrastructure/cdk.out/
+
+# --- Misc ---
 .DS_Store
-
-# Build tools and caches
-.vite/
-.next/
-out/
-.swc
-.turbo
-
-# AWS / IaC
-terraform.tfstate*
-.cdk.out/
-.aws-sam/
-
-# Editor
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# IDE
-.vscode/
-.idea/
-*.iml
-
-# amplify
-.amplify
-amplify_outputs*
-amplifyconfiguration*
-amplifyconfiguration.json
-
-# Generated files
-index.html
-jest.config.js
-
-# Local development
-.kiro/
-.git_local_backup/
-debug-token.js
-debug-scripts/
-
-# OS
-.DS_Store
+*.pem
 Thumbs.db
 
-# Admin app (Next.js)
-admin/node_modules/
-admin/.next/
-admin/out/
-admin/.env
-admin/.env.*
-admin/.eslintcache
-admin/.turbo
-admin/.swc
-admin/.vercel/
+# --- Debug ---
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
 
-# Admin editor/IDE
-admin/.vscode/
-admin/.idea/
+# --- Variables de entorno ---
+.env*
+!.env.local.example
 
-# Admin Amplify local state (do not commit)
-admin/amplify/\#current-cloud-backend/
-admin/amplify/.config/local-*
-admin/amplify/.config/local-env-info.json
+# --- Vercel ---
+.vercel
 
-# Admin Amplify generated outputs (sensitive)
-admin/amplify_outputs*
-admin/amplifyconfiguration*
-admin/amplify_outputs.json
-admin/amplifyconfiguration.json
+# --- TypeScript ---
+*.tsbuildinfo
+next-env.d.ts
+
+# --- IDE ---
+.vscode/
+.idea/

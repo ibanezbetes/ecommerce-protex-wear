@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BUSINESS_CONFIG } from '../../services/emailService';
+import { BUSINESS_CONFIG } from '@/lib/config';
 
 interface BizumDetailsProps {
   orderNumber: string;
@@ -27,95 +27,65 @@ export function BizumDetails({ orderNumber, total }: BizumDetailsProps) {
   };
 
   return (
-    <div className="bizum-panel animate-fade-in-up" style={{ marginTop: '1.25rem' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.625rem', marginBottom: '1rem' }}>
-        <span style={{ fontSize: '1.375rem' }}>📱</span>
+    <div className="mt-5 animate-fade-in-up bg-white p-6 rounded-2xl border border-blue-100 shadow-sm">
+      <div className="flex items-center gap-3 mb-6">
+        <span className="text-2xl">📱</span>
         <div>
-          <h4 style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 700, color: '#1e40af' }}>
+          <h4 className="m-0 text-base font-bold text-blue-900">
             Instrucciones de Bizum
           </h4>
-          <p style={{ margin: 0, fontSize: '0.8125rem', color: '#1d4ed8', opacity: 0.8 }}>
+          <p className="m-0 text-sm text-blue-800 opacity-80">
             Envía el pago desde tu app bancaria
           </p>
         </div>
       </div>
 
-      <p style={{ fontSize: '0.875rem', color: '#1e40af', margin: '0 0 0.5rem 0', fontWeight: 500 }}>
+      <p className="text-sm text-blue-900 font-semibold mb-2">
         Número de teléfono al que enviar:
       </p>
 
       {/* Phone number display */}
-      <div style={{ position: 'relative' }}>
-        <div className="bizum-phone-display">
+      <div className="relative mb-6">
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-center text-3xl font-mono font-bold tracking-widest text-blue-900">
           {BUSINESS_CONFIG.bizumPhone}
         </div>
         <button
           onClick={() => copyToClipboard(BUSINESS_CONFIG.bizumPhone, 'phone')}
-          style={{
-            position: 'absolute',
-            bottom: '1rem',
-            right: '1rem',
-            padding: '0.375rem 0.875rem',
-            background: copied === 'phone' ? '#3b82f6' : 'rgba(59, 130, 246, 0.15)',
-            border: '1px solid rgba(59, 130, 246, 0.3)',
-            borderRadius: '8px',
-            color: copied === 'phone' ? 'white' : '#1e40af',
-            fontSize: '0.8125rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'all 0.2s ease',
-          }}
+          className={`absolute bottom-3 right-3 px-4 py-1.5 rounded-lg text-sm font-bold transition-all ${
+            copied === 'phone' 
+              ? 'bg-blue-600 text-white' 
+              : 'bg-white text-blue-700 border border-blue-200 shadow-sm hover:bg-blue-50'
+          }`}
         >
           {copied === 'phone' ? '✓ Copiado' : 'Copiar número'}
         </button>
       </div>
 
       {/* Amount and concept */}
-      <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
-        <div style={{
-          flex: 1,
-          background: 'white',
-          borderRadius: '10px',
-          padding: '0.875rem',
-          border: '1.5px solid rgba(59, 130, 246, 0.2)',
-        }}>
-          <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+      <div className="grid grid-cols-2 gap-4 mb-6">
+        <div className="bg-white rounded-xl p-4 border-2 border-blue-100">
+          <p className="m-0 mb-1 text-xs text-gray-500 font-bold uppercase tracking-wider">
             Importe
           </p>
-          <p style={{ margin: 0, fontSize: '1.125rem', fontWeight: 700, color: '#1e40af', fontFamily: 'monospace' }}>
+          <p className="m-0 text-xl font-bold text-blue-900 font-mono">
             €{total.toFixed(2)}
           </p>
         </div>
-        <div style={{
-          flex: 1,
-          background: 'white',
-          borderRadius: '10px',
-          padding: '0.875rem',
-          border: '1.5px solid rgba(59, 130, 246, 0.2)',
-          position: 'relative',
-        }}>
-          <p style={{ margin: '0 0 4px 0', fontSize: '0.75rem', color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+        <div className="bg-white rounded-xl p-4 border-2 border-blue-100 relative">
+          <p className="m-0 mb-1 text-xs text-gray-500 font-bold uppercase tracking-wider">
             Concepto
           </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <p style={{ margin: 0, fontSize: '0.9375rem', fontWeight: 700, color: '#1e40af', fontFamily: 'monospace' }}>
+          <div className="flex items-center justify-between">
+            <p className="m-0 text-lg font-bold text-blue-900 font-mono truncate mr-2">
               {orderNumber}
             </p>
             <button
               onClick={() => copyToClipboard(orderNumber, 'concept')}
-              style={{
-                padding: '0.2rem 0.5rem',
-                background: copied === 'concept' ? '#3b82f6' : 'rgba(59, 130, 246, 0.1)',
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                borderRadius: '5px',
-                color: copied === 'concept' ? 'white' : '#1e40af',
-                fontSize: '0.7rem',
-                fontWeight: 600,
-                cursor: 'pointer',
-                transition: 'all 0.2s ease',
-                marginLeft: '0.25rem',
-                flexShrink: 0,
-              }}
+              className={`px-2 py-1 rounded text-xs font-bold transition-all flex-shrink-0 ${
+                copied === 'concept' 
+                  ? 'bg-blue-600 text-white' 
+                  : 'bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100'
+              }`}
             >
               {copied === 'concept' ? '✓' : 'Copiar'}
             </button>
@@ -124,13 +94,8 @@ export function BizumDetails({ orderNumber, total }: BizumDetailsProps) {
       </div>
 
       {/* Steps */}
-      <div style={{
-        background: 'rgba(255,255,255,0.6)',
-        borderRadius: '10px',
-        padding: '0.875rem 1rem',
-        marginBottom: '0.75rem',
-      }}>
-        <p style={{ margin: '0 0 0.625rem 0', fontSize: '0.8125rem', fontWeight: 700, color: '#1e40af' }}>
+      <div className="bg-blue-50 rounded-xl p-5 mb-4">
+        <p className="m-0 mb-3 text-sm font-bold text-blue-900">
           Pasos para pagar con Bizum:
         </p>
         {[
@@ -139,36 +104,19 @@ export function BizumDetails({ orderNumber, total }: BizumDetailsProps) {
           `Escribe "${orderNumber}" como concepto`,
           'Confirma el pago y listo',
         ].map((step, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.625rem', marginBottom: i < 3 ? '0.5rem' : 0 }}>
-            <div style={{
-              width: '20px',
-              height: '20px',
-              background: 'linear-gradient(135deg, #2563eb, #1d4ed8)',
-              borderRadius: '50%',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              flexShrink: 0,
-              fontSize: '0.6875rem',
-              fontWeight: 700,
-              color: 'white',
-            }}>
+          <div key={i} className="flex items-start gap-3 mb-2 last:mb-0">
+            <div className="w-5 h-5 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center flex-shrink-0 text-[10px] font-bold text-white mt-0.5">
               {i + 1}
             </div>
-            <p style={{ margin: 0, fontSize: '0.8125rem', color: '#1e40af', lineHeight: 1.5 }}>{step}</p>
+            <p className="m-0 text-sm text-blue-900 leading-relaxed">{step}</p>
           </div>
         ))}
       </div>
 
-      <div style={{
-        padding: '0.75rem 1rem',
-        background: 'rgba(255,255,255,0.5)',
-        borderRadius: '8px',
-        border: '1px solid rgba(59, 130, 246, 0.15)',
-      }}>
-        <p style={{ margin: 0, fontSize: '0.8125rem', color: '#1e40af', lineHeight: 1.6 }}>
+      <div className="p-4 bg-white rounded-xl border border-blue-100 shadow-sm">
+        <p className="m-0 text-sm text-blue-900 leading-relaxed">
           <strong>⚠️ Importante:</strong> Incluye el número de pedido{' '}
-          <strong style={{ fontFamily: 'monospace', background: '#dbeafe', padding: '1px 6px', borderRadius: '4px' }}>
+          <strong className="font-mono bg-blue-100 px-1.5 py-0.5 rounded text-blue-800">
             {orderNumber}
           </strong>{' '}
           como concepto. Recibirás confirmación cuando verifiquemos el pago.
