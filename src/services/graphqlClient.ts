@@ -94,6 +94,22 @@ export async function graphqlFetch<T = Record<string, unknown>>(
   const json: GraphQLResponse<T> = await response.json();
 
   if (json.errors && json.errors.length > 0) {
+    const isUnauthorized = json.errors.some(err => 
+      err.message?.toLowerCase().includes('not authorized') || 
+      err.message?.toLowerCase().includes('unauthorized') || 
+      err.message?.toLowerCase().includes('expired')
+    );
+
+    if (isUnauthorized && !isGuest) {
+      console.warn('[graphqlFetch] Token de Cognito expirado o no autorizado. Cerrando sesión y reintentando como invitado...');
+      
+      // Limpiar la sesión expirada del store useAuth
+      useAuth.getState().logout();
+      
+      // Reintentar la consulta de forma recursiva como invitado (usará la API Key en lugar del token expirado)
+      return graphqlFetch(query, variables);
+    }
+
     console.error('[graphqlFetch] Errores GraphQL:', json.errors);
     throw new Error(json.errors[0]?.message || 'Error en la petición GraphQL');
   }
