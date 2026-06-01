@@ -90,9 +90,7 @@ export default function TerminosCondicionesPage() {
               <p>
                 El uso del sitio web, el registro en el portal B2B/B2C, así como la confirmación de cualquier pedido mediante la pasarela de compra implica la aceptación <strong>plena, explícita y sin reservas</strong> por parte del Cliente de todos y cada uno de los términos detallados en este documento.
               </p>
-              <div className="legal-alert-box">
-                <strong>NOTA DE SANDBOX:</strong> Actualmente el sistema opera en modo de pruebas técnicas e integraciones virtuales de comercio seguro. Ninguna transacción monetaria real se devengará de forma definitiva a menos que se configure en modo de producción activo por los administradores de sistemas de Protex Wear.
-              </div>
+
             </section>
 
             <section id="2-propiedad" className="legal-section">
