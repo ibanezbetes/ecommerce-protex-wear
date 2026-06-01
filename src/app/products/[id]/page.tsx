@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, use } from 'react';
 import { graphqlFetch } from '@/services/graphqlClient';
+import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
@@ -64,14 +65,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     const loadProduct = async () => {
       try {
         const data = await graphqlFetch<GetProductResponse>(GET_PRODUCT, { id });
-        setProduct(data.getProduct);
-
-        if (data.getProduct?.variants?.length) {
-          setSelectedSize(data.getProduct.variants[0].size || '');
-          setSelectedColor(data.getProduct.variants[0].color || '');
+        if (data.getProduct) {
+          setProduct(data.getProduct);
+          if (data.getProduct.variants?.length) {
+            setSelectedSize(data.getProduct.variants[0].size || '');
+            setSelectedColor(data.getProduct.variants[0].color || '');
+          }
+        } else {
+          throw new Error('Product not found in cloud database');
         }
       } catch (error) {
-        console.error(error);
+        console.warn('[ProductDetailPage] Error cargando producto de AppSync. Intentando recuperar de catálogo local...', error);
+        const localProduct = MOCK_PRODUCTS.find((p) => p.id === id);
+        if (localProduct) {
+          setProduct(localProduct);
+          if (localProduct.variants?.length) {
+            setSelectedSize(localProduct.variants[0].size || '');
+            setSelectedColor(localProduct.variants[0].color || '');
+          }
+        } else {
+          setProduct(null);
+        }
       } finally {
         setLoading(false);
       }

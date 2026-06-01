@@ -110,7 +110,11 @@ export async function graphqlFetch<T = Record<string, unknown>>(
       return graphqlFetch(query, variables);
     }
 
-    console.error('[graphqlFetch] Errores GraphQL:', json.errors);
+    if (isUnauthorized) {
+      console.warn('[graphqlFetch] Petición no autorizada / API Key expirada:', json.errors);
+    } else {
+      console.error('[graphqlFetch] Errores GraphQL:', json.errors);
+    }
     throw new Error(json.errors[0]?.message || 'Error en la petición GraphQL');
   }
 

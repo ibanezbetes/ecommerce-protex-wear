@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { graphqlFetch } from '@/services/graphqlClient';
+import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
 import styles from './page.module.css';
 
 interface ProductVariant {
@@ -46,6 +47,7 @@ export default function CatalogPage() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextToken, setNextToken] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string>('ALL');
+  const [usingMockCatalog, setUsingMockCatalog] = useState(false);
 
   const fetchProducts = async (isLoadMore = false) => {
     if (isLoadMore) {
@@ -64,8 +66,18 @@ export default function CatalogPage() {
 
       setProducts((prev) => isLoadMore ? [...prev, ...fetchedItems] : fetchedItems);
       setNextToken(data.listProducts.nextToken);
+      setUsingMockCatalog(false);
     } catch (error) {
-      console.error('Error cargando productos', error);
+      console.warn('[CatalogPage] Error cargando productos de AppSync. Activando catálogo local simulado (Sandbox Fallback)...', error);
+      
+      // Filtrar catálogo simulado local según marca seleccionada
+      const mockItems = selectedBrand === 'ALL'
+        ? MOCK_PRODUCTS
+        : MOCK_PRODUCTS.filter((p) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+
+      setProducts((prev) => isLoadMore ? [...prev, ...mockItems] : mockItems);
+      setNextToken(null); // No hay paginación adicional en modo local
+      setUsingMockCatalog(true);
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -96,6 +108,16 @@ export default function CatalogPage() {
             ))}
           </div>
         </div>
+
+        {usingMockCatalog && (
+          <div className={styles.sandboxBanner}>
+            <span className={styles.sandboxIcon}>💡</span>
+            <div className={styles.sandboxContent}>
+              <strong>Modo Demo Activo (Sandbox)</strong>
+              <p>El servidor principal de datos no está disponible. Estamos visualizando un catálogo local simulado. Puedes navegar, añadir productos al carrito y simular la compra de forma robusta.</p>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className={styles.state}>Actualizando cat&aacute;logo...</div>
