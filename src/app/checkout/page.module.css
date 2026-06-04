@@ -122,6 +122,12 @@
   gap: 1.25rem;
 }
 
+.formGrid2Cols {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
 @media (min-width: 640px) {
   .formGrid2Cols {
     grid-template-columns: 1fr 1fr;
@@ -143,18 +149,18 @@
 .input {
   width: 100%;
   padding: 0.75rem 1rem;
-  border: 1px solid #d1d5db;
+  border: 1.5px solid #e5e7eb;
   border-radius: 8px;
   font-size: 0.9375rem;
   color: #111827;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   background-color: white;
 }
 
 .input:focus {
   outline: none;
   border-color: #2e559e;
-  box-shadow: 0 0 0 3px rgba(46, 85, 158, 0.1);
+  box-shadow: 0 0 0 4px rgba(46, 85, 158, 0.15);
 }
 
 /* Buttons */
@@ -171,12 +177,17 @@
   font-size: 1rem;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s, transform 0.1s;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btnNext:hover {
-  background-color: #1e3a6e;
-  transform: translateY(-1px);
+  background-color: #1d3c75;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(46, 85, 158, 0.24);
+}
+
+.btnNext:active {
+  transform: translateY(0);
 }
 
 .btnBack {
