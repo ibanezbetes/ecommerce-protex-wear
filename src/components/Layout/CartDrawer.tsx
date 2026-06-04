@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/useCart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/Feedback/ToastProvider';
-import { Fingerprint, Check } from 'lucide-react';
+import { Fingerprint, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
 const RECOMMENDATIONS = [
@@ -61,6 +61,20 @@ export function CartDrawer() {
   const [showBiometric, setShowBiometric] = useState(false);
   const [biometricMethod, setBiometricMethod] = useState('');
   const [biometricStatus, setBiometricStatus] = useState<'scanning' | 'success'>('scanning');
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -180, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 180, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -243,7 +257,6 @@ export function CartDrawer() {
                             </svg>
                           </div>
                         )}
-                        <div className={styles.quantityBadge}>{item.quantity}</div>
                       </div>
 
                       <div className={styles.itemBody}>
@@ -301,8 +314,18 @@ export function CartDrawer() {
 
               {/* Cross-selling Carousel Section */}
               <div className={styles.crossSellSection}>
-                <h4 className={styles.crossSellTitle}>Completa tu look con estos accesorios</h4>
-                <div className={styles.crossSellCarousel}>
+                <div className={styles.crossSellHeader}>
+                  <h4 className={styles.crossSellTitle}>Completa tu look con estos accesorios</h4>
+                  <div className={styles.carouselControls}>
+                    <button onClick={scrollLeft} className={styles.controlButton} aria-label="Desplazar a la izquierda">
+                      <ChevronLeft size={16} />
+                    </button>
+                    <button onClick={scrollRight} className={styles.controlButton} aria-label="Desplazar a la derecha">
+                      <ChevronRight size={16} />
+                    </button>
+                  </div>
+                </div>
+                <div ref={carouselRef} className={styles.crossSellCarousel}>
                   {RECOMMENDATIONS.map((rec) => (
                     <div key={rec.id} className={styles.crossSellCard}>
                       <img src={rec.image} alt={rec.name} className={styles.crossSellImage} />

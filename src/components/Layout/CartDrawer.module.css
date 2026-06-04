@@ -486,12 +486,47 @@
   border-top: 1px solid var(--gray-200);
 }
 
+.crossSellHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .crossSellTitle {
-  margin: 0 0 1rem;
+  margin: 0;
   color: var(--gray-900);
   font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: -0.01em;
+}
+
+.carouselControls {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.controlButton {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--gray-200);
+  border-radius: 50%;
+  background: white;
+  color: var(--gray-600);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s ease;
+}
+
+.controlButton:hover {
+  background-color: #f1f5f9;
+  color: var(--primary-color);
+  border-color: var(--primary-color);
 }
 
 .crossSellCarousel {
