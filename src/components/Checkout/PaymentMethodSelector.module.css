@@ -7,24 +7,32 @@
 .option {
   position: relative;
   overflow: hidden;
-  border: 2px solid var(--gray-200);
+  border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-lg);
   background: white;
   padding: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .option:hover {
-  border-color: rgba(46, 85, 158, 0.35);
-  background: #f7f9fc;
+  border-color: #cbd5e1;
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
 }
 
 .selected {
   border-color: var(--primary-color);
-  background: #eef3fb;
-  box-shadow: var(--shadow-md);
+  background: #f5f8ff;
+  box-shadow: 0 4px 12px rgba(46, 85, 158, 0.08);
   transform: translateY(-1px);
+}
+
+.selected:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 16px rgba(46, 85, 158, 0.12);
+  transform: translateY(-2px);
 }
 
 .checkCorner {
@@ -126,19 +134,20 @@
   border: 2px solid var(--gray-300);
   border-radius: 999px;
   background: white;
+  transition: all 0.2s ease;
 }
 
 .selected .radio {
   border-color: var(--primary-color);
-  background: var(--primary-color);
+  background: white;
   box-shadow: 0 0 0 4px rgba(46, 85, 158, 0.12);
 }
 
 .dot {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 999px;
-  background: white;
+  background: var(--primary-color);
 }
 
 @media (max-width: 520px) {
