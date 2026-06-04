@@ -195,20 +195,27 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background-color: transparent;
+  background-color: white;
   color: #4b5563;
   padding: 0.875rem 1.5rem;
   border-radius: 8px;
   font-weight: 600;
   font-size: 0.9375rem;
-  border: 1px solid #d1d5db;
+  border: 1.5px solid #e5e7eb;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .btnBack:hover {
-  background-color: #f3f4f6;
+  background-color: #f8fafc;
   color: #111827;
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.btnBack:active {
+  transform: translateY(0);
 }
 
 /* Shipping Options */
@@ -217,15 +224,28 @@
   align-items: center;
   gap: 1rem;
   padding: 1.25rem;
-  border: 2px solid #e5e7eb;
+  border: 1.5px solid #e5e7eb;
   border-radius: 12px;
+  background-color: white;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.shippingOption:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
 }
 
 .shippingOptionActive {
   border-color: #2e559e;
-  background-color: #eff6ff;
+  background-color: #f5f8ff;
+  box-shadow: 0 4px 12px rgba(46, 85, 158, 0.08);
+}
+
+.shippingOptionActive:hover {
+  border-color: #2e559e;
+  box-shadow: 0 8px 16px rgba(46, 85, 158, 0.12);
 }
 
 /* Sidebar */

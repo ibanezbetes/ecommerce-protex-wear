@@ -770,8 +770,8 @@ export default function CheckoutPage() {
                         className={`${styles.shippingOption} ${selectedShipping === option.method ? styles.shippingOptionActive : ''}`}
                         onClick={() => setSelectedShipping(option.method)}
                       >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '24px', height: '24px', borderRadius: '50%', border: '2px solid', borderColor: selectedShipping === option.method ? '#2e559e' : '#d1d5db', background: selectedShipping === option.method ? '#2e559e' : 'transparent' }}>
-                          {selectedShipping === option.method && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: 'white' }} />}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', borderRadius: '50%', border: '2px solid', borderColor: selectedShipping === option.method ? '#2e559e' : '#cbd5e1', background: 'white', transition: 'all 0.2s ease', flexShrink: 0 }}>
+                          {selectedShipping === option.method && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2e559e' }} />}
                         </div>
                         <div style={{ flex: 1 }}>
                           <h4 style={{ margin: '0 0 0.25rem', fontWeight: 600, color: '#111827' }}>{option.description}</h4>
