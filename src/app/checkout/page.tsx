@@ -2,9 +2,9 @@
 import { useState } from 'react';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
-import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
-import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
-import { BizumDetails } from '@/components/Checkout/BizumDetails';
+import { PaymentMethodSelector, PaymentMethod } from '@/components/checkout/PaymentMethodSelector';
+import { BankTransferDetails } from '@/components/checkout/BankTransferDetails';
+import { BizumDetails } from '@/components/checkout/BizumDetails';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import styles from './page.module.css';
 

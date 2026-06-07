@@ -68,6 +68,20 @@ export default function LoginPage() {
           token: response.AuthenticationResult.IdToken,
         });
 
+        // Obtener el rol del usuario desde DynamoDB
+        try {
+          const { userOperations } = await import('@/services/graphqlClient');
+          const profile = await userOperations.getUserProfile();
+          if (profile?.role) {
+            useAuth.setState((state) => ({
+              ...state,
+              user: state.user ? { ...state.user, role: profile.role as string } : null
+            }));
+          }
+        } catch (e) {
+          console.error("No se pudo obtener el rol del usuario", e);
+        }
+
         router.push('/checkout');
       } else {
         throw new Error('No se recibi\u00f3 token de autenticaci\u00f3n');
@@ -119,6 +133,20 @@ export default function LoginPage() {
           can_pay_later: false,
           token: response.AuthenticationResult.IdToken,
         });
+
+        // Obtener el rol del usuario desde DynamoDB
+        try {
+          const { userOperations } = await import('@/services/graphqlClient');
+          const profile = await userOperations.getUserProfile();
+          if (profile?.role) {
+            useAuth.setState((state) => ({
+              ...state,
+              user: state.user ? { ...state.user, role: profile.role as string } : null
+            }));
+          }
+        } catch (e) {
+          console.error("No se pudo obtener el rol del usuario", e);
+        }
 
         router.push('/checkout');
       } else {

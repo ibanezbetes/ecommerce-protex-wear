@@ -25,6 +25,8 @@ interface User {
   name: string;
   /** Si el usuario tiene permiso para pagar con factura (B2B) */
   can_pay_later: boolean;
+  /** Rol del usuario (USER o ADMIN) */
+  role?: string;
   /** JWT de Cognito (IdToken) para autorizar peticiones */
   token?: string;
 }
