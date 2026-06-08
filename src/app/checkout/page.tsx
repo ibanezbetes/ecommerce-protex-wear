@@ -7,7 +7,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
-import { BizumDetails } from '@/components/Checkout/BizumDetails';
+
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
 import styles from './page.module.css';
 
@@ -326,8 +326,8 @@ export default function CheckoutPage() {
     }
 
     // B. Payment execution
-    if (paymentMethod === 'card') {
-      // ── Pago con Tarjeta (Stripe Checkout Session) ─────────────────────
+    if (paymentMethod === 'card' || paymentMethod === 'bizum') {
+      // ── Pago con Tarjeta o Bizum (Stripe Checkout Session) ─────────────────────
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -344,6 +344,7 @@ export default function CheckoutPage() {
             customerEmail: user?.email,
             orderNumber: actualOrderId,
             discountCode: discountCode || undefined,
+            paymentMethod: paymentMethod, // Pasar el método de pago a la API
           }),
         });
         const data = await res.json();
@@ -352,7 +353,7 @@ export default function CheckoutPage() {
           window.location.href = data.url;
           return; // No resetear isProcessing — la página se descargará
         } else {
-          throw new Error(data.error || 'Error al iniciar el pago con tarjeta.');
+          throw new Error(data.error || 'Error al iniciar el pago.');
         }
       } catch (err: any) {
         // ⚠️ ERROR REAL — NO simular confirmación de pago
@@ -366,7 +367,7 @@ export default function CheckoutPage() {
         setIsProcessing(false);
       }
     } else {
-      // ── Pagos Offline (Bizum / Transferencia Bancaria) ─────────────────
+      // ── Pagos Offline (Transferencia Bancaria) ─────────────────
       try {
         await sendOrderEmail(actualOrderId);
 
@@ -652,11 +653,6 @@ export default function CheckoutPage() {
                   {paymentMethod === 'bank_transfer' && (
                     <div style={{ marginTop: '1.5rem' }}>
                       <BankTransferDetails orderNumber={orderNumber} total={total} />
-                    </div>
-                  )}
-                  {paymentMethod === 'bizum' && (
-                    <div style={{ marginTop: '1.5rem' }}>
-                      <BizumDetails orderNumber={orderNumber} total={total} />
                     </div>
                   )}
 

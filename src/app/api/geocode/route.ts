@@ -65,13 +65,20 @@ export async function GET(request: NextRequest) {
         return true;
       })
       .map((item: any) => {
-        const tipVia  = item.tip_via   ? capitalizeWords(item.tip_via)  : '';
-        const address = item.address   ? capitalizeWords(item.address)  : '';
-        const muni    = item.muniNombre ? capitalizeWords(item.muniNombre) : '';
+        const tipVia  = item.tip_via   ? capitalizeWords(item.tip_via.trim())  : '';
+        const address = item.address   ? capitalizeWords(item.address.trim())  : '';
+        const muni    = item.muniNombre ? capitalizeWords(item.muniNombre.trim()) : '';
         const cp      = item.postalCode || '';
-        const prov    = item.province  ? capitalizeWords(item.province) : '';
+        const prov    = item.province  ? capitalizeWords(item.province.trim()) : '';
 
-        const street = [tipVia, address].filter(Boolean).join(' ');
+        let street = address;
+        if (tipVia && !address.toLowerCase().startsWith(tipVia.toLowerCase())) {
+          street = `${tipVia} ${address}`;
+        }
+
+        // Limpiar dobles espacios si los hubiera
+        street = street.replace(/\s+/g, ' ').trim();
+
         if (!street) return null;
 
         let result = street;
@@ -97,9 +104,9 @@ export async function GET(request: NextRequest) {
   }
 }
 
-/** Convierte "CALLE DEL GLOBO" → "Calle Del Globo" */
+/** Convierte "CALLE DEL GLOBO" → "Calle Del Globo", soportando acentos */
 function capitalizeWords(str: string): string {
   return str
     .toLowerCase()
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+    .replace(/(^|[\s\/\-\(])\p{L}/gu, (match) => match.toUpperCase());
 }
