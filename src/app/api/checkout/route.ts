@@ -1,30 +1,93 @@
 import { NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { validateDiscount, DISCOUNT_CODES } from '@/lib/discounts';
+
+/* ============================================================================
+ * /api/checkout — Creación de Stripe Checkout Sessions
+ * ============================================================================
+ *
+ * Recibe los ítems del carrito, coste de envío, y opcionalmente un código
+ * de descuento. El código se RE-VALIDA server-side antes de aplicarse.
+ *
+ * Si hay un descuento válido, se crea (o reutiliza) un Stripe Coupon nativo
+ * y se aplica a la sesión, de forma que el usuario ve el precio correcto
+ * directamente en la página de pago de Stripe.
+ * ========================================================================= */
+
+/**
+ * Obtiene o crea un Stripe Coupon para un código de descuento dado.
+ *
+ * Usa el código como ID del cupón (e.g. "VERANO20") para idempotencia:
+ * si ya existe lo reutiliza, si no lo crea.
+ */
+async function getOrCreateStripeCoupon(
+  stripe: Stripe,
+  code: string
+): Promise<string> {
+  const promo = DISCOUNT_CODES[code];
+  if (!promo || !promo.active) {
+    throw new Error(`Código de descuento "${code}" no válido o inactivo.`);
+  }
+
+  // Intentar recuperar un cupón existente con este ID
+  try {
+    const existing = await stripe.coupons.retrieve(code);
+    if (existing && !existing.deleted) {
+      return existing.id;
+    }
+  } catch {
+    // No existe → lo creamos
+  }
+
+  // Crear el cupón en Stripe
+  const couponParams: Stripe.CouponCreateParams = {
+    id: code,
+    name: `Protex Wear — ${code}`,
+    duration: 'once',
+  };
+
+  if (promo.type === 'percentage') {
+    couponParams.percent_off = promo.value;
+  } else {
+    couponParams.amount_off = Math.round(promo.value * 100); // centavos
+    couponParams.currency = 'eur';
+  }
+
+  const coupon = await stripe.coupons.create(couponParams);
+  return coupon.id;
+}
 
 export async function POST(request: Request) {
   if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: 'Falta STRIPE_SECRET_KEY en las variables de entorno' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Falta STRIPE_SECRET_KEY en las variables de entorno' },
+      { status: 500 }
+    );
   }
-  
-  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-  
-  try {
-    const { items, shippingCost, customerEmail, orderNumber } = await request.json();
 
-    const lineItems: any[] = items.map((item: any) => ({
-      price_data: {
-        currency: 'eur',
-        product_data: {
-          name: item.name,
-          ...(item.image ? { images: [item.image] } : {}),
-          metadata: {
-            productId: item.id,
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+  try {
+    const { items, shippingCost, customerEmail, orderNumber, discountCode } =
+      await request.json();
+
+    // ── Line Items ────────────────────────────────────────────────────────
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map(
+      (item: any) => ({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: item.name,
+            ...(item.image ? { images: [item.image] } : {}),
+            metadata: {
+              productId: item.id,
+            },
           },
+          unit_amount: Math.round(item.price * 100),
         },
-        unit_amount: Math.round(item.price * 100),
-      },
-      quantity: item.quantity,
-    }));
+        quantity: item.quantity,
+      })
+    );
 
     // Add shipping as a separate line item
     if (shippingCost && shippingCost > 0) {
@@ -40,7 +103,10 @@ export async function POST(request: Request) {
       });
     }
 
-    const session = await stripe.checkout.sessions.create({
+    // ── Descuento (re-validación server-side) ─────────────────────────────
+    // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
+    // para prevenir manipulación.
+    const sessionParams: Stripe.Checkout.SessionCreateParams = {
       payment_method_types: ['card'],
       line_items: lineItems,
       mode: 'payment',
@@ -50,12 +116,37 @@ export async function POST(request: Request) {
       client_reference_id: orderNumber,
       metadata: {
         orderNumber: orderNumber || '',
+        ...(discountCode ? { discountCode } : {}),
       },
-      // Allows billing address collection
       billing_address_collection: 'auto',
-      // Prefill customer info in Stripe's hosted page
       locale: 'es',
-    });
+    };
+
+    if (discountCode && typeof discountCode === 'string') {
+      const cleanCode = discountCode.trim().toUpperCase();
+      const subtotal = items.reduce(
+        (sum: number, item: any) => sum + item.price * item.quantity,
+        0
+      );
+      const validation = validateDiscount(cleanCode, subtotal);
+
+      if (validation.valid) {
+        const couponId = await getOrCreateStripeCoupon(stripe, cleanCode);
+        sessionParams.discounts = [{ coupon: couponId }];
+        console.log(
+          `[Checkout] Cupón "${couponId}" aplicado a la sesión de Stripe para el pedido ${orderNumber}`
+        );
+      } else {
+        console.warn(
+          `[Checkout] Código de descuento "${cleanCode}" rechazado en re-validación:`,
+          validation.error
+        );
+        // No aplicamos descuento, pero seguimos con el checkout sin descuento
+        // para no bloquear la venta
+      }
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (error: any) {

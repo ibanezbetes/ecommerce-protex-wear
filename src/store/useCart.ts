@@ -11,6 +11,12 @@ import { persist } from 'zustand/middleware';
  * Cada artículo se identifica por `variantId` (no por `productId`),
  * porque un mismo producto puede tener varias tallas/colores.
  *
+ * Descuentos:
+ *   Los códigos se validan SERVER-SIDE via /api/validate-discount.
+ *   El store almacena el tipo y valor devuelto por el servidor para poder
+ *   recalcular el importe en tiempo real cuando cambian los ítems.
+ *   La validación definitiva ocurre de nuevo al crear la sesión de Stripe.
+ *
  * Integración:
  *   - CartDrawer.tsx    → UI del carrito lateral
  *   - Navbar.tsx        → Badge con el conteo de artículos
@@ -45,11 +51,20 @@ interface CartState {
   subtotal: number;
   /** Número total de unidades en el carrito */
   itemCount: number;
-  
-  // Custom discount properties
+
+  // ── Descuento (validado server-side) ──────────────────────────────────
+  /** Código de descuento aplicado (e.g. "VERANO20"), null si no hay */
   discountCode: string | null;
+  /** Tipo de descuento devuelto por el servidor ("percentage" | "fixed") */
+  discountType: 'percentage' | 'fixed' | null;
+  /** Valor del descuento devuelto por el servidor (e.g. 20 para 20%) */
+  discountValue: number | null;
+  /** Importe calculado del descuento en € */
   discountAmount: number | null;
+
+  /** Valida un código de descuento contra el servidor */
   applyDiscountCode: (code: string) => Promise<void>;
+  /** Elimina el descuento aplicado */
   removeDiscountCode: () => void;
 
   /** Añade un artículo. Si ya existe (mismo variantId), suma la cantidad. */
@@ -66,33 +81,35 @@ interface CartState {
   closeCart: () => void;
 }
 
-const SUPPORTED_DISCOUNTS: Record<string, { type: 'percentage' | 'fixed'; value: number }> = {
-  VERANO20: { type: 'percentage', value: 20 },
-  PROTEX10: { type: 'fixed', value: 10 },
-  PROTEX20: { type: 'percentage', value: 20 },
-};
-
-const computeTotals = (items: CartItem[], discountCode: string | null) => {
+/**
+ * Recalcula los totales del carrito y el importe del descuento.
+ *
+ * El descuento se recalcula usando el tipo y valor devueltos por el servidor
+ * (no un mapa local) para que la UI refleje el descuento correcto en tiempo
+ * real cuando cambian los ítems.
+ */
+const computeTotals = (
+  items: CartItem[],
+  discountType: 'percentage' | 'fixed' | null,
+  discountValue: number | null
+) => {
   const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
-  
+
   let discountAmount = 0;
-  if (discountCode) {
-    const promo = SUPPORTED_DISCOUNTS[discountCode];
-    if (promo) {
-      if (promo.type === 'percentage') {
-        discountAmount = parseFloat((cartTotal * (promo.value / 100)).toFixed(2));
-      } else {
-        discountAmount = Math.min(promo.value, cartTotal);
-      }
+  if (discountType && discountValue != null) {
+    if (discountType === 'percentage') {
+      discountAmount = parseFloat((cartTotal * (discountValue / 100)).toFixed(2));
+    } else {
+      discountAmount = Math.min(discountValue, cartTotal);
     }
   }
 
-  return { 
-    cartTotal, 
-    subtotal: cartTotal, 
+  return {
+    cartTotal,
+    subtotal: cartTotal,
     itemCount,
-    discountAmount: discountCode ? discountAmount : null
+    discountAmount: discountType ? discountAmount : null,
   };
 };
 
@@ -104,29 +121,50 @@ export const useCart = create<CartState>()(
       cartTotal: 0,
       subtotal: 0,
       itemCount: 0,
-      
+
       discountCode: null,
+      discountType: null,
+      discountValue: null,
       discountAmount: null,
 
+      // ── Descuento: validación server-side ───────────────────────────────
       applyDiscountCode: async (code: string) => {
-        const cleanCode = code.trim().toUpperCase();
-        const promo = SUPPORTED_DISCOUNTS[cleanCode];
-        if (promo) {
-          const { items } = get();
-          const totals = computeTotals(items, cleanCode);
-          set({ 
-            discountCode: cleanCode, 
-            discountAmount: totals.discountAmount 
+        const { items, subtotal } = get();
+
+        const res = await fetch('/api/validate-discount', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: code.trim(), subtotal }),
+        });
+
+        const data = await res.json();
+
+        if (data.valid) {
+          const totals = computeTotals(items, data.discountType, data.discountValue);
+          set({
+            discountCode: code.trim().toUpperCase(),
+            discountType: data.discountType,
+            discountValue: data.discountValue,
+            discountAmount: totals.discountAmount,
           });
         } else {
-          throw new Error('Código de descuento no válido');
+          throw new Error(data.error || 'Código de descuento no válido');
         }
       },
-      
+
       removeDiscountCode: () => {
-        set({ discountCode: null, discountAmount: null });
+        const { items } = get();
+        const totals = computeTotals(items, null, null);
+        set({
+          discountCode: null,
+          discountType: null,
+          discountValue: null,
+          discountAmount: null,
+          ...totals,
+        });
       },
 
+      // ── Mutaciones del carrito ──────────────────────────────────────────
       addItem: (newItem) => set((state) => {
         let newItems;
         const existing = state.items.find(i => i.variantId === newItem.variantId);
@@ -139,48 +177,59 @@ export const useCart = create<CartState>()(
         } else {
           newItems = [...state.items, newItem];
         }
-        return { items: newItems, isCartOpen: true, ...computeTotals(newItems, state.discountCode) };
+        return { items: newItems, isCartOpen: true, ...computeTotals(newItems, state.discountType, state.discountValue) };
       }),
 
       removeItem: (variantId) => set((state) => {
         const newItems = state.items.filter(i => i.variantId !== variantId);
-        return { items: newItems, ...computeTotals(newItems, state.discountCode) };
+        return { items: newItems, ...computeTotals(newItems, state.discountType, state.discountValue) };
       }),
 
       updateQuantity: (variantId, quantity) => set((state) => {
         const newItems = state.items.map(i =>
           i.variantId === variantId ? { ...i, quantity } : i
         );
-        return { items: newItems, ...computeTotals(newItems, state.discountCode) };
+        return { items: newItems, ...computeTotals(newItems, state.discountType, state.discountValue) };
       }),
 
-      clearCart: () => set({ items: [], isCartOpen: false, cartTotal: 0, subtotal: 0, itemCount: 0, discountCode: null, discountAmount: null }),
+      clearCart: () => set({
+        items: [],
+        isCartOpen: false,
+        cartTotal: 0,
+        subtotal: 0,
+        itemCount: 0,
+        discountCode: null,
+        discountType: null,
+        discountValue: null,
+        discountAmount: null,
+      }),
 
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
     }),
     {
       name: 'protex-cart-storage',
-      // persist cart items, discounts and totals
+      // Persist cart items, discount metadata, and totals
       partialize: (state) => ({
         items: state.items,
         discountCode: state.discountCode,
+        discountType: state.discountType,
+        discountValue: state.discountValue,
         cartTotal: state.cartTotal,
         subtotal: state.subtotal,
         itemCount: state.itemCount,
         discountAmount: state.discountAmount,
       }),
-      // Automatically recalculate on rehydration to prevent any stale 0.00€ totals
+      // Recalculate on rehydration to prevent stale totals
       onRehydrateStorage: () => (state, error) => {
         if (state && !error) {
-          const totals = computeTotals(state.items, state.discountCode);
+          const totals = computeTotals(state.items, state.discountType, state.discountValue);
           state.cartTotal = totals.cartTotal;
           state.subtotal = totals.subtotal;
           state.itemCount = totals.itemCount;
           state.discountAmount = totals.discountAmount;
         }
-      }
+      },
     }
   )
 );
-

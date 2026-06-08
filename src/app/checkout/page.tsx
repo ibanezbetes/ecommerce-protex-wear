@@ -8,7 +8,7 @@ import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
 import { BizumDetails } from '@/components/Checkout/BizumDetails';
-import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock } from 'lucide-react';
+import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
 import styles from './page.module.css';
 
 export interface Address {
@@ -39,9 +39,8 @@ const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 
 
 const STEPS = [
   { number: 1, title: 'Dirección', icon: MapPin },
-  { number: 2, title: 'Envío', icon: Truck },
-  { number: 3, title: 'Pago', icon: CreditCard },
-  { number: 4, title: 'Confirmar', icon: CheckCircle },
+  { number: 2, title: 'Pago', icon: CreditCard },
+  { number: 3, title: 'Confirmar', icon: CheckCircle },
 ];
 
 const CREATE_ORDER_MUTATION = `
@@ -234,7 +233,7 @@ export default function CheckoutPage() {
 
   const nextStep = () => {
     if (currentStep === 1 && !validateAddress()) return;
-    setCurrentStep(prev => Math.min(prev + 1, 4));
+    setCurrentStep(prev => Math.min(prev + 1, 3));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -328,6 +327,7 @@ export default function CheckoutPage() {
 
     // B. Payment execution
     if (paymentMethod === 'card') {
+      // ── Pago con Tarjeta (Stripe Checkout Session) ─────────────────────
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -343,50 +343,31 @@ export default function CheckoutPage() {
             shippingCost,
             customerEmail: user?.email,
             orderNumber: actualOrderId,
+            discountCode: discountCode || undefined,
           }),
         });
         const data = await res.json();
         if (res.ok && data.url) {
+          // Stripe session creada → redirigir a la pasarela de pago
           window.location.href = data.url;
+          return; // No resetear isProcessing — la página se descargará
         } else {
-          throw new Error(data.error || 'Error al iniciar el pago');
+          throw new Error(data.error || 'Error al iniciar el pago con tarjeta.');
         }
       } catch (err: any) {
-        console.warn('Conexión de pasarela procesada localmente:', err);
-
-        toast.info({
-          title: 'Procesando Transacción',
-          message: 'Autorizando y validando el pago de forma segura...',
+        // ⚠️ ERROR REAL — NO simular confirmación de pago
+        console.error('[Checkout] Error al crear sesión de Stripe:', err);
+        const errorMessage = err.message || 'No se pudo conectar con la pasarela de pago.';
+        setError(errorMessage);
+        toast.error({
+          title: 'Error en el pago',
+          message: `${errorMessage} Por favor, inténtalo de nuevo o prueba con otro método de pago.`,
         });
-
-        // 1.5s simulation for standard payment authorization wait time
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        console.log(`[Payment Authorization] Actualizando estado del pedido ${actualOrderId} a CONFIRMADO.`);
-        items.forEach(item => {
-          console.log(`[Payment Authorization] Reduciendo stock del producto ${item.productId} en cantidad: ${item.quantity}`);
-        });
-
-        try {
-          await sendOrderEmail(actualOrderId);
-        } catch (emailErr) {
-          console.warn('No se pudo enviar correo en confirmación:', emailErr);
-        }
-
-        const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
-        const updatedOrders = fallbackOrders.map((o: any) =>
-          o.orderId === actualOrderId ? { ...o, status: 'CONFIRMADO' } : o
-        );
-        sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
-
-        setOrderPlaced(true);
-        clearCart();
-        router.push(`/checkout/success?order=${actualOrderId}`);
+        setIsProcessing(false);
       }
     } else {
-      // Offline payments (Bizum / Transferencia)
+      // ── Pagos Offline (Bizum / Transferencia Bancaria) ─────────────────
       try {
-        await new Promise(resolve => setTimeout(resolve, 2000));
         await sendOrderEmail(actualOrderId);
 
         const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
@@ -399,7 +380,12 @@ export default function CheckoutPage() {
         clearCart();
         router.push(`/checkout/success?order=${actualOrderId}`);
       } catch (err: any) {
+        console.error('[Checkout] Error en pago offline:', err);
         setError(err.message || 'Error al procesar el pedido.');
+        toast.error({
+          title: 'Error',
+          message: 'No se pudo procesar el pedido. Por favor, inténtalo de nuevo.',
+        });
       } finally {
         setIsProcessing(false);
       }
@@ -644,79 +630,15 @@ export default function CheckoutPage() {
                     </div>
                   </form>
                   <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className={styles.btnNext} onClick={nextStep}>Continuar <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
-                  </div>
-                </div>
-              </>
-            )}
-
-            {/* ── STEP 2: Envío (placeholder) ──────────────────────────────────── */}
-            {currentStep === 2 && (
-              <>
-                <div className={styles.cardHeader}>
-                  <h2 className={styles.cardTitle}><Truck size={22} color="#2e559e" /> Método de Envío</h2>
-                </div>
-                <div className={styles.cardBody}>
-                  <div style={{
-                    background: '#f0f9ff',
-                    border: '2px solid #bae6fd',
-                    borderRadius: '16px',
-                    padding: '2rem',
-                    textAlign: 'center',
-                  }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚚</div>
-                    <h4 style={{ color: '#0369a1', margin: '0 0 0.5rem', fontWeight: 700, fontSize: '1.125rem' }}>
-                      Envío por Agencia Externa
-                    </h4>
-                    <p style={{ color: '#0284c7', margin: '0 0 1.5rem', fontSize: '0.9375rem' }}>
-                      Tu pedido será gestionado por nuestra empresa de transporte de confianza.
-                    </p>
-
-                    <div style={{
-                      background: 'white',
-                      borderRadius: '12px',
-                      padding: '1rem 1.5rem',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.75rem',
-                      border: '1px solid #e0f2fe',
-                      marginBottom: '1rem',
-                    }}>
-                      <span style={{ fontSize: '1.25rem' }}>📍</span>
-                      <p style={{ margin: 0, color: '#334155', fontWeight: 500, fontSize: '0.9375rem' }}>
-                        Seguimiento del pedido — <em style={{ color: '#94a3b8' }}>disponible próximamente</em>
-                      </p>
-                    </div>
-
-                    <div style={{
-                      marginTop: '0.75rem',
-                      padding: '0.875rem 1.25rem',
-                      background: shippingCost === 0 ? '#ecfdf5' : '#fffbeb',
-                      borderRadius: '10px',
-                      border: `1px solid ${shippingCost === 0 ? '#a7f3d0' : '#fde68a'}`,
-                    }}>
-                      {shippingCost === 0 ? (
-                        <p style={{ margin: 0, fontSize: '0.9375rem', color: '#065f46', fontWeight: 600 }}>
-                          🎉 ¡Envío gratuito aplicado a tu pedido!
-                        </p>
-                      ) : (
-                        <p style={{ margin: 0, fontSize: '0.9375rem', color: '#92400e', fontWeight: 500 }}>
-                          💡 Añade <strong>{(SHIPPING_THRESHOLD - discountedSubtotal).toFixed(2)}€</strong> más para conseguir envío gratuito
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-                    <button className={styles.btnBack} onClick={prevStep}>Atrás</button>
                     <button className={styles.btnNext} onClick={nextStep}>Continuar a Pago <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
                   </div>
                 </div>
               </>
             )}
 
-            {/* ── STEP 3: Pago ─────────────────────────────────────────────────── */}
-            {currentStep === 3 && (
+
+            {/* ── STEP 2: Pago ─────────────────────────────────────────────────── */}
+            {currentStep === 2 && (
               <>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardTitle}><CreditCard size={22} color="#2e559e" /> Método de Pago</h2>
@@ -746,8 +668,8 @@ export default function CheckoutPage() {
               </>
             )}
 
-            {/* ── STEP 4: Confirmar ────────────────────────────────────────────── */}
-            {currentStep === 4 && (
+            {/* ── STEP 3: Confirmar ────────────────────────────────────────────── */}
+            {currentStep === 3 && (
               <>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardTitle}><CheckCircle size={22} color="#2e559e" /> Confirmar Pedido</h2>
@@ -828,6 +750,53 @@ export default function CheckoutPage() {
                   </div>
                 </div>
               ))}
+            </div>
+
+            {/* Free shipping progress banner */}
+            <div style={{
+              padding: '0.875rem 1.5rem',
+              background: shippingCost === 0 ? '#ecfdf5' : '#fffbeb',
+              borderBottom: `1px solid ${shippingCost === 0 ? '#d1fae5' : '#fef3c7'}`,
+            }}>
+              {shippingCost === 0 ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: '#065f46', fontWeight: 600 }}>
+                  <Truck size={15} />
+                  ¡Envío gratuito aplicado!
+                </div>
+              ) : (
+                <>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
+                    <span style={{ fontSize: '0.75rem', color: '#92400e', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                      <Truck size={13} /> Envío gratis desde {SHIPPING_THRESHOLD}€
+                    </span>
+                    <span style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 500 }}>
+                      Faltan {Math.max(SHIPPING_THRESHOLD - discountedSubtotal, 0).toFixed(2)}€
+                    </span>
+                  </div>
+                  <div style={{ height: '4px', background: '#fde68a', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{
+                      height: '100%',
+                      width: `${Math.min((discountedSubtotal / SHIPPING_THRESHOLD) * 100, 100)}%`,
+                      background: 'linear-gradient(90deg, #f59e0b, #d97706)',
+                      borderRadius: '2px',
+                      transition: 'width 0.4s ease',
+                    }} />
+                  </div>
+                </>
+              )}
+            </div>
+
+            {/* Shipping method indicator */}
+            <div style={{
+              padding: '0.75rem 1.5rem',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.625rem',
+              borderBottom: '1px solid #f3f4f6',
+              background: '#fafbfc',
+            }}>
+              <Package size={15} color="#6b7280" />
+              <span style={{ fontSize: '0.8125rem', color: '#4b5563', fontWeight: 500 }}>Envío por agencia externa</span>
             </div>
 
             <div className={styles.sidebarTotals}>
