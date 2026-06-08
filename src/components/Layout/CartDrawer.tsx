@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/useCart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/Feedback/ToastProvider';
-import { Fingerprint, Check, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
 const RECOMMENDATIONS = [
@@ -58,9 +58,7 @@ export function CartDrawer() {
   const router = useRouter();
   const toast = useToast();
 
-  const [showBiometric, setShowBiometric] = useState(false);
-  const [biometricMethod, setBiometricMethod] = useState('');
-  const [biometricStatus, setBiometricStatus] = useState<'scanning' | 'success'>('scanning');
+
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -92,11 +90,14 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const shipping = subtotal > 50 ? 0 : 5.99; // Updated dynamic shipping rate: Free > 50€
+  // Tarifa plana: 9€ si subtotal < 100€, gratis si ≥ 100€
+  const SHIPPING_THRESHOLD = 100;
+  const SHIPPING_COST = 9;
+  const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const tax = subtotal * 0.21;
   const total = subtotal + tax + shipping;
-  const freeShippingProgress = Math.min((subtotal / 50) * 100, 100);
-  const remaining = Math.max(50 - subtotal, 0);
+  const freeShippingProgress = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
+  const remaining = Math.max(SHIPPING_THRESHOLD - subtotal, 0);
 
   const goToProducts = () => {
     closeCart();
@@ -116,52 +117,7 @@ export function CartDrawer() {
     });
   };
 
-  const handleExpressCheckout = (method: string) => {
-    setBiometricMethod(method);
-    setBiometricStatus('scanning');
-    setShowBiometric(true);
 
-    setTimeout(() => {
-      setBiometricStatus('success');
-      setTimeout(async () => {
-        setShowBiometric(false);
-        const orderNum = 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
-        
-        try {
-          await fetch('/api/send-order-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              orderNumber: orderNum,
-              customerName: 'Comprador Express',
-              customerEmail: 'compras@protexwear.com',
-              items: items.map(item => ({ name: item.name, quantity: item.quantity, price: item.price })),
-              subtotal,
-              tax,
-              shippingCost: shipping,
-              total,
-              paymentMethod: method === 'Apple Pay' ? 'apple_pay' : 'google_pay',
-              shippingAddress: {
-                firstName: 'Comprador',
-                lastName: 'Express',
-                street: 'Calle de la Gran Vía, 28',
-                city: 'Madrid',
-                postalCode: '28013',
-                country: 'ES',
-              },
-              shippingMethod: 'standard',
-            }),
-          });
-        } catch (e) {
-          console.warn('Fallo al mandar email express:', e);
-        }
-
-        clearCart();
-        closeCart();
-        router.push(`/checkout/success?order=${orderNum}`);
-      }, 1500);
-    }, 2000);
-  };
 
   return (
     <div className={styles.shell}>
@@ -364,10 +320,10 @@ export function CartDrawer() {
           <div className={styles.footer}>
 
 
-            {subtotal < 50 ? (
+            {subtotal < SHIPPING_THRESHOLD ? (
               <div className={styles.shippingBox}>
                 <div className={styles.shippingLabel}>
-                  <span>Env&iacute;o gratis desde 50&euro;</span>
+                  <span>Env&iacute;o gratis desde {SHIPPING_THRESHOLD}&euro;</span>
                   <span>Faltan {remaining.toFixed(2)}&euro;</span>
                 </div>
                 <div className={styles.progressTrack}>
@@ -375,12 +331,12 @@ export function CartDrawer() {
                 </div>
               </div>
             ) : (
-              <div className={styles.freeShippingBox}>Tienes env&iacute;o gratis</div>
+              <div className={styles.freeShippingBox}>🎉 Tienes env&iacute;o gratis</div>
             )}
 
             <div className={styles.summary}>
               <div className={styles.summaryRow}>
-                <span>Subtotal</span>
+                <span>Subtotal (sin IVA)</span>
                 <span className={styles.summaryValue}>{subtotal.toFixed(2)}&euro;</span>
               </div>
               <div className={styles.summaryRow}>
@@ -407,42 +363,7 @@ export function CartDrawer() {
         )}
       </motion.div>
 
-      {/* FaceID / TouchID Biometric Simulator Modal */}
-      <AnimatePresence>
-        {showBiometric && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className={styles.biometricOverlay}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className={styles.biometricCard}
-            >
-              <h3 className={styles.biometricTitle}>Pago Rápido con {biometricMethod}</h3>
-              <p className={styles.biometricSubtitle}>
-                {biometricStatus === 'scanning' ? 'Verificando datos biométricos...' : 'Identidad Confirmada'}
-              </p>
 
-              <div className={`${styles.biometricIconWrapper} ${biometricStatus === 'success' ? styles.biometricIconWrapperSuccess : ''}`}>
-                {biometricStatus === 'scanning' && <div className={styles.scanningRing} />}
-                {biometricStatus === 'scanning' ? (
-                  <Fingerprint size={42} />
-                ) : (
-                  <Check size={42} />
-                )}
-              </div>
-
-              <p style={{ margin: 0, fontSize: '0.9rem', fontWeight: 600, color: biometricStatus === 'success' ? '#10b981' : '#3b82f6' }}>
-                {biometricStatus === 'scanning' ? 'Escaneando rostro/huella en sandbox...' : '✅ Autorizando cobro de Stripe...'}
-              </p>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }

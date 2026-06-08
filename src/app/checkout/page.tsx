@@ -8,7 +8,7 @@ import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
 import { BizumDetails } from '@/components/Checkout/BizumDetails';
-import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, X, Lock } from 'lucide-react';
+import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock } from 'lucide-react';
 import styles from './page.module.css';
 
 export interface Address {
@@ -30,56 +30,10 @@ export interface ShippingOption {
   description: string;
 }
 
-export interface ShippingZone {
-  id: string;
-  name: string;
-  cost: number;
-  freeThreshold: number;
-  estimatedDays: number;
-  carrier: string;
-}
-
-export const SHIPPING_ZONES: Record<string, ShippingZone> = {
-  spain_peninsula: {
-    id: 'spain_peninsula',
-    name: 'España Península',
-    cost: 5.99,
-    freeThreshold: 50.00,
-    estimatedDays: 2,
-    carrier: 'Correos'
-  },
-  balearic: {
-    id: 'balearic',
-    name: 'Islas Baleares',
-    cost: 8.99,
-    freeThreshold: 75.00,
-    estimatedDays: 4,
-    carrier: 'Correos Baleares'
-  },
-  canary: {
-    id: 'canary',
-    name: 'Islas Canarias',
-    cost: 12.99,
-    freeThreshold: 100.00,
-    estimatedDays: 5,
-    carrier: 'Correos Canarias'
-  },
-  international: {
-    id: 'international',
-    name: 'Internacional (Portugal, Francia, Andorra)',
-    cost: 9.99,
-    freeThreshold: 80.00,
-    estimatedDays: 4,
-    carrier: 'DHL Express'
-  }
-};
-
-const getDeliveryDate = (daysToAdd: number) => {
-  const date = new Date();
-  date.setDate(date.getDate() + daysToAdd);
-  if (date.getDay() === 0) date.setDate(date.getDate() + 1);
-  return new Intl.DateTimeFormat('es-ES', { weekday: 'long', day: 'numeric', month: 'long' }).format(date);
-};
+/** Umbral (€ sin IVA y sin descuento) a partir del cual el envío es gratuito */
+export const SHIPPING_THRESHOLD = 100;
+/** Coste de envío fijo cuando no se alcanza el umbral */
+export const SHIPPING_COST_FIXED = 9;
 
 const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
 
@@ -112,24 +66,23 @@ export default function CheckoutPage() {
   const [orderPlaced, setOrderPlaced] = useState(false);
   const [orderNumber] = useState(() => generateOrderNumber());
   const [error, setError] = useState<string | null>(null);
-  
-  const [shippingZone, setShippingZone] = useState<string>('spain_peninsula');
+
   const [shippingAddress, setShippingAddress] = useState<Partial<Address>>({
     firstName: (user as any)?.firstName || user?.name?.split(' ')[0] || '',
     lastName: (user as any)?.lastName || user?.name?.split(' ').slice(1).join(' ') || '',
     company: (user as any)?.company || '',
     country: 'ES',
   });
-  
-  const [selectedShipping, setSelectedShipping] = useState('standard');
+
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  // Fallback Address Autocomplete States
+  // Autocomplete manual (fallback cuando Google Places no está activo)
   const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
+  // Ref para saber si Google Places ya está activo (evita conflicto con búsqueda manual)
+  const googlePlacesActiveRef = React.useRef<boolean>(false);
 
   const handleSelectSuggestion = (suggestion: string) => {
     const parts = suggestion.split(',').map(p => p.trim());
@@ -137,60 +90,28 @@ export default function CheckoutPage() {
       const streetPart = parts[0] + (parts[1] ? `, ${parts[1]}` : '');
       const cityPart = parts[2];
       const postalCodePart = parts[3];
-      const countryPart = 'ES'; // Spain defaults
 
       setShippingAddress(prev => ({
         ...prev,
         street: streetPart,
         city: cityPart,
         postalCode: postalCodePart,
-        country: countryPart
+        country: 'ES',
       }));
 
-      // Auto-adjust zone on selected place
-      if (postalCodePart.startsWith('07')) {
-        setShippingZone('balearic');
-      } else if (postalCodePart.startsWith('35') || postalCodePart.startsWith('38')) {
-        setShippingZone('canary');
-      } else {
-        setShippingZone('spain_peninsula');
-      }
-
-      toast.success({ 
-        title: 'Dirección Completada', 
-        message: 'Los datos se rellenaron automáticamente desde las sugerencias.' 
+      toast.success({
+        title: 'Dirección Completada',
+        message: 'Los datos se rellenaron automáticamente desde las sugerencias.',
       });
     }
     setAddressSuggestions([]);
     setShowSuggestions(false);
   };
 
-  // Dynamic Shipping Calculations based on Zone and Subtotal
-  const currentZone = SHIPPING_ZONES[shippingZone] || SHIPPING_ZONES.spain_peninsula;
+  // ── Cálculo de envío: tarifa plana ──────────────────────────────────────────
+  // 9 € si el subtotal (sin IVA, tras descuento) es < 100 €; gratis si ≥ 100 €
   const discountedSubtotal = Math.max(0, subtotal - (discountAmount || 0));
-  
-  const standardCost = discountedSubtotal >= currentZone.freeThreshold ? 0 : currentZone.cost;
-  const expressCost = standardCost + 7.00;
-
-  const currentShippingOptions = [
-    {
-      method: 'standard',
-      carrier: currentZone.carrier,
-      cost: standardCost,
-      estimatedDays: currentZone.estimatedDays,
-      description: `Envío Estándar (${currentZone.name})`,
-    },
-    {
-      method: 'express',
-      carrier: 'SEUR Express',
-      cost: expressCost,
-      estimatedDays: 1,
-      description: 'Envío Express 24h',
-    }
-  ];
-
-  const shippingOption = currentShippingOptions.find(o => o.method === selectedShipping) || currentShippingOptions[0];
-  const shippingCost = shippingOption.cost;
+  const shippingCost = discountedSubtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST_FIXED;
   const tax = discountedSubtotal * 0.21;
   const total = discountedSubtotal + tax + shippingCost;
 
@@ -224,8 +145,13 @@ export default function CheckoutPage() {
 
         autocomplete = new googleObj.maps.places.Autocomplete(inputElement, {
           types: ['address'],
-          componentRestrictions: { country: ['es', 'pt', 'fr', 'ad'] }
+          componentRestrictions: { country: ['es'] }, // Solo España
         });
+
+        // Marcar Google Places como activo → el fallback manual queda desactivado
+        googlePlacesActiveRef.current = true;
+        setShowSuggestions(false);
+        setAddressSuggestions([]);
 
         autocomplete.addListener('place_changed', () => {
           const place = autocomplete.getPlace();
@@ -253,27 +179,14 @@ export default function CheckoutPage() {
           }
 
           const fullStreet = streetNumber ? `${streetName}, ${streetNumber}` : streetName;
-          
+
           setShippingAddress(prev => ({
             ...prev,
             street: fullStreet || place.formatted_address || '',
             city: city || prev.city || '',
             postalCode: postalCode || prev.postalCode || '',
-            country: country || prev.country || 'ES'
+            country: country || prev.country || 'ES',
           }));
-
-          // Auto-adjust zone on selected place
-          if (country === 'ES') {
-            if (postalCode.startsWith('07')) {
-              setShippingZone('balearic');
-            } else if (postalCode.startsWith('35') || postalCode.startsWith('38')) {
-              setShippingZone('canary');
-            } else {
-              setShippingZone('spain_peninsula');
-            }
-          } else {
-            setShippingZone('international');
-          }
 
           toast.success({ title: 'Dirección Completada', message: 'Los datos se rellenaron automáticamente desde Google Maps.' });
         });
@@ -282,8 +195,10 @@ export default function CheckoutPage() {
       }
     };
 
-    // Dynamically inject script
-    if (!(window as any).google) {
+    // Inyectar script solo si no existe ya en el DOM
+    const alreadyLoaded = !!(window as any).google;
+    const alreadyInjected = !!document.querySelector('script[src*="maps.googleapis.com"]');
+    if (!alreadyLoaded && !alreadyInjected) {
       const script = document.createElement('script');
       script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
       script.async = true;
@@ -351,7 +266,7 @@ export default function CheckoutPage() {
             postalCode: shippingAddress.postalCode || '',
             country: shippingAddress.country || 'ES',
           },
-          shippingMethod: selectedShipping,
+          shippingMethod: 'agencia_externa',
           discountCode: discountCode || undefined,
           discountAmount: discountAmount || 0,
         }),
@@ -374,12 +289,12 @@ export default function CheckoutPage() {
     const orderItems = items.map(item => ({
       productId: item.productId,
       variantId: item.variantId || item.productId,
-      quantity: item.quantity
+      quantity: item.quantity,
     }));
 
     const orderInput = {
       type: paymentMethod === 'card' ? 'STANDARD' : 'DEFERRED',
-      items: orderItems
+      items: orderItems,
     };
 
     let actualOrderId = orderNumber;
@@ -387,7 +302,7 @@ export default function CheckoutPage() {
     // A. Mutate Order inside AppSync GraphQL endpoint (PENDIENTE_DE_PAGO state)
     try {
       const graphqlClient = await import('@/services/graphqlClient');
-      const result = await graphqlClient.graphqlFetch<{ createOrder: { orderId: string, status: string } }>(
+      const result = await graphqlClient.graphqlFetch<{ createOrder: { orderId: string; status: string } }>(
         CREATE_ORDER_MUTATION,
         { input: orderInput }
       );
@@ -406,7 +321,7 @@ export default function CheckoutPage() {
         total,
         paymentMethod,
         shippingAddress,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
       });
       sessionStorage.setItem('protex_orders', JSON.stringify(fallbackOrders));
     }
@@ -438,7 +353,7 @@ export default function CheckoutPage() {
         }
       } catch (err: any) {
         console.warn('Conexión de pasarela procesada localmente:', err);
-        
+
         toast.info({
           title: 'Procesando Transacción',
           message: 'Autorizando y validando el pago de forma segura...',
@@ -447,7 +362,6 @@ export default function CheckoutPage() {
         // 1.5s simulation for standard payment authorization wait time
         await new Promise(resolve => setTimeout(resolve, 1500));
 
-        // Simular actualización de estado de pedido y stock (AWS AppSync/Amplify no exponen estas mutaciones públicamente en schema.graphql)
         console.log(`[Payment Authorization] Actualizando estado del pedido ${actualOrderId} a CONFIRMADO.`);
         items.forEach(item => {
           console.log(`[Payment Authorization] Reduciendo stock del producto ${item.productId} en cantidad: ${item.quantity}`);
@@ -459,9 +373,8 @@ export default function CheckoutPage() {
           console.warn('No se pudo enviar correo en confirmación:', emailErr);
         }
 
-        // Register local order
         const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
-        const updatedOrders = fallbackOrders.map((o: any) => 
+        const updatedOrders = fallbackOrders.map((o: any) =>
           o.orderId === actualOrderId ? { ...o, status: 'CONFIRMADO' } : o
         );
         sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
@@ -475,10 +388,9 @@ export default function CheckoutPage() {
       try {
         await new Promise(resolve => setTimeout(resolve, 2000));
         await sendOrderEmail(actualOrderId);
-        
-        // Update local session status
+
         const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
-        const updatedOrders = fallbackOrders.map((o: any) => 
+        const updatedOrders = fallbackOrders.map((o: any) =>
           o.orderId === actualOrderId ? { ...o, status: 'CONFIRMADO_PENDIENTE_TRANSFERENCIA' } : o
         );
         sessionStorage.setItem('protex_orders', JSON.stringify(updatedOrders));
@@ -499,7 +411,7 @@ export default function CheckoutPage() {
   return (
     <div className={styles.checkoutContainer}>
       <div className={styles.checkoutLayout}>
-        
+
         {/* Left Column - Forms */}
         <div>
           {/* Header */}
@@ -515,15 +427,15 @@ export default function CheckoutPage() {
                 </p>
               </div>
             </div>
-            <button 
-              className={styles.btnBack} 
+            <button
+              className={styles.btnBack}
               onClick={() => {
                 if (typeof window !== 'undefined' && window.history.length > 1) {
                   router.back();
                 } else {
                   router.push('/productos');
                 }
-              }} 
+              }}
               style={{ padding: '0.5rem 1rem' }}
             >
               <ArrowLeft size={16} /> Volver
@@ -537,7 +449,7 @@ export default function CheckoutPage() {
               const Icon = step.icon;
               const isCompleted = currentStep > step.number;
               const isActive = currentStep === step.number;
-              
+
               let circleClass = styles.stepCircle;
               if (isActive) circleClass = `${styles.stepCircle} ${styles.stepCircleActive}`;
               if (isCompleted) circleClass = `${styles.stepCircle} ${styles.stepCircleCompleted}`;
@@ -563,6 +475,7 @@ export default function CheckoutPage() {
               </div>
             )}
 
+            {/* ── STEP 1: Dirección ────────────────────────────────────────────── */}
             {currentStep === 1 && (
               <>
                 <div className={styles.cardHeader}>
@@ -586,92 +499,95 @@ export default function CheckoutPage() {
                     </div>
                     <div className={`${styles.inputGroup} ${styles.inputGroupRelative}`}>
                       <label className={styles.label}>Dirección *</label>
-                      <input 
-                        className={styles.input} 
-                        type="text" 
+                      <input
+                        className={styles.input}
+                        type="text"
                         id="street-input"
-                        value={shippingAddress.street || ''} 
+                        value={shippingAddress.street || ''}
                         onChange={e => {
                           const val = e.target.value;
                           handleAddressChange('street', val);
-                          
+
                           if (searchTimeoutRef.current) {
                             clearTimeout(searchTimeoutRef.current);
                           }
 
-                          if (val.trim().length >= 1) {
+                          // Solo ejecutar búsqueda manual si Google Places NO está activo
+                          if (!googlePlacesActiveRef.current && val.trim().length >= 2) {
                             searchTimeoutRef.current = setTimeout(async () => {
-                              try {
-                                const res = await fetch(
-                                  `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(val)}&countrycodes=es,ad,pt,fr&format=json&addressdetails=1&limit=6`,
-                                  {
-                                    headers: {
-                                      'Accept-Language': 'es-ES,es;q=0.9',
-                                    }
-                                  }
-                                );
-                                if (!res.ok) throw new Error('API Nominatim no disponible');
-                                const data = await res.json();
-                                
-                                if (Array.isArray(data) && data.length > 0) {
-                                  const suggestions = data.map((item: any) => {
-                                    const addr = item.address || {};
-                                    const road = addr.road || addr.pedestrian || addr.path || addr.suburb || addr.neighbourhood || addr.industrial || addr.state_district || '';
-                                    const houseNumber = addr.house_number || '';
-                                    const city = addr.city || addr.town || addr.village || addr.municipality || addr.suburb || addr.county || '';
-                                    const postcode = addr.postcode || '';
-                                    
-                                    if (!road && !city) {
-                                      return item.display_name;
-                                    }
-                                    
-                                    return `${road}, ${houseNumber}, ${city}, ${postcode}, España`;
-                                  }).filter(Boolean);
+                              const controller = new AbortController();
+                              const timeoutId = setTimeout(() => controller.abort(), 6000);
 
+                              try {
+                                // 1️⃣ CartoCiudad (IGN) — base de datos oficial, todas las calles de España
+                                const res = await fetch(
+                                  `/api/geocode?q=${encodeURIComponent(val)}`,
+                                  { signal: controller.signal }
+                                );
+                                clearTimeout(timeoutId);
+
+                                if (res.ok) {
+                                  const suggestions: string[] = await res.json();
                                   if (suggestions.length > 0) {
                                     setAddressSuggestions(suggestions);
                                     setShowSuggestions(true);
                                     return;
                                   }
                                 }
-                                throw new Error('Sin resultados reales');
-                              } catch (err) {
-                                console.warn('Buscando con fallback local debido a error en Nominatim:', err);
-                                const mockAddresses = [
-                                  "Calle de Alcalá, 12, Madrid, 28014, España",
-                                  "Paseo de la Castellana, 100, Madrid, 28046, España",
-                                  "Gran Vía, 45, Madrid, 28013, España",
-                                  "Avinguda Diagonal, 400, Barcelona, 08037, España",
-                                  "La Rambla, 80, Barcelona, 08002, España",
-                                  "Calle Sierpes, 14, Sevilla, 41004, España",
-                                  "Calle Colón, 25, Valencia, 46004, España",
-                                  "Calle Larios, 8, Málaga, 29005, España",
-                                  "Calle Uría, 15, Oviedo, 33003, España",
-                                  "Calle Estafeta, 10, Pamplona, 31001, España",
-                                  "Calle Mayor, 4, Madrid, 28013, España",
-                                  "Paseo de Gracia, 20, Barcelona, 08007, España",
-                                  "Avenida de la Constitución, 18, Sevilla, 41001, España",
-                                  "Calle Alfonso I, 22, Zaragoza, 50003, España",
-                                  "Calle Poeta Querol, 5, Valencia, 46002, España",
-                                  "Avenida de Anaga, 12, Santa Cruz de Tenerife, 38001, España",
-                                  "Calle Triana, 60, Las Palmas de Gran Canaria, 35002, España",
-                                  "Paseo Marítimo, 15, Palma de Mallorca, 07014, España",
-                                  "Calle Jaime III, 2, Palma de Mallorca, 07012, España"
-                                ];
-                                const filtered = mockAddresses.filter(addr => 
-                                  addr.toLowerCase().includes(val.toLowerCase())
+
+                                // 2️⃣ Fallback: Photon si CartoCiudad no devuelve nada
+                                const resPhoton = await fetch(
+                                  `https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&lang=es&limit=8`
                                 );
-                                setAddressSuggestions(filtered);
-                                setShowSuggestions(filtered.length > 0);
+                                if (resPhoton.ok) {
+                                  const data = await resPhoton.json();
+                                  const fallback: string[] = (data?.features || [])
+                                    .filter((f: any) => {
+                                      const p = f.properties || {};
+                                      // Solo calles y portales, excluir negocios/POIs
+                                      const key = p.osm_key || '';
+                                      const type = p.type || '';
+                                      const validKeys = ['highway', 'place', 'addr'];
+                                      const validTypes = ['street', 'house', 'locality', 'district'];
+                                      return validKeys.includes(key) || validTypes.includes(type);
+                                    })
+                                    .map((f: any) => {
+                                      const p = f.properties || {};
+                                      if (p.countrycode && p.countrycode !== 'ES') return null;
+                                      const street = p.street || p.name || '';
+                                      const city   = p.city || p.town || p.village || p.county || '';
+                                      const cp     = p.postcode || '';
+                                      if (!street && !city) return null;
+                                      let s = street;
+                                      if (city) s += `, ${city}`;
+                                      if (cp)   s += `, ${cp}`;
+                                      return s + ', España';
+                                    })
+                                    .filter(Boolean) as string[];
+
+                                  const unique = [...new Set(fallback)];
+                                  if (unique.length > 0) {
+                                    setAddressSuggestions(unique);
+                                    setShowSuggestions(true);
+                                    return;
+                                  }
+                                }
+
+                                setAddressSuggestions([]);
+                                setShowSuggestions(false);
+                              } catch (err: any) {
+                                clearTimeout(timeoutId);
+                                if (err?.name !== 'AbortError') console.warn('Geocode error:', err);
+                                setAddressSuggestions([]);
+                                setShowSuggestions(false);
                               }
-                            }, 400);
+                            }, 350);
                           } else {
                             setAddressSuggestions([]);
                             setShowSuggestions(false);
                           }
-                        }} 
+                        }}
                         onBlur={() => {
-                          // Small timeout to allow the onClick handler on list items to register
                           setTimeout(() => setShowSuggestions(false), 200);
                         }}
                         onFocus={() => {
@@ -679,15 +595,15 @@ export default function CheckoutPage() {
                             setShowSuggestions(addressSuggestions.length > 0);
                           }
                         }}
-                        placeholder="Calle, número, piso..." 
-                        required 
+                        placeholder="Calle, número, piso..."
+                        required
                       />
-                      
+
                       {showSuggestions && (
                         <ul className={styles.suggestionsDropdown}>
                           {addressSuggestions.map((suggestion, index) => (
-                            <li 
-                              key={index} 
+                            <li
+                              key={index}
                               className={styles.suggestionItem}
                               onMouseDown={(e) => {
                                 e.preventDefault();
@@ -714,18 +630,10 @@ export default function CheckoutPage() {
                     <div className={styles.formGrid2Cols}>
                       <div className={styles.inputGroup}>
                         <label className={styles.label}>País *</label>
-                        <select 
-                          className={styles.input} 
-                          value={shippingAddress.country || 'ES'} 
-                          onChange={e => {
-                            const val = e.target.value;
-                            handleAddressChange('country', val);
-                            if (val !== 'ES') {
-                              setShippingZone('international');
-                            } else {
-                              setShippingZone('spain_peninsula');
-                            }
-                          }}
+                        <select
+                          className={styles.input}
+                          value={shippingAddress.country || 'ES'}
+                          onChange={e => handleAddressChange('country', e.target.value)}
                         >
                           <option value="ES">España</option>
                           <option value="PT">Portugal</option>
@@ -733,21 +641,6 @@ export default function CheckoutPage() {
                           <option value="AD">Andorra</option>
                         </select>
                       </div>
-                      
-                      {shippingAddress.country === 'ES' && (
-                        <div className={styles.inputGroup}>
-                          <label className={styles.label}>Zona de Envío *</label>
-                          <select 
-                            className={styles.input} 
-                            value={shippingZone} 
-                            onChange={e => setShippingZone(e.target.value)}
-                          >
-                            <option value="spain_peninsula">España Península (Coste: 5.99€ | Gratis &gt; 50€)</option>
-                            <option value="balearic">Islas Baleares (Coste: 8.99€ | Gratis &gt; 75€)</option>
-                            <option value="canary">Islas Canarias (Coste: 12.99€ | Gratis &gt; 100€)</option>
-                          </select>
-                        </div>
-                      )}
                     </div>
                   </form>
                   <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
@@ -757,34 +650,63 @@ export default function CheckoutPage() {
               </>
             )}
 
+            {/* ── STEP 2: Envío (placeholder) ──────────────────────────────────── */}
             {currentStep === 2 && (
               <>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardTitle}><Truck size={22} color="#2e559e" /> Método de Envío</h2>
                 </div>
                 <div className={styles.cardBody}>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                    {currentShippingOptions.map(option => (
-                      <div 
-                        key={option.method} 
-                        className={`${styles.shippingOption} ${selectedShipping === option.method ? styles.shippingOptionActive : ''}`}
-                        onClick={() => setSelectedShipping(option.method)}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '22px', height: '22px', borderRadius: '50%', border: '2px solid', borderColor: selectedShipping === option.method ? '#2e559e' : '#cbd5e1', background: 'white', transition: 'all 0.2s ease', flexShrink: 0 }}>
-                          {selectedShipping === option.method && <div style={{ width: '10px', height: '10px', borderRadius: '50%', backgroundColor: '#2e559e' }} />}
-                        </div>
-                        <div style={{ flex: 1 }}>
-                          <h4 style={{ margin: '0 0 0.25rem', fontWeight: 600, color: '#111827' }}>{option.description}</h4>
-                          <p style={{ margin: 0, fontSize: '0.875rem', color: '#6b7280' }}>
-                            Recíbelo el {getDeliveryDate(option.estimatedDays)} (vía {option.carrier})
-                          </p>
-                        </div>
-                        <div style={{ fontWeight: 700, color: '#111827', fontSize: '1.125rem' }}>
-                          {option.cost === 0 ? 'Gratis' : `${option.cost.toFixed(2)}€`}
-                        </div>
-                      </div>
-                    ))}
+                  <div style={{
+                    background: '#f0f9ff',
+                    border: '2px solid #bae6fd',
+                    borderRadius: '16px',
+                    padding: '2rem',
+                    textAlign: 'center',
+                  }}>
+                    <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🚚</div>
+                    <h4 style={{ color: '#0369a1', margin: '0 0 0.5rem', fontWeight: 700, fontSize: '1.125rem' }}>
+                      Envío por Agencia Externa
+                    </h4>
+                    <p style={{ color: '#0284c7', margin: '0 0 1.5rem', fontSize: '0.9375rem' }}>
+                      Tu pedido será gestionado por nuestra empresa de transporte de confianza.
+                    </p>
+
+                    <div style={{
+                      background: 'white',
+                      borderRadius: '12px',
+                      padding: '1rem 1.5rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.75rem',
+                      border: '1px solid #e0f2fe',
+                      marginBottom: '1rem',
+                    }}>
+                      <span style={{ fontSize: '1.25rem' }}>📍</span>
+                      <p style={{ margin: 0, color: '#334155', fontWeight: 500, fontSize: '0.9375rem' }}>
+                        Seguimiento del pedido — <em style={{ color: '#94a3b8' }}>disponible próximamente</em>
+                      </p>
+                    </div>
+
+                    <div style={{
+                      marginTop: '0.75rem',
+                      padding: '0.875rem 1.25rem',
+                      background: shippingCost === 0 ? '#ecfdf5' : '#fffbeb',
+                      borderRadius: '10px',
+                      border: `1px solid ${shippingCost === 0 ? '#a7f3d0' : '#fde68a'}`,
+                    }}>
+                      {shippingCost === 0 ? (
+                        <p style={{ margin: 0, fontSize: '0.9375rem', color: '#065f46', fontWeight: 600 }}>
+                          🎉 ¡Envío gratuito aplicado a tu pedido!
+                        </p>
+                      ) : (
+                        <p style={{ margin: 0, fontSize: '0.9375rem', color: '#92400e', fontWeight: 500 }}>
+                          💡 Añade <strong>{(SHIPPING_THRESHOLD - discountedSubtotal).toFixed(2)}€</strong> más para conseguir envío gratuito
+                        </p>
+                      )}
+                    </div>
                   </div>
+
                   <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
                     <button className={styles.btnBack} onClick={prevStep}>Atrás</button>
                     <button className={styles.btnNext} onClick={nextStep}>Continuar a Pago <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
@@ -793,17 +715,18 @@ export default function CheckoutPage() {
               </>
             )}
 
+            {/* ── STEP 3: Pago ─────────────────────────────────────────────────── */}
             {currentStep === 3 && (
               <>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardTitle}><CreditCard size={22} color="#2e559e" /> Método de Pago</h2>
                 </div>
                 <div className={styles.cardBody}>
-                  <PaymentMethodSelector 
-                    selected={paymentMethod} 
-                    onChange={(m) => setPaymentMethod(m as PaymentMethod)} 
+                  <PaymentMethodSelector
+                    selected={paymentMethod}
+                    onChange={(m) => setPaymentMethod(m as PaymentMethod)}
                   />
-                  
+
                   {paymentMethod === 'bank_transfer' && (
                     <div style={{ marginTop: '1.5rem' }}>
                       <BankTransferDetails orderNumber={orderNumber} total={total} />
@@ -823,13 +746,14 @@ export default function CheckoutPage() {
               </>
             )}
 
+            {/* ── STEP 4: Confirmar ────────────────────────────────────────────── */}
             {currentStep === 4 && (
               <>
                 <div className={styles.cardHeader}>
                   <h2 className={styles.cardTitle}><CheckCircle size={22} color="#2e559e" /> Confirmar Pedido</h2>
                 </div>
                 <div className={styles.cardBody}>
-                  
+
                   <div style={{ background: '#f9fafb', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
                     <div>
                       <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginBottom: '0.5rem' }}>Enviar a</h4>
@@ -845,14 +769,14 @@ export default function CheckoutPage() {
                         {paymentMethod === 'bank_transfer' && 'Transferencia Bancaria'}
                       </p>
                       <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginTop: '1rem', marginBottom: '0.5rem' }}>Envío</h4>
-                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>{shippingOption.description}</p>
+                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>Agencia externa</p>
                     </div>
                   </div>
 
                   <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '2rem' }}>
-                    <input 
-                      type="checkbox" 
-                      id="terms" 
+                    <input
+                      type="checkbox"
+                      id="terms"
                       checked={acceptedTerms}
                       onChange={e => setAcceptedTerms(e.target.checked)}
                       style={{ marginTop: '0.25rem', width: '1.125rem', height: '1.125rem', cursor: 'pointer' }}
@@ -864,8 +788,8 @@ export default function CheckoutPage() {
 
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <button className={styles.btnBack} onClick={prevStep} disabled={isProcessing}>Atrás</button>
-                    <button 
-                      className={styles.btnNext} 
+                    <button
+                      className={styles.btnNext}
                       onClick={handleSubmitOrder}
                       disabled={isProcessing || !acceptedTerms}
                       style={{ background: '#10b981', padding: '1rem 2.5rem' }}
@@ -880,11 +804,11 @@ export default function CheckoutPage() {
           </div>
         </div>
 
-        {/* Right Column - Order Summary Sidebar */}
+        {/* Right Column — Order Summary Sidebar */}
         <div>
           <div className={styles.sidebar}>
             <div className={styles.sidebarHeader}>Resumen del Pedido</div>
-            
+
             <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
               {items.map(item => (
                 <div key={item.variantId || item.productId} className={styles.sidebarItem}>
@@ -908,10 +832,10 @@ export default function CheckoutPage() {
 
             <div className={styles.sidebarTotals}>
               <div className={styles.sidebarTotalRow}>
-                <span>Subtotal</span>
+                <span>Subtotal (sin IVA)</span>
                 <span>{subtotal.toFixed(2)}€</span>
               </div>
-              
+
               {discountCode && (
                 <div className={styles.sidebarTotalRow} style={{ color: '#10b981', fontWeight: 500 }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -920,12 +844,12 @@ export default function CheckoutPage() {
                   <span>-{discountAmount?.toFixed(2)}€</span>
                 </div>
               )}
-              
+
               <div className={styles.sidebarTotalRow}>
                 <span>IVA (21%)</span>
                 <span>{tax.toFixed(2)}€</span>
               </div>
-              
+
               <div className={styles.sidebarTotalRow}>
                 <span>Envío</span>
                 <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit', fontWeight: shippingCost === 0 ? 600 : 400 }}>
@@ -940,8 +864,8 @@ export default function CheckoutPage() {
             </div>
 
             <div className={styles.trustBadges}>
-              <div className={styles.trustBadgeText}><ShieldCheck size={16} color="#10b981" /> Garantía de Devolución de 30 Días</div>
-              <div className={styles.trustBadgeText}><Lock size={16} color="#10b981" /> Pago Seguro con Encriptación SSL</div>
+              <div className={styles.trustBadgeText}><ShieldCheck size={16} color="#10b981" /> Pago 100% Seguro con SSL</div>
+              <div className={styles.trustBadgeText}><Lock size={16} color="#10b981" /> Tus datos están protegidos</div>
             </div>
           </div>
         </div>

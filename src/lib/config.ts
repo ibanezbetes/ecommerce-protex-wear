@@ -14,22 +14,22 @@ export const BUSINESS_CONFIG = {
   name: 'Protex Wear',
 
   /** Email de contacto para pedidos */
-  email: 'pedidos@protexwear.com',
+  email: 'info@protexwear.es',
 
   /** Teléfono principal de contacto */
-  phone: '+34 600 000 000',
+  phone: '+34 876 44 12 75',
 
-  // --- Datos bancarios (para transferencias) ---
+  // --- Datos bancarios reales (Santander — Certificado de Titularidad) ---
   /** IBAN de la cuenta bancaria */
-  bankIBAN: 'ES91 2100 0418 4502 0005 1332',
+  bankIBAN: 'ES86 0049 5484 0020 1660 2077',
   /** Código BIC/SWIFT del banco */
-  bankBIC: 'CAIXESBBXXX',
+  bankBIC: 'BSCHESMM',
   /** Nombre del banco */
-  bankName: 'CaixaBank',
+  bankName: 'Banco Santander',
   /** Titular de la cuenta bancaria */
-  bankAccountHolder: 'Protex Wear S.L.',
+  bankAccountHolder: 'PROTEX WEAR SL',
 
   // --- Bizum ---
   /** Teléfono asociado a Bizum */
-  bizumPhone: '+34 600 000 000',
+  bizumPhone: '+34 876 44 12 75',
 };
