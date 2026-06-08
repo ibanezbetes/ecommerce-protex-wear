@@ -1,7 +1,5 @@
 import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
+import nodemailer from 'nodemailer';
 
 interface OrderItem {
   name: string;
@@ -310,18 +308,29 @@ function ownerEmailHTML(data: OrderEmailPayload): string {
 // ─── Route Handler ────────────────────────────────────────────────────────────
 
 export async function POST(request: Request) {
-  if (!process.env.RESEND_API_KEY) {
-    // If no Resend key, just log and return ok (don't break checkout)
-    console.warn('⚠️ RESEND_API_KEY no configurada. Emails no enviados.');
-    return NextResponse.json({ sent: false, reason: 'No RESEND_API_KEY' });
+  if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+    console.warn('⚠️ Credenciales SMTP no configuradas. Emails no enviados.');
+    return NextResponse.json({ sent: false, reason: 'Faltan variables SMTP' });
   }
 
   const data: OrderEmailPayload = await request.json();
 
   try {
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || '465'),
+      secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    const fromEmail = process.env.EMAIL_FROM || 'pedidos@protexwear.com';
+
     // Email to customer
-    await resend.emails.send({
-      from: 'Protex Wear <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"Protex Wear" <${fromEmail}>`,
       to: data.customerEmail,
       subject: `✅ Pedido ${data.orderNumber} confirmado — Protex Wear`,
       html: customerEmailHTML(data),
@@ -329,8 +338,8 @@ export async function POST(request: Request) {
 
     // Email to owner
     const ownerEmail = process.env.OWNER_EMAIL || 'pedidos@protexwear.com';
-    await resend.emails.send({
-      from: 'Sistema Protex <onboarding@resend.dev>',
+    await transporter.sendMail({
+      from: `"Sistema Protex" <${fromEmail}>`,
       to: ownerEmail,
       subject: `🛒 Nuevo pedido ${data.orderNumber} — ${data.total.toFixed(2)}€`,
       html: ownerEmailHTML(data),
@@ -338,7 +347,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ sent: true });
   } catch (error: any) {
-    console.error('Error enviando emails:', error);
+    console.error('Error enviando emails con Nodemailer (SES):', error);
     return NextResponse.json({ sent: false, error: error.message }, { status: 500 });
   }
 }
