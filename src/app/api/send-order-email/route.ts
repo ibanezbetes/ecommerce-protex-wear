@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
+import { generateInvoicePDF, InvoiceData } from '@/lib/invoice';
 
 interface OrderItem {
   name: string;
@@ -328,12 +329,35 @@ export async function POST(request: Request) {
 
     const fromEmail = process.env.EMAIL_FROM || 'pedidos@protexwear.com';
 
+    // Generar la factura en PDF
+    const invoiceData: InvoiceData = {
+      orderNumber: data.orderNumber,
+      customerName: data.customerName,
+      customerEmail: data.customerEmail,
+      items: data.items,
+      subtotal: data.subtotal,
+      tax: data.tax,
+      shippingCost: data.shippingCost,
+      total: data.total,
+      shippingAddress: data.shippingAddress,
+      discountAmount: data.discountAmount,
+      date: new Date(),
+    };
+    const invoicePdfBuffer = await generateInvoicePDF(invoiceData);
+
     // Email to customer
     await transporter.sendMail({
       from: `"Protex Wear" <${fromEmail}>`,
       to: data.customerEmail,
       subject: `✅ Pedido ${data.orderNumber} confirmado — Protex Wear`,
       html: customerEmailHTML(data),
+      attachments: [
+        {
+          filename: `Factura_ProtexWear_${data.orderNumber}.pdf`,
+          content: invoicePdfBuffer,
+          contentType: 'application/pdf',
+        }
+      ]
     });
 
     // Email to owner
