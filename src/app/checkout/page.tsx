@@ -326,8 +326,8 @@ export default function CheckoutPage() {
     }
 
     // B. Payment execution
-    if (paymentMethod === 'card' || paymentMethod === 'bizum') {
-      // ── Pago con Tarjeta o Bizum (Stripe Checkout Session) ─────────────────────
+    if (paymentMethod === 'card' || paymentMethod === 'bizum' || paymentMethod === 'bank_transfer') {
+      // ── Pago con Stripe Checkout Session ─────────────────────
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -651,8 +651,10 @@ export default function CheckoutPage() {
                   />
 
                   {paymentMethod === 'bank_transfer' && (
-                    <div style={{ marginTop: '1.5rem' }}>
-                      <BankTransferDetails orderNumber={orderNumber} total={total} />
+                    <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                      <p style={{ margin: 0, color: '#475569', fontSize: '0.9375rem', lineHeight: '1.5' }}>
+                        Al confirmar, serás redirigido a nuestra pasarela segura de Stripe donde se te proporcionarán las instrucciones (IBAN, concepto) para realizar la transferencia bancaria. Tu pedido se procesará automáticamente en cuanto recibamos el pago.
+                      </p>
                     </div>
                   )}
 

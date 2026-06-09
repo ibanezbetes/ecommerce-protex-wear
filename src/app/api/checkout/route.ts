@@ -104,15 +104,16 @@ export async function POST(request: Request) {
     }
 
     // Determinar los métodos de pago en función de la selección del usuario
-    // Stripe acepta 'card' y 'bizum' nativamente
-    const pmTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = 
-      paymentMethod === 'bizum' ? ['bizum'] : ['card'];
+    let pmTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] | undefined;
+    if (paymentMethod === 'bizum') pmTypes = ['bizum'];
+    else if (paymentMethod === 'card') pmTypes = ['card'];
+    else pmTypes = undefined; // Dejamos que Stripe use los métodos del dashboard para bank_transfer
 
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      payment_method_types: pmTypes,
+      ...(pmTypes ? { payment_method_types: pmTypes } : {}),
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
