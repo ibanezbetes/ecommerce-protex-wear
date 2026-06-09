@@ -105,20 +105,42 @@ export async function POST(request: Request) {
 
     // Determinar los métodos de pago en función de la selección del usuario
     let pmTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] | undefined;
-    if (paymentMethod === 'bizum') pmTypes = ['bizum'];
-    else if (paymentMethod === 'card') pmTypes = ['card'];
-    else pmTypes = undefined; // Dejamos que Stripe use los métodos del dashboard para bank_transfer
+    let pmOptions: Stripe.Checkout.SessionCreateParams.PaymentMethodOptions | undefined;
+    let customerId: string | undefined;
+
+    if (paymentMethod === 'bizum') {
+      pmTypes = ['bizum'];
+    } else if (paymentMethod === 'card') {
+      pmTypes = ['card'];
+    } else if (paymentMethod === 'bank_transfer') {
+      pmTypes = ['customer_balance'];
+      pmOptions = {
+        customer_balance: {
+          funding_type: 'bank_transfer',
+          bank_transfer: {
+            type: 'eu_bank_transfer',
+            eu_bank_transfer: { country: 'DE' }
+          }
+        }
+      };
+      const customer = await stripe.customers.create({ 
+        email: customerEmail || 'guest@example.com',
+        name: `Customer for Order ${orderNumber}`
+      });
+      customerId = customer.id;
+    }
 
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
       ...(pmTypes ? { payment_method_types: pmTypes } : {}),
+      ...(pmOptions ? { payment_method_options: pmOptions } : {}),
+      ...(customerId ? { customer: customerId } : { customer_email: customerEmail || undefined }),
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
-      customer_email: customerEmail || undefined,
       client_reference_id: orderNumber,
       metadata: {
         orderNumber: orderNumber || '',
