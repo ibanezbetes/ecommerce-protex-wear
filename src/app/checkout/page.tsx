@@ -20,6 +20,7 @@ export interface Address {
   firstName?: string;
   lastName?: string;
   company?: string;
+  email?: string;
 }
 
 export interface ShippingOption {
@@ -70,6 +71,7 @@ export default function CheckoutPage() {
     firstName: (user as any)?.firstName || user?.name?.split(' ')[0] || '',
     lastName: (user as any)?.lastName || user?.name?.split(' ').slice(1).join(' ') || '',
     company: (user as any)?.company || '',
+    email: user?.email || '',
     country: 'ES',
   });
 
@@ -221,12 +223,17 @@ export default function CheckoutPage() {
   };
 
   const validateAddress = () => {
-    const required = ['firstName', 'lastName', 'street', 'city', 'postalCode'];
+    const required = ['firstName', 'lastName', 'email', 'street', 'city', 'postalCode'];
     for (const field of required) {
       if (!shippingAddress[field as keyof Address]) {
-        toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios de la dirección.' });
+        toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios de la dirección y contacto.' });
         return false;
       }
+    }
+    // Validar formato de email básico
+    if (shippingAddress.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingAddress.email)) {
+      toast.error({ title: 'Error', message: 'El correo electrónico no es válido.' });
+      return false;
     }
     return true;
   };
@@ -250,7 +257,7 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           orderNumber: actualOrderId,
           customerName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim() || 'Cliente',
-          customerEmail: user?.email || '',
+          customerEmail: shippingAddress.email || user?.email || '',
           items: items.map(item => ({ name: item.name, quantity: item.quantity, price: item.price, image: item.image })),
           subtotal,
           tax,
@@ -341,7 +348,7 @@ export default function CheckoutPage() {
               image: item.image,
             })),
             shippingCost,
-            customerEmail: user?.email,
+            customerEmail: shippingAddress.email || user?.email,
             orderNumber: actualOrderId,
             discountCode: discountCode || undefined,
             paymentMethod: paymentMethod, // Pasar el método de pago a la API
@@ -479,6 +486,10 @@ export default function CheckoutPage() {
                         <label className={styles.label}>Apellidos *</label>
                         <input className={styles.input} type="text" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
                       </div>
+                    </div>
+                    <div className={styles.inputGroup}>
+                      <label className={styles.label}>Correo electrónico *</label>
+                      <input className={styles.input} type="email" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
                     </div>
                     <div className={styles.inputGroup}>
                       <label className={styles.label}>Empresa (opcional)</label>
