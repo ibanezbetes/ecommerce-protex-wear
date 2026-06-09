@@ -72,7 +72,7 @@ export async function POST(request: Request) {
       await request.json();
 
     // ── Line Items ────────────────────────────────────────────────────────
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map(
+    const lineItems: any[] = items.map(
       (item: any) => ({
         price_data: {
           currency: 'eur',
@@ -104,8 +104,8 @@ export async function POST(request: Request) {
     }
 
     // Determinar los métodos de pago en función de la selección del usuario
-    let pmTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] | undefined;
-    let pmOptions: Stripe.Checkout.SessionCreateParams.PaymentMethodOptions | undefined;
+    let pmTypes: any[] | undefined;
+    let pmOptions: any | undefined;
     let customerId: string | undefined;
 
     if (paymentMethod === 'bizum') {
@@ -133,7 +133,7 @@ export async function POST(request: Request) {
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
-    const sessionParams: Stripe.Checkout.SessionCreateParams = {
+    const sessionParams: any = {
       ...(pmTypes ? { payment_method_types: pmTypes } : {}),
       ...(pmOptions ? { payment_method_options: pmOptions } : {}),
       ...(customerId ? { customer: customerId } : { customer_email: customerEmail || undefined }),
@@ -147,6 +147,7 @@ export async function POST(request: Request) {
         ...(discountCode ? { discountCode } : {}),
       },
       billing_address_collection: 'auto',
+      tax_id_collection: { enabled: true },
       locale: 'es',
     };
 

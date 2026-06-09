@@ -160,7 +160,9 @@ export const useCart = create<CartState>()(
           discountType: null,
           discountValue: null,
           discountAmount: null,
-          ...totals,
+          cartTotal: totals.cartTotal,
+          subtotal: totals.subtotal,
+          itemCount: totals.itemCount,
         });
       },
 

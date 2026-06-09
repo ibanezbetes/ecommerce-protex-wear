@@ -28,7 +28,7 @@ export async function GET() {
 
     const pdfBuffer = await generateInvoicePDF(sampleData);
 
-    return new NextResponse(pdfBuffer, {
+    return new NextResponse(pdfBuffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',
