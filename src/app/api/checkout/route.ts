@@ -68,7 +68,7 @@ export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   try {
-    const { items, shippingCost, customerEmail, orderNumber, discountCode } =
+    const { items, shippingCost, customerEmail, orderNumber, discountCode, paymentMethod } =
       await request.json();
 
     // ── Line Items ────────────────────────────────────────────────────────
@@ -103,11 +103,16 @@ export async function POST(request: Request) {
       });
     }
 
+    // Determinar los métodos de pago en función de la selección del usuario
+    // Stripe acepta 'card' y 'bizum' nativamente
+    const pmTypes: Stripe.Checkout.SessionCreateParams.PaymentMethodType[] = 
+      paymentMethod === 'bizum' ? ['bizum'] : ['card'];
+
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
     const sessionParams: Stripe.Checkout.SessionCreateParams = {
-      payment_method_types: ['card'],
+      payment_method_types: pmTypes,
       line_items: lineItems,
       mode: 'payment',
       success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,

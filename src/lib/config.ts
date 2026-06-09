@@ -14,7 +14,7 @@ export const BUSINESS_CONFIG = {
   name: 'Protex Wear',
 
   /** Email de contacto para pedidos */
-  email: 'info@protexwear.es',
+  email: 'Daniel.guillen@protexwear.es',
 
   /** Teléfono principal de contacto */
   phone: '+34 876 44 12 75',
