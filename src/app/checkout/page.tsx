@@ -20,6 +20,7 @@ export interface Address {
   firstName?: string;
   lastName?: string;
   company?: string;
+  cif?: string;
   email?: string;
 }
 
@@ -36,7 +37,18 @@ export const SHIPPING_THRESHOLD = 100;
 /** Coste de envío fijo cuando no se alcanza el umbral */
 export const SHIPPING_COST_FIXED = 9;
 
-const generateOrderNumber = () => 'ORD-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+const generateOrderNumber = () => {
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const seconds = date.getSeconds().toString().padStart(2, '0');
+  const ms = date.getMilliseconds().toString().padStart(3, '0').slice(0, 2);
+  // F-YYMMDD-HHMMSSxx (siempre creciente y único)
+  return `F-${year}${month}${day}-${hours}${minutes}${seconds}${ms}`;
+};
 
 const STEPS = [
   { number: 1, title: 'Dirección', icon: MapPin },
@@ -58,7 +70,7 @@ const CREATE_ORDER_MUTATION = `
 export default function CheckoutPage() {
   const router = useRouter();
   const { user } = useAuth();
-  const { items, subtotal, clearCart, discountCode, discountAmount } = useCart();
+  const { items, subtotal, clearCart } = useCart();
   const toast = useToast();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -71,6 +83,7 @@ export default function CheckoutPage() {
     firstName: (user as any)?.firstName || user?.name?.split(' ')[0] || '',
     lastName: (user as any)?.lastName || user?.name?.split(' ').slice(1).join(' ') || '',
     company: (user as any)?.company || '',
+    cif: (user as any)?.cif || '',
     email: user?.email || '',
     country: 'ES',
   });
@@ -111,10 +124,11 @@ export default function CheckoutPage() {
 
   // ── Cálculo de envío: tarifa plana ──────────────────────────────────────────
   // 9 € si el subtotal (sin IVA, tras descuento) es < 100 €; gratis si ≥ 100 €
-  const discountedSubtotal = Math.max(0, subtotal - (discountAmount || 0));
-  const shippingCost = discountedSubtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST_FIXED;
+  const discountedSubtotal = Math.max(0, subtotal);
   const tax = discountedSubtotal * 0.21;
-  const total = discountedSubtotal + tax + shippingCost;
+  const subtotalWithTax = discountedSubtotal + tax;
+  const shippingCost = subtotalWithTax >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST_FIXED;
+  const total = subtotalWithTax + shippingCost;
 
   // Protect route
   useEffect(() => {
@@ -271,10 +285,9 @@ export default function CheckoutPage() {
             city: shippingAddress.city || '',
             postalCode: shippingAddress.postalCode || '',
             country: shippingAddress.country || 'ES',
+            cif: shippingAddress.cif || '',
           },
           shippingMethod: 'agencia_externa',
-          discountCode: discountCode || undefined,
-          discountAmount: discountAmount || 0,
         }),
       });
     } catch (e) {
@@ -349,8 +362,8 @@ export default function CheckoutPage() {
             })),
             shippingCost,
             customerEmail: shippingAddress.email || user?.email,
+            customerCif: shippingAddress.cif,
             orderNumber: actualOrderId,
-            discountCode: discountCode || undefined,
             paymentMethod: paymentMethod, // Pasar el método de pago a la API
           }),
         });
@@ -491,9 +504,15 @@ export default function CheckoutPage() {
                       <label className={styles.label}>Correo electrónico *</label>
                       <input className={styles.input} type="email" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
                     </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Empresa (opcional)</label>
-                      <input className={styles.input} type="text" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
+                    <div className={styles.formGrid2Cols}>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>Empresa (opcional)</label>
+                        <input className={styles.input} type="text" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
+                      </div>
+                      <div className={styles.inputGroup}>
+                        <label className={styles.label}>NIF/CIF/DNI (Factura B2B)</label>
+                        <input className={styles.input} type="text" value={shippingAddress.cif || ''} onChange={e => handleAddressChange('cif', e.target.value)} placeholder="B12345678" />
+                      </div>
                     </div>
                     <div className={`${styles.inputGroup} ${styles.inputGroupRelative}`}>
                       <label className={styles.label}>Dirección *</label>
@@ -779,13 +798,12 @@ export default function CheckoutPage() {
                       <Truck size={13} /> Envío gratis desde {SHIPPING_THRESHOLD}€
                     </span>
                     <span style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 500 }}>
-                      Faltan {Math.max(SHIPPING_THRESHOLD - discountedSubtotal, 0).toFixed(2)}€
+                      Faltan {Math.max(SHIPPING_THRESHOLD - subtotalWithTax, 0).toFixed(2)}€
                     </span>
                   </div>
-                  <div style={{ height: '4px', background: '#fde68a', borderRadius: '2px', overflow: 'hidden' }}>
+                  <div style={{ width: '100%', background: '#fde68a', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
                     <div style={{
-                      height: '100%',
-                      width: `${Math.min((discountedSubtotal / SHIPPING_THRESHOLD) * 100, 100)}%`,
+                      width: `${Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100)}%`,
                       background: 'linear-gradient(90deg, #f59e0b, #d97706)',
                       borderRadius: '2px',
                       transition: 'width 0.4s ease',
@@ -813,15 +831,6 @@ export default function CheckoutPage() {
                 <span>Subtotal (sin IVA)</span>
                 <span>{subtotal.toFixed(2)}€</span>
               </div>
-
-              {discountCode && (
-                <div className={styles.sidebarTotalRow} style={{ color: '#10b981', fontWeight: 500 }}>
-                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    Descuento ({discountCode})
-                  </span>
-                  <span>-{discountAmount?.toFixed(2)}€</span>
-                </div>
-              )}
 
               <div className={styles.sidebarTotalRow}>
                 <span>IVA (21%)</span>

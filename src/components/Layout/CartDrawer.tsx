@@ -8,40 +8,8 @@ import { useToast } from '@/components/Feedback/ToastProvider';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
-const RECOMMENDATIONS = [
-  {
-    id: 'rec-1',
-    productId: 'prod-nitrile-gloves',
-    variantId: 'var-nitrile-gloves-l',
-    name: 'Guantes Nitrilo Ultra-Resistentes (L)',
-    price: 9.99,
-    image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=150&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'rec-2',
-    productId: 'prod-safety-glasses',
-    variantId: 'var-safety-glasses-clear',
-    name: 'Gafas de Seguridad Anti-empañamiento',
-    price: 14.50,
-    image: 'https://images.unsplash.com/photo-1599819811279-d5ad9cccf838?w=150&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'rec-3',
-    productId: 'prod-thermal-socks',
-    variantId: 'var-thermal-socks-one',
-    name: 'Calcetines Térmicos de Trabajo (Pack 3)',
-    price: 12.99,
-    image: 'https://images.unsplash.com/photo-1582966772680-860e372bb558?w=150&auto=format&fit=crop&q=60',
-  },
-  {
-    id: 'rec-4',
-    productId: 'prod-ear-defenders',
-    variantId: 'var-ear-defenders-high',
-    name: 'Orejeras de Protección Acústica Pro',
-    price: 19.99,
-    image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=150&auto=format&fit=crop&q=60',
-  }
-];
+import { useMemo } from 'react';
+import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
 
 export function CartDrawer() {
   const { 
@@ -59,6 +27,40 @@ export function CartDrawer() {
   const toast = useToast();
 
 
+
+  const recommendations = useMemo(() => {
+    if (items.length === 0) return [];
+    
+    // Obtener los IDs de los productos que ya están en el carrito
+    const cartItemIds = new Set(items.map(i => i.productId));
+    // Buscar productos disponibles que NO estén ya en el carrito y tengan variantes
+    const availableProducts = MOCK_PRODUCTS.filter(p => !cartItemIds.has(p.id) && p.variants && p.variants.length > 0);
+    
+    // Estrategia de recomendación: buscar artículos que compartan la primera palabra del primer producto del carrito
+    const firstCartItem = items[0];
+    const firstWord = firstCartItem.name.split(' ')[0].toLowerCase(); // Ej: "Polo", "Pantalón", "Gafas"
+    
+    // Encontrar relacionados
+    let related = availableProducts.filter(p => p.name.toLowerCase().includes(firstWord));
+    
+    // Si no hay suficientes relacionados (menos de 4), rellenamos con otros productos del catálogo
+    if (related.length < 4) {
+       const others = availableProducts.filter(p => !related.some(r => r.id === p.id));
+       related = [...related, ...others].slice(0, 4);
+    } else {
+       related = related.slice(0, 4);
+    }
+    
+    // Mapeamos al formato que necesita el carrusel
+    return related.map(p => ({
+      id: `rec-${p.id}`,
+      productId: p.id,
+      variantId: p.variants[0].id,
+      name: p.name,
+      price: p.variants[0].basePrice || 0,
+      image: p.variants[0].images?.[0] || 'https://via.placeholder.com/150?text=Protex',
+    }));
+  }, [items]);
 
   const carouselRef = useRef<HTMLDivElement>(null);
 
@@ -90,14 +92,15 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  // Tarifa plana: 9€ si subtotal < 100€, gratis si ≥ 100€
+  // Tarifa plana: 9€ si (subtotal + IVA) < 100€, gratis si ≥ 100€
   const SHIPPING_THRESHOLD = 100;
   const SHIPPING_COST = 9;
-  const shipping = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
   const tax = subtotal * 0.21;
-  const total = subtotal + tax + shipping;
-  const freeShippingProgress = Math.min((subtotal / SHIPPING_THRESHOLD) * 100, 100);
-  const remaining = Math.max(SHIPPING_THRESHOLD - subtotal, 0);
+  const subtotalWithTax = subtotal + tax;
+  const shipping = subtotalWithTax >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const total = subtotalWithTax + shipping;
+  const freeShippingProgress = Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100);
+  const remaining = Math.max(SHIPPING_THRESHOLD - subtotalWithTax, 0);
 
   const goToProducts = () => {
     closeCart();
@@ -269,20 +272,21 @@ export function CartDrawer() {
               </div>
 
               {/* Cross-selling Carousel Section */}
-              <div className={styles.crossSellSection}>
-                <div className={styles.crossSellHeader}>
-                  <h4 className={styles.crossSellTitle}>Completa tu look con estos accesorios</h4>
-                  <div className={styles.carouselControls}>
-                    <button onClick={scrollLeft} className={styles.controlButton} aria-label="Desplazar a la izquierda">
-                      <ChevronLeft size={16} />
-                    </button>
-                    <button onClick={scrollRight} className={styles.controlButton} aria-label="Desplazar a la derecha">
-                      <ChevronRight size={16} />
-                    </button>
+              {recommendations.length > 0 && (
+                <div className={styles.crossSellSection}>
+                  <div className={styles.crossSellHeader}>
+                    <h4 className={styles.crossSellTitle}>Completa tu look con recomendaciones para ti</h4>
+                    <div className={styles.carouselControls}>
+                      <button onClick={scrollLeft} className={styles.controlButton} aria-label="Desplazar a la izquierda">
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button onClick={scrollRight} className={styles.controlButton} aria-label="Desplazar a la derecha">
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
                   </div>
-                </div>
-                <div ref={carouselRef} className={styles.crossSellCarousel}>
-                  {RECOMMENDATIONS.map((rec) => (
+                  <div ref={carouselRef} className={styles.crossSellCarousel}>
+                    {recommendations.map((rec) => (
                     <div key={rec.id} className={styles.crossSellCard}>
                       <img src={rec.image} alt={rec.name} className={styles.crossSellImage} />
                       <div className={styles.crossSellInfo}>
@@ -312,7 +316,8 @@ export function CartDrawer() {
                   ))}
                 </div>
               </div>
-            </>
+            )}
+          </>
           )}
         </div>
 

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/Feedback/ToastProvider";
 import { AppShell } from "@/components/Layout/AppShell";
+import { CookieBanner } from "@/components/UI/CookieBanner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <AppShell>
             {children}
           </AppShell>
+          <CookieBanner />
         </ToastProvider>
       </body>
     </html>

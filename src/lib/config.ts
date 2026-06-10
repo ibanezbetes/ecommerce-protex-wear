@@ -13,6 +13,12 @@ export const BUSINESS_CONFIG = {
   /** Nombre legal de la empresa */
   name: 'Protex Wear',
 
+  // --- Datos fiscales para la factura ---
+  /** CIF de la empresa */
+  cif: 'B72983661',
+  /** Dirección legal de la empresa */
+  address: 'CALLE L (POLÍGONO INDUSTRIAL MALPICA II), NAV 1, 50016 Zaragoza, España',
+
   /** Email de contacto para pedidos */
   email: 'Daniel.guillen@protexwear.es',
 

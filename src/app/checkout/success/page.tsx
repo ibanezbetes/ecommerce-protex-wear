@@ -4,15 +4,19 @@ import React, { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, ShoppingBag, Mail, Package, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { useCart } from '@/store/useCart';
 
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order') || 'ORD-DEMO';
   const [mounted, setMounted] = useState(false);
+  const { clearCart } = useCart();
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    // Vaciar el carrito porque el pedido ya se ha completado
+    clearCart();
+  }, [clearCart]);
 
   return (
     <div style={{

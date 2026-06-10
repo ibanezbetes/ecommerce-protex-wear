@@ -1,15 +1,14 @@
-import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { generateInvoicePDF, InvoiceData } from '@/lib/invoice';
 
-interface OrderItem {
+export interface OrderItem {
   name: string;
   quantity: number;
   price: number;
   image?: string;
 }
 
-interface OrderEmailPayload {
+export interface OrderEmailPayload {
   orderNumber: string;
   customerName: string;
   customerEmail: string;
@@ -32,8 +31,6 @@ interface OrderEmailPayload {
   discountCode?: string | null;
   discountAmount?: number | null;
 }
-
-// ─── Email Templates ──────────────────────────────────────────────────────────
 
 function customerEmailHTML(data: OrderEmailPayload): string {
   const itemsRows = data.items.map(item => `
@@ -307,21 +304,17 @@ function ownerEmailHTML(data: OrderEmailPayload): string {
   `;
 }
 
-// ─── Route Handler ────────────────────────────────────────────────────────────
-
-export async function POST(request: Request) {
+export async function sendOrderEmails(data: OrderEmailPayload) {
   if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
     console.warn('⚠️ Credenciales SMTP no configuradas. Emails no enviados.');
-    return NextResponse.json({ sent: false, reason: 'Faltan variables SMTP' });
+    return { sent: false, reason: 'Faltan variables SMTP' };
   }
-
-  const data: OrderEmailPayload = await request.json();
 
   try {
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: parseInt(process.env.SMTP_PORT || '465'),
-      secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+      secure: process.env.SMTP_PORT === '465',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -335,6 +328,7 @@ export async function POST(request: Request) {
       orderNumber: data.orderNumber,
       customerName: data.customerName,
       customerEmail: data.customerEmail,
+      customerCif: data.customerCif,
       items: data.items,
       subtotal: data.subtotal,
       tax: data.tax,
@@ -342,7 +336,6 @@ export async function POST(request: Request) {
       total: data.total,
       shippingAddress: data.shippingAddress,
       discountAmount: data.discountAmount,
-      customerCif: data.customerCif,
       date: new Date(),
     };
     const invoicePdfBuffer = await generateInvoicePDF(invoiceData);
@@ -371,9 +364,9 @@ export async function POST(request: Request) {
       html: ownerEmailHTML(data),
     });
 
-    return NextResponse.json({ sent: true });
+    return { sent: true };
   } catch (error: any) {
     console.error('Error enviando emails con Nodemailer (SES):', error);
-    return NextResponse.json({ sent: false, error: error.message }, { status: 500 });
+    return { sent: false, error: error.message };
   }
 }
