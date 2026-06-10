@@ -1,14 +1,21 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 /* ============================================================================
- * useCart — Store Global del Carrito de Compras (Zustand)
+ * useCart — Store Global del Carrito de Compras (Zustand con Persistencia)
  * ============================================================================
  *
  * Gestiona los artículos del carrito, el estado del drawer (abierto/cerrado),
- * y proporciona totales calculados.
+ * y proporciona totales calculados correctamente en cada mutación del estado.
  *
  * Cada artículo se identifica por `variantId` (no por `productId`),
  * porque un mismo producto puede tener varias tallas/colores.
+ *
+ * Descuentos:
+ *   Los códigos se validan SERVER-SIDE via /api/validate-discount.
+ *   El store almacena el tipo y valor devuelto por el servidor para poder
+ *   recalcular el importe en tiempo real cuando cambian los ítems.
+ *   La validación definitiva ocurre de nuevo al crear la sesión de Stripe.
  *
  * Integración:
  *   - CartDrawer.tsx    → UI del carrito lateral
@@ -38,6 +45,15 @@ interface CartState {
   items: CartItem[];
   /** Controla si el drawer del carrito está visible */
   isCartOpen: boolean;
+  /** Total del carrito (suma de precio × cantidad de cada artículo) */
+  cartTotal: number;
+  /** Subtotal antes de impuestos (actualmente igual a cartTotal) */
+  subtotal: number;
+  /** Número total de unidades en el carrito */
+  itemCount: number;
+
+  // ── Descuento (eliminado temporalmente) ──────────────────────────────────
+
   /** Añade un artículo. Si ya existe (mismo variantId), suma la cantidad. */
   addItem: (item: CartItem) => void;
   /** Elimina un artículo del carrito por su variantId */
@@ -50,71 +66,87 @@ interface CartState {
   openCart: () => void;
   /** Cierra el drawer del carrito */
   closeCart: () => void;
-  /** Total del carrito (suma de precio × cantidad de cada artículo) */
-  get cartTotal(): number;
-  /** Subtotal antes de impuestos (actualmente igual a cartTotal) */
-  get subtotal(): number;
-  /** Número total de unidades en el carrito */
-  get itemCount(): number;
 }
 
-/**
- * Hook de Zustand para gestionar el carrito de compras.
- *
- * @example
- * ```tsx
- * const { items, addItem, openCart, cartTotal } = useCart();
- *
- * // Añadir un producto:
- * addItem({ productId: '01001', variantId: '01001-M-RED', name: 'Camiseta M Roja', price: 9.99, quantity: 1 });
- * ```
- */
-export const useCart = create<CartState>((set, get) => ({
-  items: [],
-  isCartOpen: false,
+const computeTotals = (
+  items: CartItem[]
+) => {
+  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const itemCount = items.reduce((count, item) => count + item.quantity, 0);
 
-  addItem: (newItem) => set((state) => {
-    const existing = state.items.find(i => i.variantId === newItem.variantId);
-    if (existing) {
-      // Si la variante ya está en el carrito, incrementar la cantidad
-      return {
-        items: state.items.map(i =>
-          i.variantId === newItem.variantId
-            ? { ...i, quantity: i.quantity + newItem.quantity }
-            : i
-        ),
-        isCartOpen: true,
-      };
+  return {
+    cartTotal,
+    subtotal: cartTotal,
+    itemCount,
+  };
+};
+
+export const useCart = create<CartState>()(
+  persist(
+    (set, get) => ({
+      items: [],
+      isCartOpen: false,
+      cartTotal: 0,
+      subtotal: 0,
+      itemCount: 0,
+
+      // ── Mutaciones del carrito ──────────────────────────────────────────
+      addItem: (newItem) => set((state) => {
+        let newItems;
+        const existing = state.items.find(i => i.variantId === newItem.variantId);
+        if (existing) {
+          newItems = state.items.map(i =>
+            i.variantId === newItem.variantId
+              ? { ...i, quantity: i.quantity + newItem.quantity }
+              : i
+          );
+        } else {
+          newItems = [...state.items, newItem];
+        }
+        return { items: newItems, isCartOpen: true, ...computeTotals(newItems) };
+      }),
+
+      removeItem: (variantId) => set((state) => {
+        const newItems = state.items.filter(i => i.variantId !== variantId);
+        return { items: newItems, ...computeTotals(newItems) };
+      }),
+
+      updateQuantity: (variantId, quantity) => set((state) => {
+        const newItems = state.items.map(i =>
+          i.variantId === variantId ? { ...i, quantity } : i
+        );
+        return { items: newItems, ...computeTotals(newItems) };
+      }),
+
+      clearCart: () => set({
+        items: [],
+        isCartOpen: false,
+        cartTotal: 0,
+        subtotal: 0,
+        itemCount: 0,
+      }),
+
+      openCart: () => set({ isCartOpen: true }),
+      closeCart: () => set({ isCartOpen: false }),
+    }),
+    {
+      name: 'protex-cart-storage',
+      // Persist cart items, discount metadata, and totals
+      partialize: (state) => ({
+        items: state.items,
+        cartTotal: state.cartTotal,
+        subtotal: state.subtotal,
+        itemCount: state.itemCount,
+      }),
+      // Recalculate on rehydration to prevent stale totals
+      onRehydrateStorage: () => (state, error) => {
+        if (state && !error) {
+          const totals = computeTotals(state.items);
+          state.cartTotal = totals.cartTotal;
+          state.subtotal = totals.subtotal;
+          state.itemCount = totals.itemCount;
+        }
+      },
     }
-    // Si es una variante nueva, añadirla al final
-    return { items: [...state.items, newItem], isCartOpen: true };
-  }),
-
-  removeItem: (variantId) => set((state) => ({
-    items: state.items.filter(i => i.variantId !== variantId),
-  })),
-
-  updateQuantity: (variantId, quantity) => set((state) => ({
-    items: state.items.map(i =>
-      i.variantId === variantId ? { ...i, quantity } : i
-    ),
-  })),
-
-  clearCart: () => set({ items: [], isCartOpen: false }),
-
-  openCart: () => set({ isCartOpen: true }),
-  closeCart: () => set({ isCartOpen: false }),
-
-  get cartTotal() {
-    return get().items.reduce((total, item) => total + item.price * item.quantity, 0);
-  },
-
-  get subtotal() {
-    // Actualmente igual a cartTotal. Aquí se aplicarían descuentos en el futuro.
-    return get().cartTotal;
-  },
-
-  get itemCount() {
-    return get().items.reduce((count, item) => count + item.quantity, 0);
-  },
-}));
+  )
+);

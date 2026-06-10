@@ -1,16 +1,80 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/useCart';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useToast } from '@/components/Feedback/ToastProvider';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
+import { useMemo } from 'react';
+import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
+
 export function CartDrawer() {
-  const { isCartOpen, closeCart, items, subtotal, removeItem, updateQuantity, itemCount } = useCart();
+  const { 
+    isCartOpen, 
+    closeCart, 
+    items, 
+    subtotal, 
+    removeItem, 
+    updateQuantity, 
+    itemCount,
+    addItem,
+    clearCart
+  } = useCart();
   const router = useRouter();
   const toast = useToast();
+
+
+
+  const recommendations = useMemo(() => {
+    if (items.length === 0) return [];
+    
+    // Obtener los IDs de los productos que ya están en el carrito
+    const cartItemIds = new Set(items.map(i => i.productId));
+    // Buscar productos disponibles que NO estén ya en el carrito y tengan variantes
+    const availableProducts = MOCK_PRODUCTS.filter(p => !cartItemIds.has(p.id) && p.variants && p.variants.length > 0);
+    
+    // Estrategia de recomendación: buscar artículos que compartan la primera palabra del primer producto del carrito
+    const firstCartItem = items[0];
+    const firstWord = firstCartItem.name.split(' ')[0].toLowerCase(); // Ej: "Polo", "Pantalón", "Gafas"
+    
+    // Encontrar relacionados
+    let related = availableProducts.filter(p => p.name.toLowerCase().includes(firstWord));
+    
+    // Si no hay suficientes relacionados (menos de 4), rellenamos con otros productos del catálogo
+    if (related.length < 4) {
+       const others = availableProducts.filter(p => !related.some(r => r.id === p.id));
+       related = [...related, ...others].slice(0, 4);
+    } else {
+       related = related.slice(0, 4);
+    }
+    
+    // Mapeamos al formato que necesita el carrusel
+    return related.map(p => ({
+      id: `rec-${p.id}`,
+      productId: p.id,
+      variantId: p.variants[0].id,
+      name: p.name,
+      price: p.variants[0].basePrice || 0,
+      image: p.variants[0].images?.[0] || 'https://via.placeholder.com/150?text=Protex',
+    }));
+  }, [items]);
+
+  const carouselRef = useRef<HTMLDivElement>(null);
+
+  const scrollLeft = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -180, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 180, behavior: 'smooth' });
+    }
+  };
 
   useEffect(() => {
     const handleEsc = (e: KeyboardEvent) => {
@@ -28,11 +92,15 @@ export function CartDrawer() {
 
   if (!isCartOpen) return null;
 
-  const shipping = subtotal > 100 ? 0 : 9.99;
+  // Tarifa plana: 9€ si (subtotal + IVA) < 100€, gratis si ≥ 100€
+  const SHIPPING_THRESHOLD = 100;
+  const SHIPPING_COST = 9;
   const tax = subtotal * 0.21;
-  const total = subtotal + tax + shipping;
-  const freeShippingProgress = Math.min((subtotal / 100) * 100, 100);
-  const remaining = Math.max(100 - subtotal, 0);
+  const subtotalWithTax = subtotal + tax;
+  const shipping = subtotalWithTax >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+  const total = subtotalWithTax + shipping;
+  const freeShippingProgress = Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100);
+  const remaining = Math.max(SHIPPING_THRESHOLD - subtotalWithTax, 0);
 
   const goToProducts = () => {
     closeCart();
@@ -51,6 +119,8 @@ export function CartDrawer() {
       message: 'El producto se ha eliminado del carrito.',
     });
   };
+
+
 
   return (
     <div className={styles.shell}>
@@ -115,100 +185,150 @@ export function CartDrawer() {
               </button>
             </div>
           ) : (
-            <div className={styles.items}>
-              <AnimatePresence initial={false}>
-                {items.map((item, index) => (
-                  <motion.div
-                    key={item.variantId}
-                    layout
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
-                    transition={{ duration: 0.24, delay: index * 0.03 }}
-                    className={styles.item}
-                  >
-                    <div className={styles.imageWrap}>
-                      {item.image ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                          }}
-                        />
-                      ) : (
-                        <div className={styles.imageFallback}>
-                          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                            <path d="M20 7h-4V5a4 4 0 0 0-8 0v2H4l1 14h14l1-14Z" />
-                            <path d="M9 7V5a3 3 0 0 1 6 0v2" />
-                          </svg>
-                        </div>
-                      )}
-                      <div className={styles.quantityBadge}>{item.quantity}</div>
-                    </div>
-
-                    <div className={styles.itemBody}>
-                      <div className={styles.itemTop}>
-                        <div>
-                          <h4 className={styles.itemName}>{item.name}</h4>
-                          <p className={styles.itemRef}>Ref: {item.variantId}</p>
-                        </div>
-                        <button
-                          className={styles.removeButton}
-                          onClick={() => handleRemoveItem(item.variantId)}
-                          title="Eliminar"
-                          aria-label={`Eliminar ${item.name}`}
-                        >
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <path d="M3 6h18" />
-                            <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
-                            <path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-                          </svg>
-                        </button>
+            <>
+              <div className={styles.items}>
+                <AnimatePresence initial={false}>
+                  {items.map((item, index) => (
+                    <motion.div
+                      key={item.variantId}
+                      layout
+                      initial={{ opacity: 0, y: 16 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.96, transition: { duration: 0.18 } }}
+                      transition={{ duration: 0.24, delay: index * 0.03 }}
+                      className={styles.item}
+                    >
+                      <div className={styles.imageWrap}>
+                        {item.image ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        ) : (
+                          <div className={styles.imageFallback}>
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                              <path d="M20 7h-4V5a4 4 0 0 0-8 0v2H4l1 14h14l1-14Z" />
+                              <path d="M9 7V5a3 3 0 0 1 6 0v2" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
 
-                      <div className={styles.itemBottom}>
-                        <div className={styles.stepper} aria-label={`Cantidad de ${item.name}`}>
+                      <div className={styles.itemBody}>
+                        <div className={styles.itemTop}>
+                          <div>
+                            <h4 className={styles.itemName}>{item.name}</h4>
+                            <p className={styles.itemRef}>Ref: {item.variantId}</p>
+                          </div>
                           <button
-                            className={styles.stepButton}
-                            onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
-                            disabled={item.quantity <= 1}
-                            aria-label="Reducir cantidad"
+                            className={styles.removeButton}
+                            onClick={() => handleRemoveItem(item.variantId)}
+                            title="Eliminar"
+                            aria-label={`Eliminar ${item.name}`}
                           >
-                            -
-                          </button>
-                          <span className={styles.stepValue}>{item.quantity}</span>
-                          <button
-                            className={styles.stepButton}
-                            onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
-                            aria-label="Aumentar cantidad"
-                          >
-                            +
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path d="M3 6h18" />
+                              <path d="M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2" />
+                              <path d="m19 6-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+                            </svg>
                           </button>
                         </div>
 
-                        <div className={styles.priceBlock}>
-                          <p className={styles.linePrice}>{(item.price * item.quantity).toFixed(2)}&euro;</p>
-                          {item.quantity > 1 && (
-                            <p className={styles.unitPrice}>{item.price.toFixed(2)}&euro; / ud.</p>
-                          )}
+                        <div className={styles.itemBottom}>
+                          <div className={styles.stepper} aria-label={`Cantidad de ${item.name}`}>
+                            <button
+                              className={styles.stepButton}
+                              onClick={() => updateQuantity(item.variantId, item.quantity - 1)}
+                              disabled={item.quantity <= 1}
+                              aria-label="Reducir cantidad"
+                            >
+                              -
+                            </button>
+                            <span className={styles.stepValue}>{item.quantity}</span>
+                            <button
+                              className={styles.stepButton}
+                              onClick={() => updateQuantity(item.variantId, item.quantity + 1)}
+                              aria-label="Aumentar cantidad"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <div className={styles.priceBlock}>
+                            <p className={styles.linePrice}>{(item.price * item.quantity).toFixed(2)}&euro;</p>
+                            {item.quantity > 1 && (
+                              <p className={styles.unitPrice}>{item.price.toFixed(2)}&euro; / ud.</p>
+                            )}
+                          </div>
                         </div>
                       </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+              </div>
+
+              {/* Cross-selling Carousel Section */}
+              {recommendations.length > 0 && (
+                <div className={styles.crossSellSection}>
+                  <div className={styles.crossSellHeader}>
+                    <h4 className={styles.crossSellTitle}>Completa tu look con recomendaciones para ti</h4>
+                    <div className={styles.carouselControls}>
+                      <button onClick={scrollLeft} className={styles.controlButton} aria-label="Desplazar a la izquierda">
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button onClick={scrollRight} className={styles.controlButton} aria-label="Desplazar a la derecha">
+                        <ChevronRight size={16} />
+                      </button>
                     </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
-            </div>
+                  </div>
+                  <div ref={carouselRef} className={styles.crossSellCarousel}>
+                    {recommendations.map((rec) => (
+                    <div key={rec.id} className={styles.crossSellCard}>
+                      <img src={rec.image} alt={rec.name} className={styles.crossSellImage} />
+                      <div className={styles.crossSellInfo}>
+                        <h5 className={styles.crossSellName}>{rec.name}</h5>
+                        <p className={styles.crossSellPrice}>{rec.price.toFixed(2)}€</p>
+                      </div>
+                      <button
+                        className={styles.crossSellAddBtn}
+                        onClick={() => {
+                          addItem({
+                            productId: rec.productId,
+                            variantId: rec.variantId,
+                            name: rec.name,
+                            price: rec.price,
+                            quantity: 1,
+                            image: rec.image
+                          });
+                          toast.success({
+                            title: 'Accesorio Añadido',
+                            message: `${rec.name} se ha agregado a tu carrito.`,
+                          });
+                        }}
+                      >
+                        + Añadir
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
           )}
         </div>
 
         {items.length > 0 && (
           <div className={styles.footer}>
-            {subtotal < 100 ? (
+
+
+            {subtotal < SHIPPING_THRESHOLD ? (
               <div className={styles.shippingBox}>
                 <div className={styles.shippingLabel}>
-                  <span>Env&iacute;o gratis desde 100&euro;</span>
+                  <span>Env&iacute;o gratis desde {SHIPPING_THRESHOLD}&euro;</span>
                   <span>Faltan {remaining.toFixed(2)}&euro;</span>
                 </div>
                 <div className={styles.progressTrack}>
@@ -216,12 +336,12 @@ export function CartDrawer() {
                 </div>
               </div>
             ) : (
-              <div className={styles.freeShippingBox}>Tienes env&iacute;o gratis</div>
+              <div className={styles.freeShippingBox}>🎉 Tienes env&iacute;o gratis</div>
             )}
 
             <div className={styles.summary}>
               <div className={styles.summaryRow}>
-                <span>Subtotal</span>
+                <span>Subtotal (sin IVA)</span>
                 <span className={styles.summaryValue}>{subtotal.toFixed(2)}&euro;</span>
               </div>
               <div className={styles.summaryRow}>
@@ -247,6 +367,9 @@ export function CartDrawer() {
           </div>
         )}
       </motion.div>
+
+
     </div>
   );
 }
+

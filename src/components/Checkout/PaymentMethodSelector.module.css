@@ -7,24 +7,32 @@
 .option {
   position: relative;
   overflow: hidden;
-  border: 2px solid var(--gray-200);
+  border: 1.5px solid var(--gray-200);
   border-radius: var(--radius-lg);
   background: white;
   padding: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .option:hover {
-  border-color: rgba(46, 85, 158, 0.35);
-  background: #f7f9fc;
+  border-color: #cbd5e1;
+  background: white;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.04);
 }
 
 .selected {
   border-color: var(--primary-color);
-  background: #eef3fb;
-  box-shadow: var(--shadow-md);
+  background: #f5f8ff;
+  box-shadow: 0 4px 12px rgba(46, 85, 158, 0.08);
   transform: translateY(-1px);
+}
+
+.selected:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 16px rgba(46, 85, 158, 0.12);
+  transform: translateY(-2px);
 }
 
 .checkCorner {
@@ -62,18 +70,59 @@
 }
 
 .icon {
-  width: 3rem;
-  height: 3rem;
+  width: 4.8rem;
+  height: 2.8rem;
   display: flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border-radius: var(--radius-md);
-  background: rgba(46, 85, 158, 0.1);
+  border-radius: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--gray-200);
+  padding: 0.25rem 0.4rem;
+  transition: all 0.2s ease;
+  overflow: hidden;
+}
+
+.selected .icon {
+  background: white;
+  border-color: rgba(46, 85, 158, 0.25);
+  box-shadow: 0 2px 6px rgba(46, 85, 158, 0.04);
+}
+
+.cardLogos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  width: 100%;
+  height: 100%;
+}
+
+.visaIcon {
+  width: 2rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.mastercardIcon {
+  width: 1.5rem;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.bankIcon {
+  width: 1.6rem;
+  height: 1.6rem;
   color: var(--primary-color);
-  font-size: 0.8rem;
-  font-weight: 900;
-  letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+
+.bizumIcon {
+  width: 3.4rem;
+  height: auto;
+  max-height: 100%;
+  flex-shrink: 0;
 }
 
 .content {
@@ -126,19 +175,20 @@
   border: 2px solid var(--gray-300);
   border-radius: 999px;
   background: white;
+  transition: all 0.2s ease;
 }
 
 .selected .radio {
   border-color: var(--primary-color);
-  background: var(--primary-color);
+  background: white;
   box-shadow: 0 0 0 4px rgba(46, 85, 158, 0.12);
 }
 
 .dot {
-  width: 0.45rem;
-  height: 0.45rem;
+  width: 0.55rem;
+  height: 0.55rem;
   border-radius: 999px;
-  background: white;
+  background: var(--primary-color);
 }
 
 @media (max-width: 520px) {
