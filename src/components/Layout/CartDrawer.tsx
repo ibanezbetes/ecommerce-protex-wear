@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/useCart';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,8 +8,7 @@ import { useToast } from '@/components/Feedback/ToastProvider';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import styles from './CartDrawer.module.css';
 
-import { useMemo } from 'react';
-import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
+import { useMemo, useState } from 'react';
 
 export function CartDrawer() {
   const { 
@@ -20,21 +19,30 @@ export function CartDrawer() {
     removeItem, 
     updateQuantity, 
     itemCount,
-    addItem,
-    clearCart
+    addItem
   } = useCart();
   const router = useRouter();
   const toast = useToast();
 
 
 
+  const [mockProducts, setMockProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (items.length > 0 && mockProducts.length === 0) {
+      import('@/utils/mockCatalog').then(({ MOCK_PRODUCTS }) => {
+        setMockProducts(MOCK_PRODUCTS);
+      });
+    }
+  }, [items.length, mockProducts.length]);
+
   const recommendations = useMemo(() => {
-    if (items.length === 0) return [];
+    if (items.length === 0 || mockProducts.length === 0) return [];
     
     // Obtener los IDs de los productos que ya están en el carrito
     const cartItemIds = new Set(items.map(i => i.productId));
     // Buscar productos disponibles que NO estén ya en el carrito y tengan variantes
-    const availableProducts = MOCK_PRODUCTS.filter(p => !cartItemIds.has(p.id) && p.variants && p.variants.length > 0);
+    const availableProducts = mockProducts.filter(p => !cartItemIds.has(p.id) && p.variants && p.variants.length > 0);
     
     // Estrategia de recomendación: buscar artículos que compartan la primera palabra del primer producto del carrito
     const firstCartItem = items[0];
@@ -288,6 +296,7 @@ export function CartDrawer() {
                   <div ref={carouselRef} className={styles.crossSellCarousel}>
                     {recommendations.map((rec) => (
                     <div key={rec.id} className={styles.crossSellCard}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={rec.image} alt={rec.name} className={styles.crossSellImage} />
                       <div className={styles.crossSellInfo}>
                         <h5 className={styles.crossSellName}>{rec.name}</h5>
@@ -325,7 +334,7 @@ export function CartDrawer() {
           <div className={styles.footer}>
 
 
-            {subtotal < SHIPPING_THRESHOLD ? (
+            {subtotalWithTax < SHIPPING_THRESHOLD ? (
               <div className={styles.shippingBox}>
                 <div className={styles.shippingLabel}>
                   <span>Env&iacute;o gratis desde {SHIPPING_THRESHOLD}&euro;</span>

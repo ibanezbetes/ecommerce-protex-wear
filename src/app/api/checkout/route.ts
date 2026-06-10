@@ -31,7 +31,7 @@ export async function POST(request: Request) {
             name: item.name,
             ...(item.image ? { images: [item.image] } : {}),
             metadata: {
-              productId: item.id,
+              productId: item.productId || item.id || 'prod_fallback',
             },
           },
           unit_amount: Math.round(item.price * 100),
@@ -70,7 +70,7 @@ export async function POST(request: Request) {
           funding_type: 'bank_transfer',
           bank_transfer: {
             type: 'eu_bank_transfer',
-            eu_bank_transfer: { country: 'DE' }
+            eu_bank_transfer: { country: 'ES' }
           }
         }
       };

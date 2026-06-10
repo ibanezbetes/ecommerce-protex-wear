@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { FileText, Shield, CreditCard, Truck, RefreshCw, AlertCircle } from 'lucide-react';
+import { BUSINESS_CONFIG } from '@/lib/config';
 
 export default function TerminosCondicionesPage() {
   const [activeSection, setActiveSection] = useState('1-introduccion');
@@ -85,7 +86,7 @@ export default function TerminosCondicionesPage() {
                 </h2>
               </div>
               <p>
-                Las presentes Condiciones Generales de Venta (en adelante, &quot;Términos y Condiciones&quot;) regulan de manera exclusiva las relaciones comerciales entre <strong>PROTEX WEAR S.L.</strong> (con CIF B-99999999 y domicilio social en Madrid, España) y cualquier persona física o jurídica (en adelante, &quot;el Cliente&quot;) que realice la adquisición de equipos de protección individual (EPIs), vestuario laboral y accesorios a través del portal de comercio electrónico <a href="/" className="text-[#2e559e] font-semibold underline">protexwear.es</a>.
+                Las presentes Condiciones Generales de Venta (en adelante, &quot;Términos y Condiciones&quot;) regulan de manera exclusiva las relaciones comerciales entre <strong>{BUSINESS_CONFIG.name}</strong> (con CIF {BUSINESS_CONFIG.cif} y domicilio social en {BUSINESS_CONFIG.address}) y cualquier persona física o jurídica (en adelante, &quot;el Cliente&quot;) que realice la adquisición de equipos de protección individual (EPIs), vestuario laboral y accesorios a través del portal de comercio electrónico <a href="/" className="text-[#2e559e] font-semibold underline">protexwear.es</a>.
               </p>
               <p>
                 El uso del sitio web, el registro en el portal B2B/B2C, así como la confirmación de cualquier pedido mediante la pasarela de compra implica la aceptación <strong>plena, explícita y sin reservas</strong> por parte del Cliente de todos y cada uno de los términos detallados en este documento.
@@ -103,7 +104,7 @@ export default function TerminosCondicionesPage() {
                 </h2>
               </div>
               <p>
-                Todos los contenidos mostrados en este sitio web —incluyendo, a título enunciativo pero no limitativo: designs, códigos de programación, logotipos, imagotipos, nombres comerciales, fichas técnicas de seguridad, imágenes de catálogo y descripciones de producto— están sujetos a derechos de propiedad intelectual e industrial titularidad de <strong>PROTEX WEAR S.L.</strong> o de terceras marcas de las cuales disponemos de licencia y autorización de comercialización (como 3M, Ansell, Fal Seguridad, y Portwest).
+                Todos los contenidos mostrados en este sitio web —incluyendo, a título enunciativo pero no limitativo: designs, códigos de programación, logotipos, imagotipos, nombres comerciales, fichas técnicas de seguridad, imágenes de catálogo y descripciones de producto— están sujetos a derechos de propiedad intelectual e industrial titularidad de <strong>{BUSINESS_CONFIG.name}</strong> o de terceras marcas de las cuales disponemos de licencia y autorización de comercialización (como 3M, Ansell, Fal Seguridad, y Portwest).
               </p>
               <p>
                 Queda expresamente prohibida la reproducción, distribución, comunicación pública, extracción total o parcial o modificación de cualquier elemento del portal sin el consentimiento formal y por escrito de la dirección de Protex Wear.
@@ -133,10 +134,6 @@ export default function TerminosCondicionesPage() {
                 <li className="legal-badge-item">
                   <span className="legal-badge-dot" />
                   <span><strong>Bizum Comercial y Transferencia Bancaria Directa:</strong> Para clientes que requieran flujos corporativos con emisión previa de factura proforma o albarán de entrega.</span>
-                </li>
-                <li className="legal-badge-item">
-                  <span className="legal-badge-dot" />
-                  <span><strong>Express Checkout (Apple Pay / Google Pay):</strong> Pagos móviles simplificados con validación biométrica virtual en dispositivos compatibles.</span>
                 </li>
               </ul>
               <p>
@@ -168,24 +165,9 @@ export default function TerminosCondicionesPage() {
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={{ fontWeight: 600 }}>España Península</td>
-                      <td>5,99 €</td>
-                      <td style={{ color: '#10b981', fontWeight: 700 }}>Gratis &gt; 50 €</td>
-                    </tr>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Islas Baleares</td>
-                      <td>8,99 €</td>
-                      <td style={{ color: '#10b981', fontWeight: 700 }}>Gratis &gt; 75 €</td>
-                    </tr>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Islas Canarias</td>
-                      <td>12,99 €</td>
+                      <td style={{ fontWeight: 600 }}>Tarifa Única (Nacional e Internacional)</td>
+                      <td>9,00 €</td>
                       <td style={{ color: '#10b981', fontWeight: 700 }}>Gratis &gt; 100 €</td>
-                    </tr>
-                    <tr>
-                      <td style={{ fontWeight: 600 }}>Internacional (Unión Europea)</td>
-                      <td>9,99 €</td>
-                      <td style={{ color: '#10b981', fontWeight: 700 }}>Gratis &gt; 80 €</td>
                     </tr>
                   </tbody>
                 </table>

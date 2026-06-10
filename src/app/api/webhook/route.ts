@@ -169,7 +169,6 @@ export async function POST(request: Request) {
     
   } catch (error) {
     console.error('Error interno procesando el Webhook:', error);
-    // Para entornos sandbox, no hacemos fallar el webhook ante errores de red secundarios
-    return NextResponse.json({ received: true, warning: 'Processed with minor errors' });
+    return NextResponse.json({ received: false, error: 'Processed with errors' }, { status: 500 });
   }
 }

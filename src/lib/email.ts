@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import { generateInvoicePDF, InvoiceData } from '@/lib/invoice';
+import { BUSINESS_CONFIG } from '@/lib/config';
 
 export interface OrderItem {
   name: string;
@@ -67,9 +68,9 @@ function customerEmailHTML(data: OrderEmailPayload): string {
         Tu pedido ha sido registrado con éxito. Para proceder al envío, realiza el pago de <strong>${data.total.toFixed(2)}€</strong> a la cuenta indicada a continuación. Introduce el número de pedido como concepto del pago.
       </p>
       <table style="width:100%; font-size:13px; color:#78350f;">
-        <tr><td style="padding:4px 0; width:100px;"><strong>Banco:</strong></td><td>CaixaBank</td></tr>
-        <tr><td style="padding:4px 0;"><strong>Beneficiario:</strong></td><td>PROTEX WEAR S.L.</td></tr>
-        <tr><td style="padding:4px 0;"><strong>IBAN:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">ES21 2100 0418 4502 0005 6789</td></tr>
+        <tr><td style="padding:4px 0; width:100px;"><strong>Banco:</strong></td><td>${BUSINESS_CONFIG.bankName}</td></tr>
+        <tr><td style="padding:4px 0;"><strong>Beneficiario:</strong></td><td>${BUSINESS_CONFIG.name}</td></tr>
+        <tr><td style="padding:4px 0;"><strong>IBAN:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${BUSINESS_CONFIG.bankIBAN}</td></tr>
         <tr><td style="padding:4px 0;"><strong>Concepto:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px; color:#b45309;">${data.orderNumber}</td></tr>
       </table>
     </div>
@@ -83,7 +84,7 @@ function customerEmailHTML(data: OrderEmailPayload): string {
         Para completar tu compra, realiza el envío de <strong>${data.total.toFixed(2)}€</strong> por Bizum al teléfono comercial de la empresa. Introduce tu número de pedido como asunto.
       </p>
       <table style="width:100%; font-size:13px; color:#047857;">
-        <tr><td style="padding:4px 0; width:120px;"><strong>Teléfono Bizum:</strong></td><td style="font-weight:bold; font-size:15px;">+34 612 345 678</td></tr>
+        <tr><td style="padding:4px 0; width:120px;"><strong>Teléfono Bizum:</strong></td><td style="font-weight:bold; font-size:15px;">${BUSINESS_CONFIG.bizumPhone}</td></tr>
         <tr><td style="padding:4px 0;"><strong>Concepto/Mensaje:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${data.orderNumber}</td></tr>
       </table>
     </div>
@@ -198,7 +199,7 @@ function customerEmailHTML(data: OrderEmailPayload): string {
               <!-- Help CTA -->
               <div style="text-align:center; background:#ebf8ff; border-radius:10px; padding:20px; margin-top:32px;">
                 <p style="margin:0 0 4px; color:#2b6cb0; font-size:13px; font-weight:600;">¿Tienes alguna pregunta sobre tu pedido?</p>
-                <p style="margin:0; font-size:13px; color:#4a5568;">Escríbenos a <a href="mailto:pedidos@protexwear.com" style="color:#2b6cb0; font-weight:700; text-decoration:none;">pedidos@protexwear.com</a> o responde a este email.</p>
+                <p style="margin:0; font-size:13px; color:#4a5568;">Escríbenos a <a href="mailto:${BUSINESS_CONFIG.email}" style="color:#2b6cb0; font-weight:700; text-decoration:none;">${BUSINESS_CONFIG.email}</a> o responde a este email.</p>
               </div>
 
             </td>
