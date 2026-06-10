@@ -7,6 +7,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
 import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
+import { BizumDetails } from '@/components/Checkout/BizumDetails';
 
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
 import styles from './page.module.css';

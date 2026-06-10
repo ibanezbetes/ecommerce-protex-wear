@@ -1,0 +1,9 @@
+{
+  "name": "process-excel-lambda",
+  "version": "1.0.0",
+  "description": "Lambda for processing Excel files from S3 and importing to DynamoDB",
+  "main": "index.js",
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}

@@ -118,14 +118,15 @@ export default function Navbar() {
                     >
                       Mi Perfil
                     </Link>
-                    <Link
-                      href="/pedidos"
-                      className={`${styles.dropdownLink} block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100`}
-                      onClick={() => setIsMenuOpen(false)}
-                    >
-                      Mis Pedidos
-                    </Link>
-                    {/* Role check can be added here if Next.js user object supports it */}
+                    {user?.role === 'ADMIN' && (
+                      <Link
+                        href="/admin"
+                        className={`${styles.dropdownLink} block px-4 py-2 text-sm text-indigo-600 font-medium hover:bg-gray-100`}
+                        onClick={() => setIsMenuOpen(false)}
+                      >
+                        Panel Admin
+                      </Link>
+                    )}
                     <hr className="my-1" />
                     <button
                       onClick={() => {

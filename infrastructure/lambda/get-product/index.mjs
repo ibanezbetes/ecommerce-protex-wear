@@ -42,12 +42,14 @@ export const handler = async (event) => {
       
       const { Item: specialPriceItem } = await docClient.send(getPriceCommand);
       
-      if (specialPriceItem && specialPriceItem.custom_price != null) {
+      const priceVal = specialPriceItem?.specialPrice ?? specialPriceItem?.custom_price;
+      
+      if (specialPriceItem && priceVal != null) {
         // Sobrescribir los precios base de todas las variantes (o aplicar lógica específica)
-        console.log(`Aplicando precio especial de ${specialPriceItem.custom_price} al usuario ${userId}`);
+        console.log(`Aplicando precio especial de ${priceVal} al usuario ${userId}`);
         product.variants = product.variants.map(variant => ({
           ...variant,
-          basePrice: specialPriceItem.custom_price
+          basePrice: priceVal
         }));
       }
     }

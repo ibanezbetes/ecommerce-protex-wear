@@ -23,7 +23,19 @@ type Query {
   getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools
   
   # Listar productos (con paginación simple y filtro)
-  listProducts(brand: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools
+  listProducts(brand: String, category: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools
+
+  # Perfil de usuario logueado
+  getUserProfile: User @aws_cognito_user_pools
+  
+  # Listar pedidos del usuario logueado
+  listUserOrders: [Order!]! @aws_cognito_user_pools
+  
+  # ADMINISTRADOR: Listar todos los pedidos con filtros
+  listAllOrders(status: String, email: String, startDate: String, endDate: String, limit: Int, nextToken: String): OrderConnection! @aws_cognito_user_pools
+  
+  # ADMINISTRADOR: Listar usuarios
+  listUsers(limit: Int, nextToken: String): UserConnection! @aws_cognito_user_pools
 }
 
 type ProductConnection @aws_api_key @aws_cognito_user_pools {
@@ -55,4 +67,78 @@ type OrderResponse {
 
 type Mutation {
   createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools
+  
+  # Actualizar datos del perfil de usuario (envío/facturación)
+  updateUserProfile(input: UpdateUserProfileInput!): User @aws_cognito_user_pools
+  
+  # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto
+  setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools
+}
+
+# --- NUEVOS MODELOS Y TIPOS ---
+
+type User @aws_cognito_user_pools {
+  id: ID!
+  email: String!
+  name: String
+  role: String! # "USER" o "ADMIN"
+  shippingAddress: Address
+  billingAddress: Address
+  specialPrices: [UserPrice]
+}
+
+type UserConnection @aws_cognito_user_pools {
+  items: [User!]!
+  nextToken: String
+}
+
+type Address @aws_cognito_user_pools {
+  street: String
+  city: String
+  postalCode: String
+  country: String
+}
+
+input UpdateUserProfileInput {
+  name: String
+  shippingAddress: AddressInput
+  billingAddress: AddressInput
+}
+
+input AddressInput {
+  street: String
+  city: String
+  postalCode: String
+  country: String
+}
+
+type UserPrice @aws_cognito_user_pools {
+  userId: ID!
+  productId: ID!
+  specialPrice: Float!
+}
+
+type Order @aws_cognito_user_pools {
+  id: ID!
+  userId: String!
+  customerEmail: String!
+  orderDate: String!
+  status: String!
+  totalAmount: Float!
+  items: [OrderItem!]!
+  shippingAddress: Address
+  billingAddress: Address
+}
+
+type OrderConnection @aws_cognito_user_pools {
+  items: [Order!]!
+  nextToken: String
+}
+
+type OrderItem @aws_cognito_user_pools {
+  productId: ID!
+  variantId: ID!
+  quantity: Int!
+  priceAtPurchase: Float!
+  name: String
 }
