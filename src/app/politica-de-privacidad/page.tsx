@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { UserCheck, Eye, Database, Share2, Award, Mail } from 'lucide-react';
+import { BUSINESS_CONFIG } from '@/lib/config';
 
 export default function PoliticaPrivacidadPage() {
   const [activeSection, setActiveSection] = useState('1-responsable');
@@ -91,19 +92,19 @@ export default function PoliticaPrivacidadPage() {
               <div className="legal-info-card">
                 <div className="legal-info-item">
                   <span className="legal-info-label">Razón Social</span>
-                  <span className="legal-info-val">PROTEX WEAR S.L.</span>
+                  <span className="legal-info-val">{BUSINESS_CONFIG.name}</span>
                 </div>
                 <div className="legal-info-item">
                   <span className="legal-info-label">NIF</span>
-                  <span className="legal-info-val">B-99999999</span>
+                  <span className="legal-info-val">{BUSINESS_CONFIG.cif}</span>
                 </div>
                 <div className="legal-info-item" style={{ gridColumn: 'span 2' }}>
                   <span className="legal-info-label">Domicilio Social</span>
-                  <span className="legal-info-val">Calle de la Seguridad e Higiene Laboral, 12, 28001 Madrid, España</span>
+                  <span className="legal-info-val">{BUSINESS_CONFIG.address}</span>
                 </div>
                 <div className="legal-info-item" style={{ gridColumn: 'span 2' }}>
                   <span className="legal-info-label">Correo electrónico LOPD</span>
-                  <span className="legal-info-val" style={{ color: '#2e559e', textDecoration: 'underline' }}>lopd@protexwear.es</span>
+                  <span className="legal-info-val" style={{ color: '#2e559e', textDecoration: 'underline' }}>{BUSINESS_CONFIG.email}</span>
                 </div>
               </div>
             </section>
@@ -246,7 +247,7 @@ export default function PoliticaPrivacidadPage() {
                 </h2>
               </div>
               <p>
-                Para ejercer cualquiera de los derechos descritos o realizar una consulta sobre el tratamiento de su información de carácter personal, puede dirigir un escrito firmado acompañado de copia de documento oficial de identidad (DNI o NIE) a la dirección de correo electrónico <a href="mailto:lopd@protexwear.es" className="text-[#2e559e] font-semibold underline">lopd@protexwear.es</a>.
+                Para ejercer cualquiera de los derechos descritos o realizar una consulta sobre el tratamiento de su información de carácter personal, puede dirigir un escrito firmado acompañado de copia de documento oficial de identidad (DNI o NIE) a la dirección de correo electrónico <a href={`mailto:${BUSINESS_CONFIG.email}`} className="text-[#2e559e] font-semibold underline">{BUSINESS_CONFIG.email}</a>.
               </p>
               <p>
                 Asimismo, le informamos que si considera vulnerados sus derechos, tiene derecho a presentar una reclamación formal ante la <strong>Agencia Española de Protección de Datos (AEPD)</strong> a través de su sede electrónica oficial (<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" className="text-[#2e559e] underline">www.aepd.es</a>).

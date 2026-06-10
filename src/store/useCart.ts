@@ -112,8 +112,9 @@ export const useCart = create<CartState>()(
       }),
 
       updateQuantity: (variantId, quantity) => set((state) => {
+        const safeQuantity = quantity < 1 ? 1 : quantity;
         const newItems = state.items.map(i =>
-          i.variantId === variantId ? { ...i, quantity } : i
+          i.variantId === variantId ? { ...i, quantity: safeQuantity } : i
         );
         return { items: newItems, ...computeTotals(newItems) };
       }),

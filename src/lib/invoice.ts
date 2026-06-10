@@ -77,7 +77,7 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       doc.font('Helvetica').fillColor(TEXT_MUTED);
       doc.text(`NIF/CIF: ${BUSINESS_CONFIG.cif}`, 50, compY + 15);
       doc.text(BUSINESS_CONFIG.address, 50, compY + 30);
-      doc.text('pedidos@protexwear.es', 50, compY + 45);
+      doc.text(BUSINESS_CONFIG.email, 50, compY + 45);
       doc.text(BUSINESS_CONFIG.phone, 50, compY + 60);
 
       // --- SEPARATOR LINE ---
@@ -173,7 +173,7 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
 
       // --- FOOTER ---
       doc.fontSize(8).fillColor('#94a3b8');
-      doc.text('Gracias por su confianza. Para cualquier consulta sobre esta factura, contáctenos en pedidos@protexwear.es', 50, 780, { align: 'center', width: 495 });
+      doc.text(`Gracias por su confianza. Para cualquier consulta sobre esta factura, contáctenos en ${BUSINESS_CONFIG.email}`, 50, 780, { align: 'center', width: 495 });
 
       doc.end();
     } catch (error) {

@@ -3,7 +3,6 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { graphqlFetch } from '@/services/graphqlClient';
-import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
 import styles from './page.module.css';
 
 interface ProductVariant {
@@ -85,6 +84,8 @@ function CatalogContent() {
     } catch (error) {
       console.warn('[CatalogPage] Error cargando productos de AppSync. Activando catálogo local simulado (Sandbox Fallback)...', error);
       
+      const { MOCK_PRODUCTS } = await import('@/utils/mockCatalog');
+
       // Filtrar catálogo simulado local según marca seleccionada
       const mockItems = selectedBrand === 'ALL'
         ? MOCK_PRODUCTS

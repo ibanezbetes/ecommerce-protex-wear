@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ArrowLeftRight, CheckCircle2, AlertTriangle, Truck, ShieldAlert, Sparkles } from 'lucide-react';
+import { BUSINESS_CONFIG } from '@/lib/config';
 
 export default function DevolucionesPage() {
   const [activeSection, setActiveSection] = useState('1-desistimiento');
@@ -154,7 +155,7 @@ export default function DevolucionesPage() {
                   <div className="legal-timeline-badge" />
                   <h4 className="legal-timeline-title">Paso 1: Solicitud de Devolución</h4>
                   <p className="legal-timeline-desc">
-                    Envíe un correo electrónico a <a href="mailto:soporte@protexwear.es" style={{ color: '#2e559e', textDecoration: 'underline' }}>soporte@protexwear.es</a> indicando su número de pedido y los artículos específicos a devolver.
+                    Envíe un correo electrónico a <a href={`mailto:${BUSINESS_CONFIG.email}`} style={{ color: '#2e559e', textDecoration: 'underline' }}>{BUSINESS_CONFIG.email}</a> indicando su número de pedido y los artículos específicos a devolver.
                   </p>
                 </div>
                 <div className="legal-timeline-item">
@@ -197,14 +198,14 @@ export default function DevolucionesPage() {
                 </li>
                 <li className="legal-badge-item">
                   <span className="legal-badge-dot" />
-                  <span><strong>Gastos de Envío de Devolución:</strong> Si el cambio es por un error de Protex Wear o defecto de fabricación, el coste es 100% gratuito. En el caso de desistimiento comercial ordinario, el coste del envío de retorno (5,99 €) se deducirá de la cantidad final a reembolsar.</span>
+                  <span><strong>Gastos de Envío de Devolución:</strong> Si el cambio es por un error de Protex Wear o defecto de fabricación, el coste es 100% gratuito. En el caso de desistimiento comercial ordinario, el coste del envío de retorno (9,00 €) se deducirá de la cantidad final a reembolsar.</span>
                 </li>
               </ul>
               
               <div className="legal-alert-box" style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '2rem' }}>
                 <Sparkles className="h-6 w-6" style={{ color: '#2e559e', flexShrink: 0 }} />
                 <p style={{ margin: 0, fontSize: '0.85rem' }}>
-                  ¿Tiene alguna duda o desea tramitar un cambio urgente? Póngase en contacto inmediato con nuestro equipo de atención telefónica al cliente en el teléfono gratuito <strong>900 123 456</strong>.
+                  ¿Tiene alguna duda o desea tramitar un cambio urgente? Póngase en contacto inmediato con nuestro equipo de atención telefónica al cliente en el teléfono <strong>{BUSINESS_CONFIG.phone}</strong>.
                 </p>
               </div>
             </section>

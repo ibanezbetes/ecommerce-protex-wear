@@ -2,6 +2,10 @@ import { NextResponse } from 'next/server';
 import { generateInvoicePDF, InvoiceData } from '@/lib/invoice';
 
 export async function GET() {
+  if (process.env.NODE_ENV !== 'development') {
+    return NextResponse.json({ error: 'Endpoint is only available in development mode' }, { status: 403 });
+  }
+  
   try {
     const sampleData: InvoiceData = {
       orderNumber: 'ORD-TEST-1234',
