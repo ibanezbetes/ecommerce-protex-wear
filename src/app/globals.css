@@ -95,11 +95,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-img {
-  display: block;
-  max-width: 100%;
-}
-
 .container {
   width: min(1180px, calc(100% - 2rem));
   margin-left: auto;
@@ -107,66 +102,8 @@ img {
 }
 
 /* ===========================================================================
- * 3. TIPOGRAFÍA GLOBAL
+ * 3. COMPONENTES REUTILIZABLES
  * ========================================================================= */
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--gray-900);
-}
-
-a {
-  color: var(--primary-color);
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-a:hover {
-  color: var(--primary-dark);
-}
-
-/* ===========================================================================
- * 4. FORMULARIOS
- * ========================================================================= */
-
-input,
-textarea,
-select {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid var(--gray-300);
-  border-radius: var(--radius-md);
-  font-size: 1rem;
-  font-family: inherit;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: var(--gray-400);
-  box-shadow: 0 0 0 3px rgb(0 0 0 / 0.06);
-}
-
-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 500;
-  color: var(--gray-700);
-  font-size: 0.875rem;
-}
-
-/* ===========================================================================
- * 5. COMPONENTES REUTILIZABLES
- * ========================================================================= */
-
-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none !important;
-}
 
 /* --- Alertas --- */
 
@@ -202,7 +139,7 @@ button:disabled {
 }
 
 /* ===========================================================================
- * 6. UTILIDADES CUSTOM — Solo las que Tailwind NO cubre
+ * 4. UTILIDADES CUSTOM — Solo las que Tailwind NO cubre
  *    (clases que referencian las variables CSS de marca)
  * ========================================================================= */
 

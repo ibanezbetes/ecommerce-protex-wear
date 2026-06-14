@@ -5,6 +5,7 @@ import { useAuth } from "@/store/useAuth";
 import { userOperations } from "@/services/graphqlClient";
 import { useRouter } from "next/navigation";
 import { User, Package, MapPin, Loader2, Save, CreditCard } from "lucide-react";
+import styles from "./page.module.css";
 
 export default function ProfilePage() {
   const { user, isGuest } = useAuth();
@@ -72,198 +73,213 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+      <div className={styles.loadingShell}>
+        <div className={styles.loadingCard}>
+          <Loader2 className={styles.loadingIcon} />
+          <p className={styles.loadingText}>Cargando tu perfil...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white flex items-center gap-3">
-          <User className="w-8 h-8 text-indigo-600" />
-          Mi Perfil
-        </h1>
-        <p className="text-gray-500 mt-2">
-          Hola, {profile?.name || user?.email}. Gestiona tus datos y consulta tus compras.
-        </p>
-      </div>
+    <div className={styles.page}>
+      <div className={styles.container}>
+        <section className={styles.heroCard}>
+          <div className={styles.heroIconWrap}>
+            <User className={styles.heroIcon} />
+          </div>
+          <div className={styles.heroCopy}>
+            <span className={styles.eyebrow}>Cuenta Protex Wear</span>
+            <h1 className={styles.title}>Mi Perfil</h1>
+            <p className={styles.subtitle}>
+              Hola, {profile?.name || user?.email}. Gestiona tus datos, direcciones y pedidos desde un solo lugar.
+            </p>
+          </div>
+          <div className={styles.heroMeta}>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Usuario</span>
+              <strong className={styles.metaValue}>{profile?.name || user?.email}</strong>
+            </div>
+            <div className={styles.metaItem}>
+              <span className={styles.metaLabel}>Secciones</span>
+              <strong className={styles.metaValue}>{activeTab === "data" ? "Datos" : "Pedidos"}</strong>
+            </div>
+          </div>
+        </section>
 
-      <div className="flex border-b border-gray-200 dark:border-gray-700 mb-8">
-        <button
-          className={`pb-4 px-6 font-medium text-sm border-b-2 transition-colors ${
-            activeTab === "data"
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          }`}
-          onClick={() => setActiveTab("data")}
-        >
-          Mis Datos
-        </button>
-        <button
-          className={`pb-4 px-6 font-medium text-sm border-b-2 transition-colors ${
-            activeTab === "orders"
-              ? "border-indigo-600 text-indigo-600"
-              : "border-transparent text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-300"
-          }`}
-          onClick={() => setActiveTab("orders")}
-        >
-          Mis Pedidos
-        </button>
-      </div>
+        <div className={styles.tabBar}>
+          <button
+            className={`${styles.tabButton} ${activeTab === "data" ? styles.tabButtonActive : ""}`}
+            onClick={() => setActiveTab("data")}
+          >
+            Mis Datos
+          </button>
+          <button
+            className={`${styles.tabButton} ${activeTab === "orders" ? styles.tabButtonActive : ""}`}
+            onClick={() => setActiveTab("orders")}
+          >
+            Mis Pedidos
+          </button>
+        </div>
 
       {activeTab === "data" && (
-        <form onSubmit={handleSaveProfile} className="space-y-8 max-w-3xl">
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white">Información Básica</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email (No modificable)</label>
+        <form onSubmit={handleSaveProfile} className={styles.formLayout}>
+          <section className={styles.panelCard}>
+            <div className={styles.cardHeader}>
+              <h2 className={styles.cardTitle}>Información Básica</h2>
+              <p className={styles.cardHint}>Datos que usas para identificar tu cuenta.</p>
+            </div>
+            <div className={styles.formGrid}>
+              <div className={styles.field}>
+                <label className={styles.label}>Email (No modificable)</label>
                 <input
                   type="text"
                   value={profile?.email || ""}
                   disabled
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700/50 px-4 py-2 text-gray-500 cursor-not-allowed"
+                  className={styles.inputDisabled}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nombre Completo</label>
+              <div className={styles.field}>
+                <label className={styles.label}>Nombre Completo</label>
                 <input
                   type="text"
                   value={profile?.name || ""}
                   onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-gray-400" />
+          <section className={styles.panelCard}>
+            <h2 className={styles.cardTitleWithIcon}>
+              <MapPin className={styles.sectionIcon} />
               Dirección de Envío
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Calle y número</label>
+            <div className={styles.formGrid}>
+              <div className={`${styles.field} ${styles.fullWidth}`}>
+                <label className={styles.label}>Calle y número</label>
                 <input
                   type="text"
                   value={profile?.shippingAddress?.street || ""}
                   onChange={(e) => updateAddress("shipping", "street", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ciudad</label>
+              <div className={styles.field}>
+                <label className={styles.label}>Ciudad</label>
                 <input
                   type="text"
                   value={profile?.shippingAddress?.city || ""}
                   onChange={(e) => updateAddress("shipping", "city", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código Postal</label>
+              <div className={styles.field}>
+                <label className={styles.label}>Código Postal</label>
                 <input
                   type="text"
                   value={profile?.shippingAddress?.postalCode || ""}
                   onChange={(e) => updateAddress("shipping", "postalCode", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
             </div>
-          </div>
+          </section>
 
-          <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-            <h2 className="text-xl font-semibold mb-4 text-gray-900 dark:text-white flex items-center gap-2">
-              <CreditCard className="w-5 h-5 text-gray-400" />
+          <section className={styles.panelCard}>
+            <h2 className={styles.cardTitleWithIcon}>
+              <CreditCard className={styles.sectionIcon} />
               Datos de Facturación
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Calle y número</label>
+            <div className={styles.formGrid}>
+              <div className={`${styles.field} ${styles.fullWidth}`}>
+                <label className={styles.label}>Calle y número</label>
                 <input
                   type="text"
                   value={profile?.billingAddress?.street || ""}
                   onChange={(e) => updateAddress("billing", "street", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Ciudad</label>
+              <div className={styles.field}>
+                <label className={styles.label}>Ciudad</label>
                 <input
                   type="text"
                   value={profile?.billingAddress?.city || ""}
                   onChange={(e) => updateAddress("billing", "city", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Código Postal</label>
+              <div className={styles.field}>
+                <label className={styles.label}>Código Postal</label>
                 <input
                   type="text"
                   value={profile?.billingAddress?.postalCode || ""}
                   onChange={(e) => updateAddress("billing", "postalCode", e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2 text-gray-900 dark:text-white"
+                  className={styles.input}
                 />
               </div>
             </div>
-          </div>
+          </section>
 
           <button
             type="submit"
             disabled={saving}
-            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+            className={styles.saveButton}
           >
-            {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+            {saving ? <Loader2 className={styles.buttonIconSpin} /> : <Save className={styles.buttonIcon} />}
             Guardar Cambios
           </button>
         </form>
       )}
 
       {activeTab === "orders" && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+        <div className={styles.panelCard}>
           {orders.length === 0 ? (
-            <div className="p-8 text-center flex flex-col items-center">
-              <Package className="w-16 h-16 text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">No tienes pedidos</h3>
-              <p className="text-gray-500 mt-2">Todavía no has realizado ninguna compra con nosotros.</p>
+            <div className={styles.emptyState}>
+              <Package className={styles.emptyIcon} />
+              <h3 className={styles.emptyTitle}>No tienes pedidos</h3>
+              <p className={styles.emptyText}>Todavía no has realizado ninguna compra con nosotros.</p>
             </div>
           ) : (
-            <table className="w-full text-left text-sm">
-              <thead className="bg-gray-50 dark:bg-gray-900/50 text-gray-600 dark:text-gray-300 uppercase">
+            <div className={styles.tableWrap}>
+              <table className={styles.table}>
+                <thead className={styles.tableHead}>
                 <tr>
-                  <th className="px-6 py-4 font-semibold">ID Pedido</th>
-                  <th className="px-6 py-4 font-semibold">Fecha</th>
-                  <th className="px-6 py-4 font-semibold">Total</th>
-                  <th className="px-6 py-4 font-semibold">Estado</th>
+                  <th className={styles.th}>ID Pedido</th>
+                  <th className={styles.th}>Fecha</th>
+                  <th className={styles.th}>Total</th>
+                  <th className={styles.th}>Estado</th>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                </thead>
+                <tbody>
                 {orders.map((order: any) => (
-                  <tr key={order.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                    <td className="px-6 py-4 font-medium text-gray-900 dark:text-white">
+                  <tr key={order.id} className={styles.tr}>
+                    <td className={styles.tdStrong}>
                       #{order.id.split("-").pop() || order.id}
                     </td>
-                    <td className="px-6 py-4 text-gray-500">
+                    <td className={styles.tdMuted}>
                       {new Date(order.orderDate).toLocaleDateString()}
                     </td>
-                    <td className="px-6 py-4 font-medium">
+                    <td className={styles.tdStrong}>
                       {order.totalAmount.toFixed(2)} €
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 rounded-full text-xs font-medium">
+                    <td className={styles.td}>
+                      <span className={styles.statusPill}>
                         {order.status}
                       </span>
                     </td>
                   </tr>
                 ))}
-              </tbody>
-            </table>
+                </tbody>
+              </table>
+            </div>
           )}
         </div>
       )}
+      </div>
     </div>
   );
 }
