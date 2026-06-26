@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import { BUSINESS_CONFIG } from '@/lib/config';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -63,7 +64,7 @@ export default function Footer() {
 
           {/* Customer Service */}
           <div className={styles.column}>
-            <h3 className={styles.columnTitle}>Atencin al Cliente</h3>
+            <h3 className={styles.columnTitle}>Atención al Cliente</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="/contacto" className={styles.link}>
@@ -71,13 +72,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/ayuda" className={styles.link}>
-                  Centro de Ayuda
+                <Link href="/devoluciones" className={styles.link}>
+                  Política de Devoluciones
                 </Link>
               </li>
               <li>
                 <Link href="/envios" className={styles.link}>
-                  Informacin de Envos
+                  Información de Envíos
                 </Link>
               </li>
             </ul>
@@ -94,8 +95,7 @@ export default function Footer() {
                 </svg>
                 <div>
                   <p className={styles.text}>
-                    Calle Ejemplo 123<br />
-                    28001 Madrid, Espaa
+                    {BUSINESS_CONFIG.address}
                   </p>
                 </div>
               </div>
@@ -104,7 +104,7 @@ export default function Footer() {
                 <svg className={`${styles.link} h-5 w-5`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                 </svg>
-                <p className={styles.text}>+34 900 123 456</p>
+                <p className={styles.text}>{BUSINESS_CONFIG.phone}</p>
               </div>
             </div>
           </div>
@@ -114,14 +114,14 @@ export default function Footer() {
         <div className={`${styles.bottom} border-t border-gray-800 mt-8 pt-8`}>
           <div className={`${styles.bottomRow} flex flex-col md:flex-row justify-between items-center`}>
             <div className="text-gray-400 text-sm mb-4 md:mb-0">
-               {currentYear} Protex Wear. Todos los derechos reservados.
+               {currentYear} {BUSINESS_CONFIG.name}. Todos los derechos reservados.
             </div>
             <div className={`${styles.legal} flex space-x-6 text-sm`}>
-              <Link href="/privacidad" className={styles.legalLink}>
-                Poltica de Privacidad
+              <Link href="/politica-de-privacidad" className={styles.legalLink}>
+                Política de Privacidad
               </Link>
-              <Link href="/terminos" className={styles.legalLink}>
-                Trminos de Uso
+              <Link href="/terminos-y-condiciones" className={styles.legalLink}>
+                Términos y Condiciones
               </Link>
             </div>
           </div>

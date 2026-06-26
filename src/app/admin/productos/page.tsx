@@ -15,7 +15,7 @@ export default function ProductManagementPage() {
       setError(null);
       // Currently using the lightweight client which doesn't support complex filters out of the box without more setup,
       // but we can list them and filter client-side for now or just fetch all.
-      const data = await productOperations.listProducts(undefined, 50);
+      const data = await productOperations.listProducts(undefined, undefined, 50);
       setProducts(data?.items || []);
     } catch (err: any) {
       console.error(err);

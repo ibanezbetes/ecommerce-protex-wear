@@ -75,6 +75,16 @@ npm test             # Ejecutar tests
 npm run test:watch   # Tests en modo watch
 ```
 
+### Flujo CI/CD Frontend
+
+El workflow [.github/workflows/flujo-ci-cd-frontend.yml](../.github/workflows/flujo-ci-cd-frontend.yml) sincroniza automáticamente esta cadena de ramas:
+
+1. `develop` -> `feature/frontend-layout`
+2. `feature/frontend-layout` -> `frontend-layout/octavio-branch`
+3. `feature/frontend-layout` -> `frontend-layout/yeray-branch`
+
+`main` no participa en este flujo y sigue gestionándose manualmente.
+
 ---
 
 ## 📊 **Lazar** (Migration Specialist)

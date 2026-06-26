@@ -14,6 +14,7 @@ interface Product {
   id: string;
   name: string;
   brand: string;
+  category?: string;
   variants?: ProductVariant[];
 }
 
@@ -50,6 +51,7 @@ function CatalogContent() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextToken, setNextToken] = useState<string | null>(null);
   const [selectedBrand, setSelectedBrand] = useState<string>('ALL');
+  const [usingMockCatalog, setUsingMockCatalog] = useState(false);
 
   const fetchProducts = async (isLoadMore = false) => {
     if (isLoadMore) {
@@ -78,8 +80,20 @@ function CatalogContent() {
 
       setProducts((prev) => isLoadMore ? [...prev, ...fetchedItems] : fetchedItems);
       setNextToken(currentNextToken || null);
+      setUsingMockCatalog(false);
     } catch (error) {
-      console.error('Error cargando productos', error);
+      console.warn('[CatalogPage] Error cargando productos de AppSync. Activando catálogo local simulado (Sandbox Fallback)...', error);
+      
+      const { MOCK_PRODUCTS } = await import('@/utils/mockCatalog');
+
+      // Filtrar catálogo simulado local según marca seleccionada
+      const mockItems = selectedBrand === 'ALL'
+        ? MOCK_PRODUCTS
+        : MOCK_PRODUCTS.filter((p) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
+
+      setProducts((prev) => isLoadMore ? [...prev, ...mockItems] : mockItems);
+      setNextToken(null); // No hay paginación adicional en modo local
+      setUsingMockCatalog(true);
     } finally {
       setLoading(false);
       setLoadingMore(false);

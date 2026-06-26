@@ -1,6 +1,8 @@
 'use client';
 import React, { useState } from 'react';
 import { useToast } from '@/components/Feedback/ToastProvider';
+import { Mail, Phone, MapPin, Send, AlertCircle, Clock, FileText } from 'lucide-react';
+import { BUSINESS_CONFIG } from '@/lib/config';
 import styles from './page.module.css';
 
 const ContactPage = () => {
@@ -130,7 +132,7 @@ const ContactPage = () => {
             </form>
 
             <p className={styles.privacyNotice}>
-              Le informamos que los datos personales obtenidos mediante este formulario, así como su dirección de correo electrónico, serán incorporados en un fichero del cual es responsable PROTEX WEAR, S.A. con la finalidad de atender sus consultas y enviarle el presupuesto solicitado. Nos comprometemos a usar dichos datos únicamente para la finalidad anteriormente mencionada. Los datos proporcionados se conservarán mientras no solicite el cese de la actividad. Los datos no se cederán a terceros salvo en los casos en que exista una obligación legal. El envío de este formulario implica la aceptación de las cláusulas expuestas. Tiene derecho a acceder a sus datos personales, rectificar los datos inexactos o solicitar su supresión cuando los datos ya no sean necesarios para los fines que fueron recogidos. Podrá ejercer sus derechos, acompañando fotocopia del DNI, a la dirección Pol. Malpica, C/F Oeste, COMPLEJO GREGORIO QUEJIDO, Nave 24, 50016 (ZARAGOZA).
+              Le informamos que los datos personales obtenidos mediante este formulario, así como su dirección de correo electrónico, serán incorporados en un fichero del cual es responsable {BUSINESS_CONFIG.name} con la finalidad de atender sus consultas y enviarle el presupuesto solicitado. Nos comprometemos a usar dichos datos únicamente para la finalidad anteriormente mencionada. Los datos proporcionados se conservarán mientras no solicite el cese de la actividad. Los datos no se cederán a terceros salvo en los casos en que exista una obligación legal. El envío de este formulario implica la aceptación de las cláusulas expuestas. Tiene derecho a acceder a sus datos personales, rectificar los datos inexactos o solicitar su supresión cuando los datos ya no sean necesarios para los fines que fueron recogidos. Podrá ejercer sus derechos, acompañando fotocopia del DNI, a la dirección {BUSINESS_CONFIG.address}.
             </p>
           </div>
 
@@ -145,7 +147,7 @@ const ContactPage = () => {
                 </div>
                 <div className={styles.infoContent}>
                   <h3>¿Dónde estamos?</h3>
-                  <p>Polígono Industrial Malpica, Calle de la letra L, Nº6, Nave 1, 50016, Zaragoza.</p>
+                  <p>{BUSINESS_CONFIG.address}</p>
                 </div>
               </div>
 
@@ -155,7 +157,7 @@ const ContactPage = () => {
                 </div>
                 <div className={styles.infoContent}>
                   <h3>Teléfono</h3>
-                  <p><a href="tel:+34876441275" style={{ color: 'inherit', textDecoration: 'none' }}>(+34) 876 44 12 75</a></p>
+                  <p><a href={`tel:${BUSINESS_CONFIG.phone}`} style={{ color: 'inherit', textDecoration: 'none' }}>{BUSINESS_CONFIG.phone}</a></p>
                 </div>
               </div>
 
@@ -165,7 +167,7 @@ const ContactPage = () => {
                 </div>
                 <div className={styles.infoContent}>
                   <h3>E-mail</h3>
-                  <p><a href="mailto:info@protexwear.es" style={{ color: 'inherit', textDecoration: 'none' }}>info@protexwear.es</a></p>
+                  <p><a href={`mailto:${BUSINESS_CONFIG.email}`} style={{ color: 'inherit', textDecoration: 'none' }}>{BUSINESS_CONFIG.email}</a></p>
                 </div>
               </div>
 

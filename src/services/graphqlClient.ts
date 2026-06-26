@@ -94,7 +94,27 @@ export async function graphqlFetch<T = Record<string, unknown>>(
   const json: GraphQLResponse<T> = await response.json();
 
   if (json.errors && json.errors.length > 0) {
-    console.error('[graphqlFetch] Errores GraphQL:', json.errors);
+    const isUnauthorized = json.errors.some(err => 
+      err.message?.toLowerCase().includes('not authorized') || 
+      err.message?.toLowerCase().includes('unauthorized') || 
+      err.message?.toLowerCase().includes('expired')
+    );
+
+    if (isUnauthorized && !isGuest) {
+      console.warn('[graphqlFetch] Token de Cognito expirado o no autorizado. Cerrando sesión y reintentando como invitado...');
+      
+      // Limpiar la sesión expirada del store useAuth
+      useAuth.getState().logout();
+      
+      // Reintentar la consulta de forma recursiva como invitado (usará la API Key en lugar del token expirado)
+      return graphqlFetch(query, variables);
+    }
+
+    if (isUnauthorized) {
+      console.warn('[graphqlFetch] Petición no autorizada / API Key expirada:', json.errors);
+    } else {
+      console.error('[graphqlFetch] Errores GraphQL:', json.errors);
+    }
     throw new Error(json.errors[0]?.message || 'Error en la petición GraphQL');
   }
 
@@ -309,12 +329,12 @@ const SET_SPECIAL_PRICE_MUTATION = `
 
 export const adminOperations = {
   async listAllOrders(filters: any = {}) {
-    const data = await graphqlFetch<{ listAllOrders: Record<string, unknown> }>(LIST_ALL_ORDERS_QUERY, filters);
+    const data = await graphqlFetch<{ listAllOrders: { items: any[], nextToken?: string } }>(LIST_ALL_ORDERS_QUERY, filters);
     return data.listAllOrders;
   },
 
   async listUsers(limit?: number, nextToken?: string) {
-    const data = await graphqlFetch<{ listUsers: Record<string, unknown> }>(LIST_USERS_QUERY, { limit, nextToken });
+    const data = await graphqlFetch<{ listUsers: { items: any[], nextToken?: string } }>(LIST_USERS_QUERY, { limit, nextToken });
     return data.listUsers;
   },
 

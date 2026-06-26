@@ -1,9 +1,9 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import Navbar from '@/components/layout/Navbar';
-import Footer from '@/components/layout/Footer';
-import { CartDrawer } from '@/components/layout/CartDrawer';
+import Navbar from '@/components/Layout/Navbar';
+import Footer from '@/components/Layout/Footer';
+import { CartDrawer } from '@/components/Layout/CartDrawer';
 
 const AUTH_ROUTES = new Set(['/login', '/register']);
 
