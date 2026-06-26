@@ -114,6 +114,27 @@
                     "autoVerifiedAttributes": [
                       "email"
                     ],
+                    "emailConfiguration": {
+                      "from": "Protex Wear <Daniel.guillen@protexwear.es>",
+                      "replyToEmailAddress": "Daniel.guillen@protexwear.es",
+                      "emailSendingAccount": "DEVELOPER",
+                      "sourceArn": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "arn:",
+                            {
+                              "Ref": "AWS::Partition"
+                            },
+                            ":ses:eu-west-1:",
+                            {
+                              "Ref": "AWS::AccountId"
+                            },
+                            ":identity/Daniel.guillen@protexwear.es"
+                          ]
+                        ]
+                      }
+                    },
                     "emailVerificationMessage": "The verification code to your new account is {####}",
                     "emailVerificationSubject": "Verify your new account",
                     "policies": {
@@ -327,7 +348,7 @@
                         "ApiId"
                       ]
                     },
-                    "expires": 1812377831
+                    "expires": 1814011752
                   }
                 },
                 "constructInfo": {
@@ -1005,6 +1026,39 @@
                         "fieldName": "listAllOrders",
                         "kind": "UNIT",
                         "typeName": "Query"
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_appsync.CfnResolver",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_appsync.Resolver",
+                  "version": "2.120.0"
+                }
+              },
+              "CreateOrderResolver": {
+                "id": "CreateOrderResolver",
+                "path": "EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver",
+                "children": {
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::AppSync::Resolver",
+                      "aws:cdk:cloudformation:props": {
+                        "apiId": {
+                          "Fn::GetAtt": [
+                            "ProtexWearApi2D35C46F",
+                            "ApiId"
+                          ]
+                        },
+                        "dataSourceName": "OrderDataSource",
+                        "fieldName": "createOrder",
+                        "kind": "UNIT",
+                        "typeName": "Mutation"
                       }
                     },
                     "constructInfo": {
@@ -1721,6 +1775,32 @@
                                       ]
                                     }
                                   ]
+                                },
+                                {
+                                  "Action": "lambda:InvokeFunction",
+                                  "Effect": "Allow",
+                                  "Resource": [
+                                    {
+                                      "Fn::GetAtt": [
+                                        "NotificationHandler5A872A20",
+                                        "Arn"
+                                      ]
+                                    },
+                                    {
+                                      "Fn::Join": [
+                                        "",
+                                        [
+                                          {
+                                            "Fn::GetAtt": [
+                                              "NotificationHandler5A872A20",
+                                              "Arn"
+                                            ]
+                                          },
+                                          ":*"
+                                        ]
+                                      ]
+                                    }
+                                  ]
                                 }
                               ],
                               "Version": "2012-10-17"
@@ -1786,12 +1866,15 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "12ea69f7d8a3bd3bff6de3624050d821c39c960a02200f21bc3a54f40b969afd.zip"
+                      "s3Key": "a6852ca50feb4f37bd48105ff60d6ff91be89e8f1d3b2efd05ffd1e8b86a8aaf.zip"
                     },
                     "environment": {
                       "variables": {
                         "TABLE_NAME": {
                           "Ref": "ProtexWearTableF73247B0"
+                        },
+                        "NOTIFICATION_LAMBDA_NAME": {
+                          "Ref": "NotificationHandler5A872A20"
                         }
                       }
                     },
@@ -2409,6 +2492,173 @@
             "constructInfo": {
               "fqn": "constructs.Construct",
               "version": "10.6.0"
+            }
+          },
+          "NotificationHandler": {
+            "id": "NotificationHandler",
+            "path": "EcommerceProtexWearStack/NotificationHandler",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "ses:SendEmail",
+                                    "ses:SendRawEmail"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "NotificationHandlerServiceRoleDefaultPolicy02DD28C2",
+                            "roles": [
+                              {
+                                "Ref": "NotificationHandlerServiceRole75069BD7"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.120.0"
+                }
+              },
+              "Code": {
+                "id": "Code",
+                "path": "EcommerceProtexWearStack/NotificationHandler/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "EcommerceProtexWearStack/NotificationHandler/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "EcommerceProtexWearStack/NotificationHandler/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "EcommerceProtexWearStack/NotificationHandler/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "cdce8eeebf6bfae42144b0e49844a02f6c4a178df55cdca292f12cfca8fc49a2.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "SENDER_EMAIL": "Daniel.guillen@protexwear.es"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "role": {
+                      "Fn::GetAtt": [
+                        "NotificationHandlerServiceRole75069BD7",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "nodejs20.x"
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.120.0"
             }
           },
           "UploadsBucketName": {

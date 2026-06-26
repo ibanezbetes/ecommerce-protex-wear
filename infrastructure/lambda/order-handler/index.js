@@ -1,10 +1,13 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand, ScanCommand, GetCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, ScanCommand, GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda");
 
 const client = new DynamoDBClient({});
 const docClient = DynamoDBDocumentClient.from(client);
+const lambdaClient = new LambdaClient({});
 
 const TABLE_NAME = process.env.TABLE_NAME;
+const NOTIFICATION_LAMBDA_NAME = process.env.NOTIFICATION_LAMBDA_NAME;
 
 exports.handler = async (event) => {
   const { fieldName } = event.info;
@@ -22,6 +25,8 @@ exports.handler = async (event) => {
     case 'listAllOrders':
       await requireAdmin(userId);
       return await listAllOrders(args);
+    case 'createOrder':
+      return await createOrder(args.input, userId, identity.claims ? identity.claims.email : null);
     default:
       throw new Error(`Unsupported field: ${fieldName}`);
   }
@@ -35,6 +40,47 @@ async function requireAdmin(userId) {
   if (!Item || Item.role !== 'ADMIN') {
     throw new Error("Forbidden: Admin access required");
   }
+}
+
+async function createOrder(input, userId, email) {
+  const orderId = `ORD-${Date.now()}`;
+  
+  const order = { ...input, orderId, userId, orderDate: new Date().toISOString(), status: 'PENDING' };
+  const putParams = {
+    TableName: TABLE_NAME,
+    Item: {
+      PK: `ORDER#USER#${userId}`,
+      SK: `ORDER#${orderId}`,
+      type: "Order",
+      ...order
+    }
+  };
+  
+  await docClient.send(new PutCommand(putParams));
+
+  if (NOTIFICATION_LAMBDA_NAME && email) {
+    const payload = {
+      type: "OrderConfirmation",
+      payload: {
+        email: email,
+        orderId: orderId,
+        name: email.split('@')[0]
+      }
+    };
+    
+    try {
+      await lambdaClient.send(new InvokeCommand({
+        FunctionName: NOTIFICATION_LAMBDA_NAME,
+        InvocationType: "Event",
+        Payload: Buffer.from(JSON.stringify(payload))
+      }));
+      console.log(`Notification lambda invoked for order ${orderId}`);
+    } catch (e) {
+      console.error("Failed to invoke notification lambda", e);
+    }
+  }
+
+  return { success: true, orderId: orderId, message: "Order created successfully" };
 }
 
 async function listUserOrders(userId) {

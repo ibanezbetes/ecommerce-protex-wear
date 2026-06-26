@@ -38,6 +38,12 @@ export class EcommerceStack extends cdk.Stack {
         requireUppercase: true,
         requireDigits: true,
       },
+      email: cognito.UserPoolEmail.withSES({
+        fromEmail: 'Daniel.guillen@protexwear.es',
+        fromName: 'Protex Wear',
+        replyTo: 'Daniel.guillen@protexwear.es',
+        sesRegion: 'eu-west-1',
+      }),
     });
 
     const userPoolClient = new cognito.UserPoolClient(this, 'ProtexWearUserPoolClient', {
@@ -122,6 +128,7 @@ export class EcommerceStack extends cdk.Stack {
     const orderDataSource = api.addLambdaDataSource('OrderDataSource', orderHandlerLambda);
     orderDataSource.createResolver('ListUserOrdersResolver', { typeName: 'Query', fieldName: 'listUserOrders' });
     orderDataSource.createResolver('ListAllOrdersResolver', { typeName: 'Query', fieldName: 'listAllOrders' });
+    orderDataSource.createResolver('CreateOrderResolver', { typeName: 'Mutation', fieldName: 'createOrder' });
 
     // Resolver básico de listado directo a DynamoDB (opcional, si se quiere paginar sin lambda)
     const dbDataSource = api.addDynamoDbDataSource('DbDataSource', table);
@@ -212,6 +219,24 @@ export class EcommerceStack extends cdk.Stack {
       new s3n.LambdaDestination(processExcelLambda),
       { suffix: '.xlsx' }
     );
+
+    // 8. Notification Lambda (SES)
+    const notificationLambda = new lambda.Function(this, 'NotificationHandler', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/notification-handler')),
+      environment: {
+        SENDER_EMAIL: 'Daniel.guillen@protexwear.es',
+      },
+    });
+
+    notificationLambda.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+      resources: ['*'],
+    }));
+
+    notificationLambda.grantInvoke(orderHandlerLambda);
+    orderHandlerLambda.addEnvironment('NOTIFICATION_LAMBDA_NAME', notificationLambda.functionName);
 
     new cdk.CfnOutput(this, 'UploadsBucketName', { value: uploadsBucket.bucketName });
   }

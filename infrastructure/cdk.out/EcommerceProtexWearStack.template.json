@@ -78,6 +78,27 @@
     "AutoVerifiedAttributes": [
      "email"
     ],
+    "EmailConfiguration": {
+     "EmailSendingAccount": "DEVELOPER",
+     "From": "Protex Wear <Daniel.guillen@protexwear.es>",
+     "ReplyToEmailAddress": "Daniel.guillen@protexwear.es",
+     "SourceArn": {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":ses:eu-west-1:",
+        {
+         "Ref": "AWS::AccountId"
+        },
+        ":identity/Daniel.guillen@protexwear.es"
+       ]
+      ]
+     }
+    },
     "EmailVerificationMessage": "The verification code to your new account is {####}",
     "EmailVerificationSubject": "Verify your new account",
     "Policies": {
@@ -229,7 +250,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1812377831
+    "Expires": 1814011752
    },
    "DependsOn": [
     "ProtexWearApiSchemaCF7F059D"
@@ -675,6 +696,28 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/ListAllOrdersResolver/Resource"
+   }
+  },
+  "ProtexWearApiCreateOrderResolver7D875FC7": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ProtexWearApi2D35C46F",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "OrderDataSource",
+    "FieldName": "createOrder",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ProtexWearApiOrderDataSource84B0EA53",
+    "ProtexWearApiSchemaCF7F059D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver/Resource"
    }
   },
   "ProtexWearApiDbDataSourceServiceRole3818109A": {
@@ -1138,6 +1181,32 @@
          ]
         }
        ]
+      },
+      {
+       "Action": "lambda:InvokeFunction",
+       "Effect": "Allow",
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "NotificationHandler5A872A20",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "NotificationHandler5A872A20",
+             "Arn"
+            ]
+           },
+           ":*"
+          ]
+         ]
+        }
+       ]
       }
      ],
      "Version": "2012-10-17"
@@ -1160,12 +1229,15 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "12ea69f7d8a3bd3bff6de3624050d821c39c960a02200f21bc3a54f40b969afd.zip"
+     "S3Key": "a6852ca50feb4f37bd48105ff60d6ff91be89e8f1d3b2efd05ffd1e8b86a8aaf.zip"
     },
     "Environment": {
      "Variables": {
       "TABLE_NAME": {
        "Ref": "ProtexWearTableF73247B0"
+      },
+      "NOTIFICATION_LAMBDA_NAME": {
+       "Ref": "NotificationHandler5A872A20"
       }
      }
     },
@@ -1184,7 +1256,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/OrderOperationsHandler/Resource",
-    "aws:asset:path": "asset.12ea69f7d8a3bd3bff6de3624050d821c39c960a02200f21bc3a54f40b969afd",
+    "aws:asset:path": "asset.a6852ca50feb4f37bd48105ff60d6ff91be89e8f1d3b2efd05ffd1e8b86a8aaf",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1691,6 +1763,101 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource"
+   }
+  },
+  "NotificationHandlerServiceRole75069BD7": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Statement": [
+      {
+       "Action": "sts:AssumeRole",
+       "Effect": "Allow",
+       "Principal": {
+        "Service": "lambda.amazonaws.com"
+       }
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "ManagedPolicyArns": [
+     {
+      "Fn::Join": [
+       "",
+       [
+        "arn:",
+        {
+         "Ref": "AWS::Partition"
+        },
+        ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+       ]
+      ]
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/Resource"
+   }
+  },
+  "NotificationHandlerServiceRoleDefaultPolicy02DD28C2": {
+   "Type": "AWS::IAM::Policy",
+   "Properties": {
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": [
+        "ses:SendEmail",
+        "ses:SendRawEmail"
+       ],
+       "Effect": "Allow",
+       "Resource": "*"
+      }
+     ],
+     "Version": "2012-10-17"
+    },
+    "PolicyName": "NotificationHandlerServiceRoleDefaultPolicy02DD28C2",
+    "Roles": [
+     {
+      "Ref": "NotificationHandlerServiceRole75069BD7"
+     }
+    ]
+   },
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/NotificationHandler/ServiceRole/DefaultPolicy/Resource"
+   }
+  },
+  "NotificationHandler5A872A20": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+     },
+     "S3Key": "cdce8eeebf6bfae42144b0e49844a02f6c4a178df55cdca292f12cfca8fc49a2.zip"
+    },
+    "Environment": {
+     "Variables": {
+      "SENDER_EMAIL": "Daniel.guillen@protexwear.es"
+     }
+    },
+    "Handler": "index.handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "NotificationHandlerServiceRole75069BD7",
+      "Arn"
+     ]
+    },
+    "Runtime": "nodejs20.x"
+   },
+   "DependsOn": [
+    "NotificationHandlerServiceRoleDefaultPolicy02DD28C2",
+    "NotificationHandlerServiceRole75069BD7"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/NotificationHandler/Resource",
+    "aws:asset:path": "asset.cdce8eeebf6bfae42144b0e49844a02f6c4a178df55cdca292f12cfca8fc49a2",
+    "aws:asset:is-bundled": false,
+    "aws:asset:property": "Code"
    }
   },
   "CDKMetadata": {

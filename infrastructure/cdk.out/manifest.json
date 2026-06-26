@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f22de45049d917850a1d9c014df0dada2958277830d5f24e982c0ecc3a8e3de4.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/5cd7b845062764fc57ea1294a9161d52b0c4ba14ba8b54e270f009ffd87188be.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -170,6 +170,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "ProtexWearApiListAllOrdersResolverD7F1852C"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiCreateOrderResolver7D875FC7"
           }
         ],
         "/EcommerceProtexWearStack/ProtexWearApi/DbDataSource/ServiceRole/Resource": [
@@ -356,6 +362,24 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandlerServiceRole75069BD7"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandlerServiceRoleDefaultPolicy02DD28C2"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandler5A872A20"
           }
         ],
         "/EcommerceProtexWearStack/UploadsBucketName": [

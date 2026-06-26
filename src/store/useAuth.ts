@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 /* ============================================================================
  * useAuth — Store Global de Autenticación (Zustand)
@@ -54,11 +55,18 @@ interface AuthState {
  * const token = useAuth.getState().user?.token;
  * ```
  */
-export const useAuth = create<AuthState>((set) => ({
-  user: null,
-  isGuest: true,
+export const useAuth = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      isGuest: true,
 
-  setSession: (userData: User) => set({ user: userData, isGuest: false }),
+      setSession: (userData: User) => set({ user: userData, isGuest: false }),
 
-  logout: () => set({ user: null, isGuest: true }),
-}));
+      logout: () => set({ user: null, isGuest: true }),
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+);
