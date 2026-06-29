@@ -249,41 +249,45 @@ function CatalogContent() {
         {/* Sidebar Filters */}
         <div className="w-full lg:w-64 shrink-0 space-y-8">
           {/* Price Filter */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="font-bold text-gray-900 mb-4">Precio Máximo</h3>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="text-sm font-semibold text-gray-500">0€</span>
-              <input 
-                type="range" 
-                min="0" 
-                max="500" 
-                value={maxPrice} 
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-              />
-              <span className="text-sm font-semibold text-indigo-600">{maxPrice}€</span>
+          {urlCategory && (
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-900 mb-4">Precio Máximo</h3>
+              <div className="flex items-center gap-4 mb-4">
+                <span className="text-sm font-semibold text-gray-500">0€</span>
+                <input 
+                  type="range" 
+                  min="0" 
+                  max="500" 
+                  value={maxPrice} 
+                  onChange={(e) => setMaxPrice(Number(e.target.value))}
+                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                />
+                <span className="text-sm font-semibold text-indigo-600">{maxPrice}€</span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Size Filter */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="font-bold text-gray-900 mb-4">Talla</h3>
-            <div className="flex flex-wrap gap-2">
-              {['ALL', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43', '44', '45', '46'].map((size) => (
-                <button
-                  key={size}
-                  onClick={() => setSelectedSize(size)}
-                  className={`w-10 h-10 rounded-xl text-sm font-bold flex items-center justify-center transition-all ${
-                    selectedSize === size
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-200'
-                  }`}
-                >
-                  {size === 'ALL' ? 'Todas' : size}
-                </button>
-              ))}
+          {urlCategory && (
+            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
+              <h3 className="font-bold text-gray-900 mb-4">Talla</h3>
+              <div className="flex flex-wrap gap-2">
+                {['ALL', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43', '44', '45', '46'].map((size) => (
+                  <button
+                    key={size}
+                    onClick={() => setSelectedSize(size)}
+                    className={`w-10 h-10 rounded-xl text-sm font-bold flex items-center justify-center transition-all ${
+                      selectedSize === size
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-200'
+                    }`}
+                  >
+                    {size === 'ALL' ? 'Todas' : size}
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Color Filter */}
           <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
@@ -336,7 +340,7 @@ function CatalogContent() {
                     <Link key={product.id} href={`/productos/${product.id}`} className="group flex flex-col bg-white rounded-3xl border border-gray-100 overflow-hidden hover:shadow-2xl hover:shadow-indigo-900/5 hover:-translate-y-1 transition-all duration-300">
                       
                       {/* Image Container */}
-                      <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden flex items-center justify-center p-8">
+                      <div className="relative aspect-[3/4] bg-gray-50 overflow-hidden flex items-center justify-center">
                         <div className="absolute inset-0 bg-gradient-to-t from-gray-900/10 to-transparent z-10 mix-blend-multiply opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                         
                         {/* Badges */}
@@ -358,7 +362,7 @@ function CatalogContent() {
                         <img
                           src={image}
                           alt={product.name}
-                          className="w-full h-full object-contain mix-blend-darken transform group-hover:scale-105 transition-transform duration-500 ease-out"
+                          className="w-full h-full object-cover mix-blend-darken transform group-hover:scale-105 transition-transform duration-500 ease-out"
                           onError={(e) => {
                             e.currentTarget.src = 'https://via.placeholder.com/600x800?text=Protex+Wear';
                           }}

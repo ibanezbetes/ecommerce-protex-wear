@@ -22,7 +22,7 @@ export default function Footer() {
                 alt="Protex Wear" 
                 width={160} 
                 height={45} 
-                className="brightness-0 invert hover:opacity-80 transition-opacity object-contain" 
+                className="brightness-0 invert hover:opacity-80 transition-opacity object-contain w-auto h-auto" 
               />
             </Link>
             <p className="text-indigo-200/80 leading-relaxed mb-8 max-w-sm">

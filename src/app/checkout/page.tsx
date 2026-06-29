@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
-import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
+import { PaymentMethodSelector, PaymentMethod } from '@/components/checkout/PaymentMethodSelector';
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
 
 export interface Address {

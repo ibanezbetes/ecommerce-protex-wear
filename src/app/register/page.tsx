@@ -88,7 +88,7 @@ export default function RegisterPage() {
 
         <div className="relative z-20 flex justify-end">
           <Link href="/">
-            <Image src="/logo.png" alt="Protex Wear" width={150} height={40} className="brightness-0 invert hover:opacity-80 transition-opacity" priority />
+            <Image src="/logo.png" alt="Protex Wear" width={150} height={40} className="brightness-0 invert hover:opacity-80 transition-opacity w-auto h-auto" priority />
           </Link>
         </div>
 
@@ -116,7 +116,7 @@ export default function RegisterPage() {
         <div className="w-full max-w-md mx-auto">
           <div className="md:hidden mb-10 flex justify-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Protex Wear" width={140} height={40} priority />
+              <Image src="/logo.png" alt="Protex Wear" width={140} height={40} className="w-auto h-auto" priority />
             </Link>
           </div>
 

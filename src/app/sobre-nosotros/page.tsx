@@ -85,6 +85,7 @@ export default function SobreNosotrosPage() {
                 src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?auto=format&fit=crop&q=80&w=1200" 
                 alt="Operario con EPI" 
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
             </div>
@@ -163,11 +164,11 @@ export default function SobreNosotrosPage() {
             Distribuidores Oficiales de las Mejores Marcas
           </h3>
           <div className="flex flex-wrap justify-center items-center gap-10 sm:gap-20 opacity-50 grayscale hover:grayscale-0 transition-all duration-700">
-            <Image src="/images/brands/3m.jpg" alt="3M" width={100} height={50} className="object-contain" />
-            <Image src="/images/brands/Ansell.jpg" alt="Ansell" width={120} height={60} className="object-contain" />
-            <Image src="/images/brands/fal.jpg" alt="Fal Seguridad" width={110} height={55} className="object-contain" />
-            <Image src="/images/brands/Portwest.jpg" alt="Portwest" width={130} height={65} className="object-contain" />
-            <Image src="/images/brands/deltaplus.webp" alt="Delta Plus" width={120} height={60} className="object-contain" />
+            <Image src="/images/brands/3m.jpg" alt="3M" width={100} height={50} className="object-contain w-auto h-auto" />
+            <Image src="/images/brands/Ansell.jpg" alt="Ansell" width={120} height={60} className="object-contain w-auto h-auto" />
+            <Image src="/images/brands/fal.jpg" alt="Fal Seguridad" width={110} height={55} className="object-contain w-auto h-auto" />
+            <Image src="/images/brands/Portwest.jpg" alt="Portwest" width={130} height={65} className="object-contain w-auto h-auto" />
+            <Image src="/images/brands/deltaplus.webp" alt="Delta Plus" width={120} height={60} className="object-contain w-auto h-auto" />
           </div>
         </div>
       </section>

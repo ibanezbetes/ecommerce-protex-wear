@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md mx-auto">
           <div className="md:hidden mb-10 flex justify-center">
             <Link href="/">
-              <Image src="/logo.png" alt="Protex Wear" width={140} height={40} priority />
+              <Image src="/logo.png" alt="Protex Wear" width={140} height={40} className="w-auto h-auto" priority />
             </Link>
           </div>
 
@@ -185,7 +185,7 @@ export default function ForgotPasswordPage() {
         </div>
 
         <div className="relative z-20 max-w-lg mx-auto text-center">
-          <Image src="/logo.png" alt="Protex Wear" width={200} height={60} className="brightness-0 invert mx-auto mb-8" priority />
+          <Image src="/logo.png" alt="Protex Wear" width={200} height={60} className="brightness-0 invert mx-auto mb-8 w-auto h-auto" priority />
           <h2 className="text-3xl font-extrabold text-white mb-4">Seguridad B2B</h2>
           <p className="text-indigo-100 text-lg">
             Mantén el acceso a tus pedidos y facturación protegido en todo momento.

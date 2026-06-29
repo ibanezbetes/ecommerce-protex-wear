@@ -69,7 +69,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-            <Image src="/logo.png" alt="Protex Wear" width={140} height={40} className="object-contain" priority />
+            <Image src="/logo.png" alt="Protex Wear" width={140} height={40} className="w-auto h-auto object-contain" priority />
           </Link>
 
           {/* Desktop Navigation */}

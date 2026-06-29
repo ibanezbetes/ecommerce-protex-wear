@@ -79,7 +79,7 @@
         }
       }
     },
-    "5cd7b845062764fc57ea1294a9161d52b0c4ba14ba8b54e270f009ffd87188be": {
+    "1a34e6826b0a2c21385f272e47a7e45d68270de65474010c693252218a87136c": {
       "source": {
         "path": "EcommerceProtexWearStack.template.json",
         "packaging": "file"
@@ -87,7 +87,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "5cd7b845062764fc57ea1294a9161d52b0c4ba14ba8b54e270f009ffd87188be.json",
+          "objectKey": "1a34e6826b0a2c21385f272e47a7e45d68270de65474010c693252218a87136c.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }
