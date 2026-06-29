@@ -39,6 +39,12 @@ export interface CartItem {
   image?: string;
 }
 
+interface Discount {
+  code: string;
+  type: 'fixed' | 'percentage';
+  value: number;
+}
+
 /** Estado y acciones del store del carrito */
 interface CartState {
   /** Lista de artículos en el carrito */
@@ -52,7 +58,10 @@ interface CartState {
   /** Número total de unidades en el carrito */
   itemCount: number;
 
-  // ── Descuento (eliminado temporalmente) ──────────────────────────────────
+  /** Descuento aplicado */
+  discount: Discount | null;
+  /** Monto de descuento total en euros */
+  discountAmount: number;
 
   /** Añade un artículo. Si ya existe (mismo variantId), suma la cantidad. */
   addItem: (item: CartItem) => void;
@@ -66,18 +75,35 @@ interface CartState {
   openCart: () => void;
   /** Cierra el drawer del carrito */
   closeCart: () => void;
+  /** Aplica un descuento */
+  applyDiscount: (discount: Discount) => void;
+  /** Elimina el descuento actual */
+  removeDiscount: () => void;
 }
 
 const computeTotals = (
-  items: CartItem[]
+  items: CartItem[],
+  discount: Discount | null
 ) => {
-  const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+  const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
   const itemCount = items.reduce((count, item) => count + item.quantity, 0);
+  
+  let discountAmount = 0;
+  if (discount) {
+    if (discount.type === 'percentage') {
+      discountAmount = subtotal * (discount.value / 100);
+    } else {
+      discountAmount = discount.value;
+    }
+  }
+  
+  const cartTotal = Math.max(0, subtotal - discountAmount);
 
   return {
     cartTotal,
-    subtotal: cartTotal,
+    subtotal,
     itemCount,
+    discountAmount
   };
 };
 
@@ -89,6 +115,8 @@ export const useCart = create<CartState>()(
       cartTotal: 0,
       subtotal: 0,
       itemCount: 0,
+      discount: null,
+      discountAmount: 0,
 
       // ── Mutaciones del carrito ──────────────────────────────────────────
       addItem: (newItem) => set((state) => {
@@ -103,12 +131,12 @@ export const useCart = create<CartState>()(
         } else {
           newItems = [...state.items, newItem];
         }
-        return { items: newItems, isCartOpen: true, ...computeTotals(newItems) };
+        return { items: newItems, isCartOpen: true, ...computeTotals(newItems, state.discount) };
       }),
 
       removeItem: (variantId) => set((state) => {
         const newItems = state.items.filter(i => i.variantId !== variantId);
-        return { items: newItems, ...computeTotals(newItems) };
+        return { items: newItems, ...computeTotals(newItems, state.discount) };
       }),
 
       updateQuantity: (variantId, quantity) => set((state) => {
@@ -116,7 +144,7 @@ export const useCart = create<CartState>()(
         const newItems = state.items.map(i =>
           i.variantId === variantId ? { ...i, quantity: safeQuantity } : i
         );
-        return { items: newItems, ...computeTotals(newItems) };
+        return { items: newItems, ...computeTotals(newItems, state.discount) };
       }),
 
       clearCart: () => set({
@@ -125,7 +153,19 @@ export const useCart = create<CartState>()(
         cartTotal: 0,
         subtotal: 0,
         itemCount: 0,
+        discount: null,
+        discountAmount: 0,
       }),
+
+      applyDiscount: (discount) => set((state) => ({
+        discount,
+        ...computeTotals(state.items, discount)
+      })),
+
+      removeDiscount: () => set((state) => ({
+        discount: null,
+        ...computeTotals(state.items, null)
+      })),
 
       openCart: () => set({ isCartOpen: true }),
       closeCart: () => set({ isCartOpen: false }),
@@ -138,14 +178,17 @@ export const useCart = create<CartState>()(
         cartTotal: state.cartTotal,
         subtotal: state.subtotal,
         itemCount: state.itemCount,
+        discount: state.discount,
+        discountAmount: state.discountAmount,
       }),
       // Recalculate on rehydration to prevent stale totals
       onRehydrateStorage: () => (state, error) => {
         if (state && !error) {
-          const totals = computeTotals(state.items);
+          const totals = computeTotals(state.items, state.discount);
           state.cartTotal = totals.cartTotal;
           state.subtotal = totals.subtotal;
           state.itemCount = totals.itemCount;
+          state.discountAmount = totals.discountAmount;
         }
       },
     }

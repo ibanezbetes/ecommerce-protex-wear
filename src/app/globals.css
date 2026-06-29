@@ -18,6 +18,7 @@
  * ========================================================================= */
 
 @import "tailwindcss";
+@source "../";
 
 /* ===========================================================================
  * 1. DESIGN TOKENS — Variables CSS del sistema de diseño
@@ -69,11 +70,7 @@
  * 2. RESET Y BASE
  * ========================================================================= */
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
+
 
 html {
   line-height: 1.5;
@@ -772,92 +769,6 @@ body {
   box-shadow: 0 6px 20px rgba(46, 85, 158, 0.4);
 }
 
-/* Helpers */
-.max-w-6xl { max-width: 72rem; }
-.max-w-5xl { max-width: 64rem; }
-.max-w-md { max-width: 28rem; }
-.max-w-sm { max-width: 24rem; }
-.pointer-events-auto { pointer-events: auto; }
-.inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
-.overflow-y-auto { overflow-y: auto; }
-.overflow-y-scroll { overflow-y: scroll; }
-.flex-shrink-0 { flex-shrink: 0; }
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border-width: 0;
-}
-.bg-opacity-75 { background-color: rgba(107, 114, 128, 0.75); }
-.top-4 { top: 1rem; }
-.w-screen { width: 100vw; }
-.space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
-.space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-.lg\:col-span-2 { grid-column: span 2 / span 2; }
-.lg\:col-span-1 { grid-column: span 1 / span 1; }
-
-/* Helper utility classes for Legal Pages (Tailwind-like layout fixes in Vanilla CSS) */
-.min-h-screen {
-  min-height: 100vh;
-}
-.flex {
-  display: flex;
-}
-.flex-col {
-  flex-direction: column;
-}
-.flex-1 {
-  flex: 1 1 0%;
-}
-.max-w-7xl {
-  max-width: 80rem; /* 1280px */
-}
-.max-w-4xl {
-  max-width: 56rem; /* 896px */
-}
-.mx-auto {
-  margin-left: auto;
-  margin-right: auto;
-}
-.w-full {
-  width: 100%;
-}
-.px-4 {
-  padding-left: 1rem;
-  padding-right: 1rem;
-}
-.py-12 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-}
-.relative {
-  position: relative;
-}
-.z-10 {
-  z-index: 10;
-}
-.hidden {
-  display: none;
-}
-.space-y-1 > :not([hidden]) ~ :not([hidden]) {
-  margin-top: 0.25rem;
-}
-@media (min-width: 1024px) {
-  .lg\:block {
-    display: block;
-  }
-}
-@media (min-width: 768px) {
-  .md\:py-16 {
-    padding-top: 4rem;
-    padding-bottom: 4rem;
-  }
-}
 
 /* Premium Legal Pages Design System */
 .legal-wrapper {

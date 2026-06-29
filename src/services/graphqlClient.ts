@@ -97,6 +97,7 @@ export async function graphqlFetch<T = Record<string, unknown>>(
     const isUnauthorized = json.errors.some(err => 
       err.message?.toLowerCase().includes('not authorized') || 
       err.message?.toLowerCase().includes('unauthorized') || 
+      err.message?.toLowerCase().includes('authorization') || 
       err.message?.toLowerCase().includes('expired')
     );
 
@@ -154,20 +155,41 @@ const LIST_PRODUCTS_QUERY = `
 // Operaciones de Producto
 // ===========================================================================
 
-/**
- * Métodos de alto nivel para interactuar con productos en la API.
- * Encapsulan las queries GraphQL y proporcionan tipado básico.
- */
+const CREATE_PRODUCT_MUTATION = `
+  mutation CreateProduct($input: CreateProductInput!) {
+    createProduct(input: $input) {
+      id
+      sku
+      name
+      price
+      stock
+      isActive
+    }
+  }
+`;
+
+const UPDATE_PRODUCT_MUTATION = `
+  mutation UpdateProduct($id: ID!, $input: UpdateProductInput!) {
+    updateProduct(id: $id, input: $input) {
+      id
+      sku
+      name
+      price
+      stock
+      isActive
+    }
+  }
+`;
+
+const DELETE_PRODUCT_MUTATION = `
+  mutation DeleteProduct($id: ID!) {
+    deleteProduct(id: $id) {
+      id
+    }
+  }
+`;
+
 export const productOperations = {
-  /**
-   * Lista productos del catálogo con filtros opcionales y paginación.
-   *
-   * @param brand     - Filtrar por marca (e.g., "Anbor", "Forli"). Omitir para todas.
-   * @param category  - Filtrar por categoría. Omitir para todas.
-   * @param limit     - Número máximo de productos por página (default: API decide).
-   * @param nextToken - Token de paginación para obtener la siguiente página.
-   * @returns         - Objeto con `items` (array de productos) y `nextToken`.
-   */
   async listProducts(
     brand?: string,
     category?: string,
@@ -189,6 +211,21 @@ export const productOperations = {
 
     return data.listProducts;
   },
+
+  async createProduct(input: any) {
+    const data = await graphqlFetch<{ createProduct: any }>(CREATE_PRODUCT_MUTATION, { input });
+    return data.createProduct;
+  },
+
+  async updateProduct(id: string, input: any) {
+    const data = await graphqlFetch<{ updateProduct: any }>(UPDATE_PRODUCT_MUTATION, { id, input });
+    return data.updateProduct;
+  },
+
+  async deleteProduct(id: string) {
+    const data = await graphqlFetch<{ deleteProduct: any }>(DELETE_PRODUCT_MUTATION, { id });
+    return data.deleteProduct;
+  }
 };
 
 // ===========================================================================

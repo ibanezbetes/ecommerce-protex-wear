@@ -63,7 +63,12 @@ export const useAuth = create<AuthState>()(
 
       setSession: (userData: User) => set({ user: userData, isGuest: false }),
 
-      logout: () => set({ user: null, isGuest: true }),
+      logout: () => {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'protex_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        }
+        set({ user: null, isGuest: true });
+      },
     }),
     {
       name: 'auth-storage',

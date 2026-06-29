@@ -25,6 +25,7 @@ export interface MockProduct {
   name: string;
   description?: string;
   brand: string;
+  category?: string;
   variants: MockVariant[];
 }
 

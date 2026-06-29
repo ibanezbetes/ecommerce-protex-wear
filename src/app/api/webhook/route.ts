@@ -165,6 +165,41 @@ export async function POST(request: Request) {
       }
     }
 
+    if (event.type === 'checkout.session.expired') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const orderId = session.client_reference_id;
+      if (orderId) {
+        console.log(`❌ Sesión expirada/Carrito abandonado. Actualizando pedido ${orderId}`);
+        try {
+          await graphqlFetch(UPDATE_ORDER_STATUS_MUTATION, {
+            orderId: orderId,
+            status: 'CANCELADO'
+          });
+        } catch (dbErr) {
+          console.warn(`[Webhook] Fallo al actualizar estado de expiración para el pedido ${orderId}:`, dbErr);
+        }
+      }
+    }
+
+    if (event.type === 'charge.refunded') {
+      const charge = event.data.object as Stripe.Charge;
+      if (charge.payment_intent) {
+        try {
+          const sessions = await stripe.checkout.sessions.list({ payment_intent: charge.payment_intent as string });
+          const orderId = sessions.data[0]?.client_reference_id;
+          if (orderId) {
+            console.log(`💸 Reembolso detectado. Actualizando pedido ${orderId} a DEVUELTO`);
+            await graphqlFetch(UPDATE_ORDER_STATUS_MUTATION, {
+              orderId: orderId,
+              status: 'DEVUELTO'
+            });
+          }
+        } catch (dbErr) {
+          console.warn(`[Webhook] Fallo al actualizar reembolso para el charge ${charge.id}:`, dbErr);
+        }
+      }
+    }
+
     return NextResponse.json({ received: true });
     
   } catch (error) {

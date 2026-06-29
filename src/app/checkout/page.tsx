@@ -6,11 +6,7 @@ import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/Checkout/PaymentMethodSelector';
-import { BankTransferDetails } from '@/components/Checkout/BankTransferDetails';
-import { BizumDetails } from '@/components/Checkout/BizumDetails';
-
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
-import styles from './page.module.css';
 
 export interface Address {
   id?: string;
@@ -25,17 +21,7 @@ export interface Address {
   email?: string;
 }
 
-export interface ShippingOption {
-  method: string;
-  carrier: string;
-  cost: number;
-  estimatedDays: number;
-  description: string;
-}
-
-/** Umbral (€ sin IVA y sin descuento) a partir del cual el envío es gratuito */
 export const SHIPPING_THRESHOLD = 100;
-/** Coste de envío fijo cuando no se alcanza el umbral */
 export const SHIPPING_COST_FIXED = 9;
 
 const generateOrderNumber = () => {
@@ -47,7 +33,6 @@ const generateOrderNumber = () => {
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds().toString().padStart(2, '0');
   const ms = date.getMilliseconds().toString().padStart(3, '0').slice(0, 2);
-  // F-YYMMDD-HHMMSSxx (siempre creciente y único)
   return `F-${year}${month}${day}-${hours}${minutes}${seconds}${ms}`;
 };
 
@@ -66,7 +51,6 @@ const CREATE_ORDER_MUTATION = `
     }
   }
 `;
-
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -92,11 +76,9 @@ export default function CheckoutPage() {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('card');
   const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-  // Autocomplete manual (fallback cuando Google Places no está activo)
   const [addressSuggestions, setAddressSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const searchTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-  // Ref para saber si Google Places ya está activo (evita conflicto con búsqueda manual)
   const googlePlacesActiveRef = React.useRef<boolean>(false);
 
   const handleSelectSuggestion = (suggestion: string) => {
@@ -116,35 +98,28 @@ export default function CheckoutPage() {
 
       toast.success({
         title: 'Dirección Completada',
-        message: 'Los datos se rellenaron automáticamente desde las sugerencias.',
+        message: 'Los datos se rellenaron automáticamente.',
       });
     }
     setAddressSuggestions([]);
     setShowSuggestions(false);
   };
 
-  // ── Cálculo de envío: tarifa plana ──────────────────────────────────────────
-  // 9 € si el subtotal (sin IVA, tras descuento) es < 100 €; gratis si ≥ 100 €
   const discountedSubtotal = Math.max(0, subtotal);
   const tax = discountedSubtotal * 0.21;
   const subtotalWithTax = discountedSubtotal + tax;
   const shippingCost = subtotalWithTax >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST_FIXED;
   const total = subtotalWithTax + shippingCost;
 
-  // Protect route
   useEffect(() => {
     if (items.length === 0 && !orderPlaced) {
       router.push('/');
     }
   }, [items, router, orderPlaced]);
 
-  // Google Places Autocomplete Integration with Try-Catch and Graceful Fallback
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
-    if (!apiKey) {
-      console.warn('Google Places API Key no configurada. Degradación elegante activa.');
-      return;
-    }
+    if (!apiKey) return;
 
     const inputElement = document.getElementById('street-input') as HTMLInputElement;
     if (!inputElement) return;
@@ -154,17 +129,13 @@ export default function CheckoutPage() {
     const initAutocomplete = () => {
       try {
         const googleObj = (window as any).google;
-        if (!googleObj || !googleObj.maps || !googleObj.maps.places) {
-          console.warn('Google Maps API no está disponible en window.');
-          return;
-        }
+        if (!googleObj || !googleObj.maps || !googleObj.maps.places) return;
 
         autocomplete = new googleObj.maps.places.Autocomplete(inputElement, {
           types: ['address'],
-          componentRestrictions: { country: ['es'] }, // Solo España
+          componentRestrictions: { country: ['es'] },
         });
 
-        // Marcar Google Places como activo → el fallback manual queda desactivado
         googlePlacesActiveRef.current = true;
         setShowSuggestions(false);
         setAddressSuggestions([]);
@@ -181,17 +152,11 @@ export default function CheckoutPage() {
 
           for (const component of place.address_components) {
             const types = component.types;
-            if (types.includes('route')) {
-              streetName = component.long_name;
-            } else if (types.includes('street_number')) {
-              streetNumber = component.long_name;
-            } else if (types.includes('locality')) {
-              city = component.long_name;
-            } else if (types.includes('postal_code')) {
-              postalCode = component.long_name;
-            } else if (types.includes('country')) {
-              country = component.short_name;
-            }
+            if (types.includes('route')) streetName = component.long_name;
+            else if (types.includes('street_number')) streetNumber = component.long_name;
+            else if (types.includes('locality')) city = component.long_name;
+            else if (types.includes('postal_code')) postalCode = component.long_name;
+            else if (types.includes('country')) country = component.short_name;
           }
 
           const fullStreet = streetNumber ? `${streetName}, ${streetNumber}` : streetName;
@@ -204,14 +169,11 @@ export default function CheckoutPage() {
             country: country || prev.country || 'ES',
           }));
 
-          toast.success({ title: 'Dirección Completada', message: 'Los datos se rellenaron automáticamente desde Google Maps.' });
+          toast.success({ title: 'Dirección Completada', message: 'Los datos se rellenaron desde Google Maps.' });
         });
-      } catch (err) {
-        console.error('Error inicializando Google Places Autocomplete:', err);
-      }
+      } catch (err) {}
     };
 
-    // Inyectar script solo si no existe ya en el DOM
     const alreadyLoaded = !!(window as any).google;
     const alreadyInjected = !!document.querySelector('script[src*="maps.googleapis.com"]');
     if (!alreadyLoaded && !alreadyInjected) {
@@ -220,7 +182,6 @@ export default function CheckoutPage() {
       script.async = true;
       script.defer = true;
       script.onload = initAutocomplete;
-      script.onerror = () => console.warn('Fallo al cargar script de Google Maps Places.');
       document.head.appendChild(script);
     } else {
       initAutocomplete();
@@ -241,11 +202,10 @@ export default function CheckoutPage() {
     const required = ['firstName', 'lastName', 'email', 'street', 'city', 'postalCode'];
     for (const field of required) {
       if (!shippingAddress[field as keyof Address]) {
-        toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios de la dirección y contacto.' });
+        toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios.' });
         return false;
       }
     }
-    // Validar formato de email básico
     if (shippingAddress.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(shippingAddress.email)) {
       toast.error({ title: 'Error', message: 'El correo electrónico no es válido.' });
       return false;
@@ -291,9 +251,7 @@ export default function CheckoutPage() {
           shippingMethod: 'agencia_externa',
         }),
       });
-    } catch (e) {
-      console.warn('No se pudo enviar el email de confirmación:', e);
-    }
+    } catch (e) {}
   };
 
   const handleSubmitOrder = async () => {
@@ -305,7 +263,6 @@ export default function CheckoutPage() {
     setIsProcessing(true);
     setError(null);
 
-    // Prepare AppSync Input format
     const orderItems = items.map(item => ({
       productId: item.productId,
       variantId: item.variantId || item.productId,
@@ -319,7 +276,6 @@ export default function CheckoutPage() {
 
     let actualOrderId = orderNumber;
 
-    // A. Mutate Order inside AppSync GraphQL endpoint (PENDIENTE_DE_PAGO state)
     try {
       const graphqlClient = await import('@/services/graphqlClient');
       const result = await graphqlClient.graphqlFetch<{ createOrder: { orderId: string; status: string } }>(
@@ -328,11 +284,8 @@ export default function CheckoutPage() {
       );
       if (result?.createOrder?.orderId) {
         actualOrderId = result.createOrder.orderId;
-        console.log('Pedido registrado en AppSync con ID:', actualOrderId);
       }
     } catch (err: any) {
-      console.warn('Fallo en mutación createOrder de AppSync, procediendo con registro local resiliente:', err);
-      // Fallback local robusto para no interrumpir el flujo de ventas
       const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
       fallbackOrders.push({
         orderId: orderNumber,
@@ -346,9 +299,7 @@ export default function CheckoutPage() {
       sessionStorage.setItem('protex_orders', JSON.stringify(fallbackOrders));
     }
 
-    // B. Payment execution
     if (paymentMethod === 'card' || paymentMethod === 'bizum' || paymentMethod === 'bank_transfer') {
-      // ── Pago con Stripe Checkout Session ─────────────────────
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -365,20 +316,17 @@ export default function CheckoutPage() {
             customerEmail: shippingAddress.email || user?.email,
             customerCif: shippingAddress.cif,
             orderNumber: actualOrderId,
-            paymentMethod: paymentMethod, // Pasar el método de pago a la API
+            paymentMethod: paymentMethod,
           }),
         });
         const data = await res.json();
         if (res.ok && data.url) {
-          // Stripe session creada → redirigir a la pasarela de pago
           window.location.href = data.url;
-          return; // No resetear isProcessing — la página se descargará
+          return; 
         } else {
           throw new Error(data.error || 'Error al iniciar el pago.');
         }
       } catch (err: any) {
-        // ⚠️ ERROR REAL — NO simular confirmación de pago
-        console.error('[Checkout] Error al crear sesión de Stripe:', err);
         const errorMessage = err.message || 'No se pudo conectar con la pasarela de pago.';
         setError(errorMessage);
         toast.error({
@@ -388,10 +336,8 @@ export default function CheckoutPage() {
         setIsProcessing(false);
       }
     } else {
-      // ── Pagos Offline (Transferencia Bancaria) ─────────────────
       try {
         await sendOrderEmail(actualOrderId);
-
         const fallbackOrders = JSON.parse(sessionStorage.getItem('protex_orders') || '[]');
         const updatedOrders = fallbackOrders.map((o: any) =>
           o.orderId === actualOrderId ? { ...o, status: 'CONFIRMADO_PENDIENTE_TRANSFERENCIA' } : o
@@ -402,7 +348,6 @@ export default function CheckoutPage() {
         clearCart();
         router.push(`/checkout/success?order=${actualOrderId}`);
       } catch (err: any) {
-        console.error('[Checkout] Error en pago offline:', err);
         setError(err.message || 'Error al procesar el pedido.');
         toast.error({
           title: 'Error',
@@ -417,172 +362,125 @@ export default function CheckoutPage() {
   if (items.length === 0 && !orderPlaced) return null;
 
   return (
-    <div className={styles.checkoutContainer}>
-      <div className={styles.checkoutLayout}>
-
+    <div className="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-12">
+        
         {/* Left Column - Forms */}
-        <div>
+        <div className="flex-1 w-full lg:w-2/3">
+          
           {/* Header */}
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '2rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-              <div style={{ background: '#2e559e', padding: '0.5rem', borderRadius: '8px', color: 'white' }}>
-                <ShoppingCart size={24} />
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+                <ShoppingCart className="w-6 h-6" />
               </div>
               <div>
-                <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#111827', margin: 0 }}>Finalizar Compra</h1>
-                <p style={{ fontSize: '0.875rem', color: '#6b7280', margin: 0, display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
-                  <Lock size={14} /> Pago 100% Seguro
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Finalizar Compra</h1>
+                <p className="text-sm font-medium text-gray-500 flex items-center gap-1.5 mt-1">
+                  <Lock className="w-4 h-4 text-emerald-500" /> Pago 100% Seguro Encriptado
                 </p>
               </div>
             </div>
             <button
-              className={styles.btnBack}
-              onClick={() => {
-                if (typeof window !== 'undefined' && window.history.length > 1) {
-                  router.back();
-                } else {
-                  router.push('/productos');
-                }
-              }}
-              style={{ padding: '0.5rem 1rem' }}
+              onClick={() => router.back()}
+              className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-gray-600 hover:text-indigo-600 bg-white hover:bg-indigo-50 border border-gray-200 hover:border-indigo-100 rounded-xl transition-all"
             >
-              <ArrowLeft size={16} /> Volver
+              <ArrowLeft className="w-4 h-4" /> Volver
             </button>
           </div>
 
           {/* Stepper */}
-          <div className={styles.stepsContainer}>
-            <div className={styles.stepLine} />
-            {STEPS.map((step) => {
-              const Icon = step.icon;
-              const isCompleted = currentStep > step.number;
-              const isActive = currentStep === step.number;
-
-              let circleClass = styles.stepCircle;
-              if (isActive) circleClass = `${styles.stepCircle} ${styles.stepCircleActive}`;
-              if (isCompleted) circleClass = `${styles.stepCircle} ${styles.stepCircleCompleted}`;
-
-              return (
-                <div key={step.number} className={styles.stepItem}>
-                  <div className={circleClass}>
-                    {isCompleted ? <CheckCircle size={20} /> : <Icon size={20} />}
+          <div className="relative mb-12">
+            <div className="absolute top-1/2 left-0 w-full h-1 bg-gray-200 -translate-y-1/2 rounded-full z-0" />
+            <div className="relative z-10 flex justify-between">
+              {STEPS.map((step) => {
+                const Icon = step.icon;
+                const isCompleted = currentStep > step.number;
+                const isActive = currentStep === step.number;
+                return (
+                  <div key={step.number} className="flex flex-col items-center gap-3 bg-gray-50/50 px-2">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                      isActive ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-600/30 ring-4 ring-indigo-100 scale-110' : 
+                      isCompleted ? 'bg-emerald-500 text-white shadow-md' : 'bg-white text-gray-400 border-2 border-gray-200'
+                    }`}>
+                      {isCompleted ? <CheckCircle className="w-6 h-6" /> : <Icon className="w-5 h-5" />}
+                    </div>
+                    <span className={`text-sm font-bold tracking-wide ${isActive ? 'text-indigo-600' : isCompleted ? 'text-emerald-600' : 'text-gray-400'}`}>
+                      {step.title}
+                    </span>
                   </div>
-                  <span className={`${styles.stepLabel} ${isActive ? styles.stepLabelActive : ''}`}>
-                    {step.title}
-                  </span>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           {/* Content Area */}
-          <div className={styles.card}>
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 overflow-hidden">
             {error && (
-              <div style={{ background: '#fef2f2', borderLeft: '4px solid #ef4444', padding: '1rem', margin: '1.5rem 1.5rem 0', borderRadius: '4px', color: '#991b1b' }}>
+              <div className="m-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-xl text-red-800 font-medium flex items-center gap-3">
+                <ShieldCheck className="w-5 h-5 text-red-500" />
                 {error}
               </div>
             )}
 
-            {/* ── STEP 1: Dirección ────────────────────────────────────────────── */}
+            {/* ── STEP 1: Dirección */}
             {currentStep === 1 && (
-              <>
-                <div className={styles.cardHeader}>
-                  <h2 className={styles.cardTitle}><MapPin size={22} color="#2e559e" /> Dirección de Envío</h2>
+              <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                  <MapPin className="w-6 h-6 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Dirección de Envío</h2>
                 </div>
-                <div className={styles.cardBody}>
-                  <form className={styles.formGrid}>
-                    <div className={styles.formGrid2Cols}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Nombre *</label>
-                        <input className={styles.input} type="text" value={shippingAddress.firstName || ''} onChange={e => handleAddressChange('firstName', e.target.value)} required />
+                <div className="p-8">
+                  <form className="space-y-6">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Nombre *</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.firstName || ''} onChange={e => handleAddressChange('firstName', e.target.value)} required />
                       </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Apellidos *</label>
-                        <input className={styles.input} type="text" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
-                      </div>
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Correo electrónico *</label>
-                      <input className={styles.input} type="email" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
-                    </div>
-                    <div className={styles.formGrid2Cols}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Empresa (opcional)</label>
-                        <input className={styles.input} type="text" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
-                      </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>NIF/CIF/DNI (Factura B2B)</label>
-                        <input className={styles.input} type="text" value={shippingAddress.cif || ''} onChange={e => handleAddressChange('cif', e.target.value)} placeholder="B12345678" />
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Apellidos *</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
                       </div>
                     </div>
-                    <div className={`${styles.inputGroup} ${styles.inputGroupRelative}`}>
-                      <label className={styles.label}>Dirección *</label>
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold text-gray-700">Correo electrónico *</label>
+                      <input type="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Empresa (opcional)</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">NIF/CIF/DNI (Factura B2B)</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.cif || ''} onChange={e => handleAddressChange('cif', e.target.value)} placeholder="B12345678" />
+                      </div>
+                    </div>
+                    <div className="space-y-2 relative">
+                      <label className="text-sm font-bold text-gray-700">Dirección *</label>
                       <input
-                        className={styles.input}
                         type="text"
                         id="street-input"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all"
                         value={shippingAddress.street || ''}
                         onChange={e => {
                           const val = e.target.value;
                           handleAddressChange('street', val);
-
-                          if (searchTimeoutRef.current) {
-                            clearTimeout(searchTimeoutRef.current);
-                          }
-
-                          // Solo ejecutar búsqueda manual si Google Places NO está activo
+                          if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
                           if (!googlePlacesActiveRef.current && val.trim().length >= 2) {
                             searchTimeoutRef.current = setTimeout(async () => {
-                              const controller = new AbortController();
-                              const timeoutId = setTimeout(() => controller.abort(), 6000);
-
                               try {
-                                // 1️⃣ CartoCiudad (IGN) — base de datos oficial, todas las calles de España
-                                const res = await fetch(
-                                  `/api/geocode?q=${encodeURIComponent(val)}`,
-                                  { signal: controller.signal }
-                                );
-                                clearTimeout(timeoutId);
-
-                                if (res.ok) {
-                                  const suggestions: string[] = await res.json();
-                                  if (suggestions.length > 0) {
-                                    setAddressSuggestions(suggestions);
-                                    setShowSuggestions(true);
-                                    return;
-                                  }
-                                }
-
-                                // 2️⃣ Fallback: Photon si CartoCiudad no devuelve nada
-                                const resPhoton = await fetch(
-                                  `https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&lang=es&limit=8`
-                                );
+                                const resPhoton = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(val)}&lang=es&limit=8`);
                                 if (resPhoton.ok) {
                                   const data = await resPhoton.json();
-                                  const fallback: string[] = (data?.features || [])
-                                    .filter((f: any) => {
-                                      const p = f.properties || {};
-                                      // Solo calles y portales, excluir negocios/POIs
-                                      const key = p.osm_key || '';
-                                      const type = p.type || '';
-                                      const validKeys = ['highway', 'place', 'addr'];
-                                      const validTypes = ['street', 'house', 'locality', 'district'];
-                                      return validKeys.includes(key) || validTypes.includes(type);
-                                    })
-                                    .map((f: any) => {
-                                      const p = f.properties || {};
-                                      if (p.countrycode && p.countrycode !== 'ES') return null;
-                                      const street = p.street || p.name || '';
-                                      const city   = p.city || p.town || p.village || p.county || '';
-                                      const cp     = p.postcode || '';
-                                      if (!street && !city) return null;
-                                      let s = street;
-                                      if (city) s += `, ${city}`;
-                                      if (cp)   s += `, ${cp}`;
-                                      return s + ', España';
-                                    })
-                                    .filter(Boolean) as string[];
-
+                                  const fallback: string[] = (data?.features || []).map((f: any) => {
+                                    const p = f.properties || {};
+                                    if (p.countrycode && p.countrycode !== 'ES') return null;
+                                    const street = p.street || p.name || '';
+                                    const city   = p.city || p.town || '';
+                                    if (!street && !city) return null;
+                                    return `${street}${city ? `, ${city}` : ''}, España`;
+                                  }).filter(Boolean) as string[];
                                   const unique = [...new Set(fallback)];
                                   if (unique.length > 0) {
                                     setAddressSuggestions(unique);
@@ -590,191 +488,166 @@ export default function CheckoutPage() {
                                     return;
                                   }
                                 }
-
-                                setAddressSuggestions([]);
-                                setShowSuggestions(false);
-                              } catch (err: any) {
-                                clearTimeout(timeoutId);
-                                if (err?.name !== 'AbortError') console.warn('Geocode error:', err);
-                                setAddressSuggestions([]);
-                                setShowSuggestions(false);
-                              }
-                            }, 350);
-                          } else {
-                            setAddressSuggestions([]);
-                            setShowSuggestions(false);
-                          }
-                        }}
-                        onBlur={() => {
-                          setTimeout(() => setShowSuggestions(false), 200);
-                        }}
-                        onFocus={() => {
-                          if (shippingAddress.street && shippingAddress.street.length >= 1) {
-                            setShowSuggestions(addressSuggestions.length > 0);
+                              } catch (err) {}
+                              setShowSuggestions(false);
+                            }, 400);
                           }
                         }}
                         placeholder="Calle, número, piso..."
                         required
                       />
-
-                      {showSuggestions && (
-                        <ul className={styles.suggestionsDropdown}>
+                      {showSuggestions && addressSuggestions.length > 0 && (
+                        <ul className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
                           {addressSuggestions.map((suggestion, index) => (
                             <li
                               key={index}
-                              className={styles.suggestionItem}
+                              className="px-4 py-3 hover:bg-indigo-50 cursor-pointer flex items-center gap-3 border-b border-gray-50 last:border-0 text-sm text-gray-700 font-medium"
                               onMouseDown={(e) => {
                                 e.preventDefault();
                                 handleSelectSuggestion(suggestion);
                               }}
                             >
-                              <MapPin className={`h-4 w-4 ${styles.suggestionIcon}`} />
-                              <span>{suggestion}</span>
+                              <MapPin className="w-4 h-4 text-indigo-400" />
+                              {suggestion}
                             </li>
                           ))}
                         </ul>
                       )}
                     </div>
-                    <div className={styles.formGrid2Cols}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Ciudad *</label>
-                        <input className={styles.input} type="text" value={shippingAddress.city || ''} onChange={e => handleAddressChange('city', e.target.value)} required />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Ciudad *</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.city || ''} onChange={e => handleAddressChange('city', e.target.value)} required />
                       </div>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>Código Postal *</label>
-                        <input className={styles.input} type="text" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
-                      </div>
-                    </div>
-                    <div className={styles.formGrid2Cols}>
-                      <div className={styles.inputGroup}>
-                        <label className={styles.label}>País *</label>
-                        <select
-                          className={styles.input}
-                          value={shippingAddress.country || 'ES'}
-                          onChange={e => handleAddressChange('country', e.target.value)}
-                        >
-                          <option value="ES">España</option>
-                          <option value="PT">Portugal</option>
-                          <option value="FR">Francia</option>
-                          <option value="AD">Andorra</option>
-                        </select>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Código Postal *</label>
+                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
                       </div>
                     </div>
                   </form>
-                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button className={styles.btnNext} onClick={nextStep}>Continuar a Pago <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
+                  <div className="mt-10 flex justify-end">
+                    <button onClick={nextStep} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/30 group">
+                      Continuar a Pago <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
-
-            {/* ── STEP 2: Pago ─────────────────────────────────────────────────── */}
+            {/* ── STEP 2: Pago */}
             {currentStep === 2 && (
-              <>
-                <div className={styles.cardHeader}>
-                  <h2 className={styles.cardTitle}><CreditCard size={22} color="#2e559e" /> Método de Pago</h2>
+              <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                  <CreditCard className="w-6 h-6 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Método de Pago</h2>
                 </div>
-                <div className={styles.cardBody}>
+                <div className="p-8">
                   <PaymentMethodSelector
                     selected={paymentMethod}
                     onChange={(m) => setPaymentMethod(m as PaymentMethod)}
                   />
 
                   {paymentMethod === 'bank_transfer' && (
-                    <div style={{ marginTop: '1.5rem', padding: '1rem', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-                      <p style={{ margin: 0, color: '#475569', fontSize: '0.9375rem', lineHeight: '1.5' }}>
+                    <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
+                      <p className="text-sm text-amber-800 font-medium leading-relaxed">
                         Al confirmar, serás redirigido a nuestra pasarela segura de Stripe donde se te proporcionarán las instrucciones (IBAN, concepto) para realizar la transferencia bancaria. Tu pedido se procesará automáticamente en cuanto recibamos el pago.
                       </p>
                     </div>
                   )}
 
-                  <div style={{ marginTop: '2rem', display: 'flex', justifyContent: 'space-between' }}>
-                    <button className={styles.btnBack} onClick={prevStep}>Atrás</button>
-                    <button className={styles.btnNext} onClick={nextStep}>Revisar Pedido <ArrowLeft size={18} style={{ transform: 'rotate(180deg)' }} /></button>
+                  <div className="mt-10 flex items-center justify-between">
+                    <button onClick={prevStep} className="px-6 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors">
+                      Atrás
+                    </button>
+                    <button onClick={nextStep} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-indigo-600/30 group">
+                      Revisar Pedido <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
+                    </button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
 
-            {/* ── STEP 3: Confirmar ────────────────────────────────────────────── */}
+            {/* ── STEP 3: Confirmar */}
             {currentStep === 3 && (
-              <>
-                <div className={styles.cardHeader}>
-                  <h2 className={styles.cardTitle}><CheckCircle size={22} color="#2e559e" /> Confirmar Pedido</h2>
+              <div className="animate-in fade-in slide-in-from-right-4 duration-500">
+                <div className="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center gap-3">
+                  <CheckCircle className="w-6 h-6 text-indigo-600" />
+                  <h2 className="text-xl font-bold text-gray-900">Confirmar Pedido</h2>
                 </div>
-                <div className={styles.cardBody}>
-
-                  <div style={{ background: '#f9fafb', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
+                <div className="p-8">
+                  <div className="bg-gray-50 p-6 rounded-2xl mb-8 grid grid-cols-1 sm:grid-cols-2 gap-6 border border-gray-100">
                     <div>
-                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginBottom: '0.5rem' }}>Enviar a</h4>
-                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>{shippingAddress.firstName} {shippingAddress.lastName}</p>
-                      <p style={{ margin: '0.25rem 0', color: '#4b5563', fontSize: '0.9375rem' }}>{shippingAddress.street}</p>
-                      <p style={{ margin: 0, color: '#4b5563', fontSize: '0.9375rem' }}>{shippingAddress.postalCode} {shippingAddress.city}, {shippingAddress.country}</p>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Enviar a</h4>
+                      <p className="font-bold text-gray-900">{shippingAddress.firstName} {shippingAddress.lastName}</p>
+                      <p className="text-sm text-gray-600 mt-1">{shippingAddress.street}</p>
+                      <p className="text-sm text-gray-600">{shippingAddress.postalCode} {shippingAddress.city}, {shippingAddress.country}</p>
                     </div>
                     <div>
-                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginBottom: '0.5rem' }}>Método de Pago</h4>
-                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mb-2">Método de Pago</h4>
+                      <p className="font-bold text-gray-900">
                         {paymentMethod === 'card' && 'Tarjeta de Crédito / Débito'}
                         {paymentMethod === 'bizum' && 'Pago por Bizum'}
                         {paymentMethod === 'bank_transfer' && 'Transferencia Bancaria'}
                       </p>
-                      <h4 style={{ fontSize: '0.875rem', textTransform: 'uppercase', color: '#6b7280', fontWeight: 700, marginTop: '1rem', marginBottom: '0.5rem' }}>Envío</h4>
-                      <p style={{ margin: 0, fontWeight: 500, color: '#111827' }}>Agencia externa</p>
+                      <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mt-4 mb-2">Envío</h4>
+                      <p className="font-bold text-gray-900">Agencia externa</p>
                     </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: '0.75rem', marginBottom: '2rem' }}>
+                  <div className="flex items-start gap-3 mb-10 bg-indigo-50/50 p-4 rounded-xl border border-indigo-100">
                     <input
                       type="checkbox"
                       id="terms"
                       checked={acceptedTerms}
                       onChange={e => setAcceptedTerms(e.target.checked)}
-                      style={{ marginTop: '0.25rem', width: '1.125rem', height: '1.125rem', cursor: 'pointer' }}
+                      className="mt-1 w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-600 cursor-pointer"
                     />
-                    <label htmlFor="terms" style={{ fontSize: '0.9375rem', color: '#4b5563', cursor: 'pointer', lineHeight: 1.5 }}>
-                      He leído y acepto los <a href="/terminos-y-condiciones" target="_blank" style={{ color: '#2e559e', textDecoration: 'underline' }}>términos y condiciones</a> y la <a href="/politica-de-privacidad" target="_blank" style={{ color: '#2e559e', textDecoration: 'underline' }}>política de privacidad</a>. Entiendo que esta compra implica una obligación de pago.
+                    <label htmlFor="terms" className="text-sm text-gray-700 cursor-pointer leading-relaxed font-medium">
+                      He leído y acepto los <a href="/terminos-y-condiciones" target="_blank" className="text-indigo-600 font-bold hover:underline">términos y condiciones</a> y la <a href="/politica-de-privacidad" target="_blank" className="text-indigo-600 font-bold hover:underline">política de privacidad</a>. Entiendo que esta compra implica una obligación de pago.
                     </label>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <button className={styles.btnBack} onClick={prevStep} disabled={isProcessing}>Atrás</button>
+                  <div className="flex items-center justify-between">
+                    <button onClick={prevStep} disabled={isProcessing} className="px-6 py-3 text-gray-600 font-bold hover:bg-gray-100 rounded-xl transition-colors disabled:opacity-50">
+                      Atrás
+                    </button>
                     <button
-                      className={styles.btnNext}
                       onClick={handleSubmitOrder}
                       disabled={isProcessing || !acceptedTerms}
-                      style={{ background: '#10b981', padding: '1rem 2.5rem' }}
+                      className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                      {isProcessing ? 'Procesando...' : `Pagar ${total.toFixed(2)}€`}
-                      {!isProcessing && <CheckCircle size={18} />}
+                      {isProcessing ? 'Procesando segura...' : `Pagar ${total.toFixed(2)}€`}
+                      {!isProcessing && <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />}
                     </button>
                   </div>
                 </div>
-              </>
+              </div>
             )}
           </div>
         </div>
 
         {/* Right Column — Order Summary Sidebar */}
-        <div>
-          <div className={styles.sidebar}>
-            <div className={styles.sidebarHeader}>Resumen del Pedido</div>
+        <div className="w-full lg:w-1/3">
+          <div className="bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 sticky top-24 overflow-hidden">
+            <div className="bg-gray-900 text-white px-6 py-4 font-bold text-lg flex items-center gap-2">
+              <Package className="w-5 h-5 text-indigo-400" /> Resumen del Pedido
+            </div>
 
-            <div style={{ maxHeight: '350px', overflowY: 'auto' }}>
+            <div className="max-h-[400px] overflow-y-auto p-2">
               {items.map(item => (
-                <div key={item.variantId || item.productId} className={styles.sidebarItem}>
+                <div key={item.variantId || item.productId} className="flex items-center gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
                   {item.image ? (
-                    <img src={item.image} alt={item.name} className={styles.sidebarItemImg} />
+                    <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm" />
                   ) : (
-                    <div className={styles.sidebarItemImg} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      <ShoppingCart color="#9ca3af" />
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center border border-gray-200">
+                      <ShoppingCart className="w-6 h-6 text-gray-400" />
                     </div>
                   )}
-                  <div className={styles.sidebarItemInfo}>
-                    <p className={styles.sidebarItemName}>{item.name}</p>
-                    <p className={styles.sidebarItemPrice}>{item.quantity} × {item.price.toFixed(2)}€</p>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-gray-900 line-clamp-2">{item.name}</p>
+                    <p className="text-xs font-semibold text-gray-500 mt-1">Cant: {item.quantity} × {item.price.toFixed(2)}€</p>
                   </div>
-                  <div style={{ fontWeight: 600, color: '#111827' }}>
+                  <div className="font-extrabold text-indigo-600">
                     {(item.price * item.quantity).toFixed(2)}€
                   </div>
                 </div>
@@ -782,78 +655,59 @@ export default function CheckoutPage() {
             </div>
 
             {/* Free shipping progress banner */}
-            <div style={{
-              padding: '0.875rem 1.5rem',
-              background: shippingCost === 0 ? '#ecfdf5' : '#fffbeb',
-              borderBottom: `1px solid ${shippingCost === 0 ? '#d1fae5' : '#fef3c7'}`,
-            }}>
+            <div className={`px-6 py-4 border-y ${shippingCost === 0 ? 'bg-emerald-50 border-emerald-100' : 'bg-amber-50 border-amber-100'}`}>
               {shippingCost === 0 ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8125rem', color: '#065f46', fontWeight: 600 }}>
-                  <Truck size={15} />
-                  ¡Envío gratuito aplicado!
+                <div className="flex items-center gap-2 text-sm text-emerald-700 font-bold">
+                  <Truck className="w-5 h-5" /> ¡Envío gratuito aplicado!
                 </div>
               ) : (
                 <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.375rem' }}>
-                    <span style={{ fontSize: '0.75rem', color: '#92400e', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
-                      <Truck size={13} /> Envío gratis desde {SHIPPING_THRESHOLD}€
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="text-xs text-amber-800 font-bold flex items-center gap-1">
+                      <Truck className="w-4 h-4" /> Envío gratis desde {SHIPPING_THRESHOLD}€
                     </span>
-                    <span style={{ fontSize: '0.75rem', color: '#b45309', fontWeight: 500 }}>
+                    <span className="text-xs text-amber-600 font-bold">
                       Faltan {Math.max(SHIPPING_THRESHOLD - subtotalWithTax, 0).toFixed(2)}€
                     </span>
                   </div>
-                  <div style={{ width: '100%', background: '#fde68a', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
-                    <div style={{
-                      width: `${Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100)}%`,
-                      background: 'linear-gradient(90deg, #f59e0b, #d97706)',
-                      borderRadius: '2px',
-                      transition: 'width 0.4s ease',
-                    }} />
+                  <div className="w-full bg-amber-200 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-amber-500 h-full transition-all duration-500" 
+                      style={{ width: `\${Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100)}%` }} 
+                    />
                   </div>
                 </>
               )}
             </div>
 
-            {/* Shipping method indicator */}
-            <div style={{
-              padding: '0.75rem 1.5rem',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.625rem',
-              borderBottom: '1px solid #f3f4f6',
-              background: '#fafbfc',
-            }}>
-              <Package size={15} color="#6b7280" />
-              <span style={{ fontSize: '0.8125rem', color: '#4b5563', fontWeight: 500 }}>Envío por agencia externa</span>
-            </div>
-
-            <div className={styles.sidebarTotals}>
-              <div className={styles.sidebarTotalRow}>
+            <div className="p-6 bg-gray-50/50 space-y-3">
+              <div className="flex justify-between text-sm font-medium text-gray-600">
                 <span>Subtotal (sin IVA)</span>
                 <span>{subtotal.toFixed(2)}€</span>
               </div>
-
-              <div className={styles.sidebarTotalRow}>
+              <div className="flex justify-between text-sm font-medium text-gray-600">
                 <span>IVA (21%)</span>
                 <span>{tax.toFixed(2)}€</span>
               </div>
-
-              <div className={styles.sidebarTotalRow}>
-                <span>Envío</span>
-                <span style={{ color: shippingCost === 0 ? '#10b981' : 'inherit', fontWeight: shippingCost === 0 ? 600 : 400 }}>
-                  {shippingCost === 0 ? 'Gratis' : `${shippingCost.toFixed(2)}€`}
+              <div className="flex justify-between text-sm font-bold text-gray-600">
+                <span>Envío (Agencia)</span>
+                <span className={shippingCost === 0 ? 'text-emerald-600' : 'text-gray-900'}>
+                  {shippingCost === 0 ? 'Gratis' : `\${shippingCost.toFixed(2)}€`}
                 </span>
               </div>
-
-              <div className={styles.sidebarTotalFinal}>
-                <span>Total</span>
-                <span style={{ color: '#2e559e', fontSize: '1.5rem' }}>{total.toFixed(2)}€</span>
+              <div className="pt-4 mt-4 border-t border-gray-200 flex justify-between items-end">
+                <span className="text-lg font-bold text-gray-900">Total</span>
+                <span className="text-3xl font-black text-indigo-600">{total.toFixed(2)}€</span>
               </div>
             </div>
 
-            <div className={styles.trustBadges}>
-              <div className={styles.trustBadgeText}><ShieldCheck size={16} color="#10b981" /> Pago 100% Seguro con SSL</div>
-              <div className={styles.trustBadgeText}><Lock size={16} color="#10b981" /> Tus datos están protegidos</div>
+            <div className="bg-gray-900 px-6 py-4 flex flex-col gap-2">
+              <div className="flex items-center gap-2 text-xs font-medium text-gray-300">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Pago 100% Seguro Encriptado SSL
+              </div>
+              <div className="flex items-center gap-2 text-xs font-medium text-gray-300">
+                <CheckCircle className="w-4 h-4 text-emerald-400" /> Garantía de devolución 30 días
+              </div>
             </div>
           </div>
         </div>
