@@ -1,0 +1,72 @@
+name: Flujo CI/CD Frontend
+
+on:
+  push:
+    branches:
+      - develop
+      - feature/frontend-layout
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-branches:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+
+      - name: Sync branch flow
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          git fetch --all --prune
+
+          SOURCE_BRANCH="${GITHUB_REF_NAME}"
+
+          sync_branch() {
+            local parent_branch="$1"
+            local child_branch="$2"
+
+            if ! git ls-remote --exit-code --heads origin "$child_branch" >/dev/null 2>&1; then
+              echo "::warning::Skipping missing branch ${child_branch}"
+              return 0
+            fi
+
+            git checkout -B "$child_branch" "origin/$child_branch"
+
+            echo "Merging ${parent_branch} into ${child_branch}..."
+            if git merge "$parent_branch" --no-edit; then
+              echo "Merge successful. Pushing ${child_branch}..."
+              git push origin "$child_branch"
+            else
+              echo "::warning::Merge conflict detected for ${child_branch}. Skipping sync for this branch."
+              git merge --abort || true
+              return 1
+            fi
+          }
+
+          case "$SOURCE_BRANCH" in
+            develop)
+              sync_branch "origin/develop" "feature/frontend-layout"
+              sync_branch "feature/frontend-layout" "frontend-layout/octavio-branch"
+              sync_branch "feature/frontend-layout" "frontend-layout/yeray-branch"
+              ;;
+            feature/frontend-layout)
+              sync_branch "origin/feature/frontend-layout" "frontend-layout/octavio-branch"
+              sync_branch "origin/feature/frontend-layout" "frontend-layout/yeray-branch"
+              ;;
+            *)
+              echo "No sync configured for ${SOURCE_BRANCH}."
+              ;;
+          esac

@@ -63,7 +63,45 @@ export default function OrderDetailPage({ params }: { params: any }) {
     fetchOrder();
   }, [orderId]);
 
+  const [trackingModalOpen, setTrackingModalOpen] = useState(false);
+  const [trackingNumber, setTrackingNumber] = useState('');
+
+  const confirmShipping = async () => {
+    setTrackingModalOpen(false);
+    setUpdating(true);
+    
+    // Simular guardado en BBDD
+    await new Promise(r => setTimeout(r, 500));
+    setOrder((prev: any) => ({ ...prev, status: 'SHIPPED' }));
+
+    // Disparar email
+    try {
+      await fetch('/api/send-shipping-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          orderId: order.id,
+          customerEmail: order.customerEmail,
+          customerName: order.customerName,
+          trackingNumber: trackingNumber || 'Pendiente'
+        })
+      });
+      alert('Email de envío mandado correctamente al cliente.');
+    } catch (e) {
+      console.error(e);
+      alert('Error enviando el email de tracking');
+    }
+    
+    setUpdating(false);
+  };
+
   const updateStatus = async (newStatus: string) => {
+    if (newStatus === 'SHIPPED') {
+      setTrackingNumber('');
+      setTrackingModalOpen(true);
+      return;
+    }
+
     setUpdating(true);
     // Simulate update
     await new Promise(r => setTimeout(r, 500));
@@ -273,6 +311,47 @@ export default function OrderDetailPage({ params }: { params: any }) {
           </div>
         </div>
       </div>
+
+      {/* Tracking Modal */}
+      {trackingModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm transition-all animate-in fade-in zoom-in-95 duration-200">
+          <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
+              <h2 className="text-xl font-bold text-gray-800">Enviar Pedido</h2>
+              <button onClick={() => setTrackingModalOpen(false)} className="p-2 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-200 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              </button>
+            </div>
+            
+            <div className="p-6">
+              <p className="text-sm text-gray-600 mb-4">
+                El estado cambiará a <strong>ENVIADO</strong> y se notificará automáticamente a <strong>{order.customerEmail}</strong>. Introduce el código de seguimiento de la agencia de transportes:
+              </p>
+              
+              <div className="space-y-1 mb-6">
+                <label className="text-sm font-semibold text-gray-700">Código de Seguimiento (Tracking ID)</label>
+                <input 
+                  type="text" 
+                  value={trackingNumber} 
+                  onChange={e => setTrackingNumber(e.target.value)} 
+                  className="w-full px-4 py-2 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none font-mono" 
+                  placeholder="Ej: PK45091238ES"
+                />
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-100">
+                <button onClick={() => setTrackingModalOpen(false)} className="px-5 py-2.5 text-sm font-semibold text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors">
+                  Cancelar
+                </button>
+                <button onClick={confirmShipping} className="px-5 py-2.5 text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl shadow-sm hover:shadow transition-all flex items-center gap-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                  Confirmar y Enviar Email
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

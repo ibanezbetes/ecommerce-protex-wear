@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/f11dc8788c5d87c8c9491ecd3170d677676416f73a9e3437825a98532448b722.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1a34e6826b0a2c21385f272e47a7e45d68270de65474010c693252218a87136c.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -100,6 +100,84 @@
             "data": "ProtexWearApiGetProductResolver8A307CC8"
           }
         ],
+        "/EcommerceProtexWearStack/ProtexWearApi/UserDataSource/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiUserDataSourceServiceRole6E382F30"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/UserDataSource/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiUserDataSourceServiceRoleDefaultPolicy1AB33CD7"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/UserDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiUserDataSource5452A458"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/GetUserProfileResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiGetUserProfileResolverD3E11B9C"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/ListUsersResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiListUsersResolver980C2E69"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/UpdateUserProfileResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiUpdateUserProfileResolver6E9096FE"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/SetSpecialPriceResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiSetSpecialPriceResolver4D550DB4"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/OrderDataSource/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiOrderDataSourceServiceRoleCC048DCC"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/OrderDataSource/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiOrderDataSourceServiceRoleDefaultPolicy55C793A9"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/OrderDataSource/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiOrderDataSource84B0EA53"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/ListUserOrdersResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiListUserOrdersResolver262D033F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/ListAllOrdersResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiListAllOrdersResolverD7F1852C"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearApiCreateOrderResolver7D875FC7"
+          }
+        ],
         "/EcommerceProtexWearStack/ProtexWearApi/DbDataSource/ServiceRole/Resource": [
           {
             "type": "aws:cdk:logicalId",
@@ -142,6 +220,42 @@
             "data": "GetProductHandlerE1A19DE6"
           }
         ],
+        "/EcommerceProtexWearStack/UserOperationsHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserOperationsHandlerServiceRoleB9367916"
+          }
+        ],
+        "/EcommerceProtexWearStack/UserOperationsHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserOperationsHandlerServiceRoleDefaultPolicy53F31C92"
+          }
+        ],
+        "/EcommerceProtexWearStack/UserOperationsHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UserOperationsHandlerF56A913F"
+          }
+        ],
+        "/EcommerceProtexWearStack/OrderOperationsHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OrderOperationsHandlerServiceRole4412327C"
+          }
+        ],
+        "/EcommerceProtexWearStack/OrderOperationsHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OrderOperationsHandlerServiceRoleDefaultPolicyC90210DA"
+          }
+        ],
+        "/EcommerceProtexWearStack/OrderOperationsHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OrderOperationsHandler587A2B52"
+          }
+        ],
         "/EcommerceProtexWearStack/GraphQLAPIURL": [
           {
             "type": "aws:cdk:logicalId",
@@ -170,6 +284,108 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UserPoolClientId"
+          }
+        ],
+        "/EcommerceProtexWearStack/ExcelUploadsBucket/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExcelUploadsBucketCD58A5D5"
+          }
+        ],
+        "/EcommerceProtexWearStack/ExcelUploadsBucket/Policy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExcelUploadsBucketPolicy27A05BF8"
+          }
+        ],
+        "/EcommerceProtexWearStack/ExcelUploadsBucket/AutoDeleteObjectsCustomResource/Default": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExcelUploadsBucketAutoDeleteObjectsCustomResourceE2BEC37F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ExcelUploadsBucket/Notifications/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExcelUploadsBucketNotifications0134E66D"
+          }
+        ],
+        "/EcommerceProtexWearStack/ExcelUploadsBucket/AllowBucketNotificationsToEcommerceProtexWearStackProcessExcelHandler85E5A029": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ExcelUploadsBucketAllowBucketNotificationsToEcommerceProtexWearStackProcessExcelHandler85E5A02958879DE3"
+          }
+        ],
+        "/EcommerceProtexWearStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Role": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderRole3B1BD092"
+          }
+        ],
+        "/EcommerceProtexWearStack/Custom::S3AutoDeleteObjectsCustomResourceProvider/Handler": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CustomS3AutoDeleteObjectsCustomResourceProviderHandler9D90184F"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProcessExcelHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessExcelHandlerServiceRole9F5D3A34"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProcessExcelHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessExcelHandlerServiceRoleDefaultPolicyE42E0B38"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProcessExcelHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProcessExcelHandler4C9DFE59"
+          }
+        ],
+        "/EcommerceProtexWearStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleB6FB88EC"
+          }
+        ],
+        "/EcommerceProtexWearStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Role/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db834RoleDefaultPolicy2CF63D36"
+          }
+        ],
+        "/EcommerceProtexWearStack/BucketNotificationsHandler050a0587b7544547bf325f094a3db834/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "BucketNotificationsHandler050a0587b7544547bf325f094a3db8347ECC3691"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandlerServiceRole75069BD7"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandlerServiceRoleDefaultPolicy02DD28C2"
+          }
+        ],
+        "/EcommerceProtexWearStack/NotificationHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "NotificationHandler5A872A20"
+          }
+        ],
+        "/EcommerceProtexWearStack/UploadsBucketName": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "UploadsBucketName"
           }
         ],
         "/EcommerceProtexWearStack/CDKMetadata/Default": [

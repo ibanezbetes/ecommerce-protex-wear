@@ -2,7 +2,6 @@
 
 import React, { createContext, useCallback, useContext, useMemo, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import styles from './ToastProvider.module.css';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -32,35 +31,49 @@ const DEFAULT_TITLES: Record<ToastType, string> = {
   success: 'Correcto',
   error: 'Error',
   warning: 'Aviso',
-  info: 'Informacion',
+  info: 'Información',
 };
 
 const ICONS: Record<ToastType, React.ReactNode> = {
   success: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
       <path d="M20 6 9 17l-5-5" />
     </svg>
   ),
   error: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.8">
       <path d="M18 6 6 18" />
       <path d="m6 6 12 12" />
     </svg>
   ),
   warning: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
       <path d="M12 9v4" />
       <path d="M12 17h.01" />
       <path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0Z" />
     </svg>
   ),
   info: (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
       <path d="M12 17v-6" />
       <path d="M12 7h.01" />
       <circle cx="12" cy="12" r="10" />
     </svg>
   ),
+};
+
+const TYPE_STYLES: Record<ToastType, string> = {
+  success: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+  error: 'bg-red-50 border-red-200 text-red-800',
+  warning: 'bg-amber-50 border-amber-200 text-amber-800',
+  info: 'bg-indigo-50 border-indigo-200 text-indigo-800',
+};
+
+const ICON_STYLES: Record<ToastType, string> = {
+  success: 'text-emerald-500 bg-emerald-100',
+  error: 'text-red-500 bg-red-100',
+  warning: 'text-amber-500 bg-amber-100',
+  info: 'text-indigo-500 bg-indigo-100',
 };
 
 function normalizeInput(type: ToastType, input: ToastInput | string): Omit<Toast, 'id' | 'type'> {
@@ -115,7 +128,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   return (
     <ToastContext.Provider value={value}>
       {children}
-      <div className={styles.viewport} aria-live="polite" aria-relevant="additions">
+      <div className="fixed top-4 right-4 z-50 flex flex-col gap-3 w-full max-w-[360px] pointer-events-none" aria-live="polite" aria-relevant="additions">
         <AnimatePresence initial={false}>
           {toasts.map((toast) => (
             <motion.div
@@ -125,18 +138,22 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
               animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
               exit={{ opacity: 0, x: 24, scale: 0.98 }}
               transition={{ duration: 0.2 }}
-              className={`${styles.toast} ${styles[toast.type]}`}
+              className={`pointer-events-auto flex items-start gap-3 p-4 rounded-xl border shadow-lg ${TYPE_STYLES[toast.type]}`}
               role={toast.type === 'error' ? 'alert' : 'status'}
             >
-              <div className={styles.icon} aria-hidden="true">
+              <div className={`shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${ICON_STYLES[toast.type]}`} aria-hidden="true">
                 {ICONS[toast.type]}
               </div>
-              <div className={styles.content}>
-                <p className={styles.title}>{toast.title}</p>
-                <p className={styles.message}>{toast.message}</p>
+              <div className="flex-1 min-w-0 pt-0.5">
+                <p className="font-bold text-sm leading-tight mb-1">{toast.title}</p>
+                <p className="text-sm opacity-90 leading-snug">{toast.message}</p>
               </div>
-              <button className={styles.close} onClick={() => dismiss(toast.id)} aria-label="Cerrar notificacion">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <button 
+                className="shrink-0 p-1 opacity-50 hover:opacity-100 transition-opacity rounded focus:outline-none focus:ring-2 focus:ring-current" 
+                onClick={() => dismiss(toast.id)} 
+                aria-label="Cerrar notificacion"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 6 6 18" />
                   <path d="m6 6 12 12" />
                 </svg>

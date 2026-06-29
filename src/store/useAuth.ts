@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 /* ============================================================================
  * useAuth — Store Global de Autenticación (Zustand)
@@ -25,6 +26,8 @@ interface User {
   name: string;
   /** Si el usuario tiene permiso para pagar con factura (B2B) */
   can_pay_later: boolean;
+  /** Rol del usuario (USER o ADMIN) */
+  role?: string;
   /** JWT de Cognito (IdToken) para autorizar peticiones */
   token?: string;
 }
@@ -52,11 +55,23 @@ interface AuthState {
  * const token = useAuth.getState().user?.token;
  * ```
  */
-export const useAuth = create<AuthState>((set) => ({
-  user: null,
-  isGuest: true,
+export const useAuth = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      isGuest: true,
 
-  setSession: (userData: User) => set({ user: userData, isGuest: false }),
+      setSession: (userData: User) => set({ user: userData, isGuest: false }),
 
-  logout: () => set({ user: null, isGuest: true }),
-}));
+      logout: () => {
+        if (typeof document !== 'undefined') {
+          document.cookie = 'protex_role=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+        }
+        set({ user: null, isGuest: true });
+      },
+    }),
+    {
+      name: 'auth-storage',
+    }
+  )
+);

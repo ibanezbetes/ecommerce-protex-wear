@@ -1,0 +1,19 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.shippingCalculator = void 0;
+const backend_1 = require("@aws-amplify/backend");
+/**
+ * Shipping Calculator Lambda Function
+ * Calculates shipping costs based on location, weight, and shipping method
+ */
+exports.shippingCalculator = (0, backend_1.defineFunction)({
+    entry: './handler.ts',
+    environment: {
+        // Shipping API keys and configuration
+        SHIPPING_API_KEY: process.env.SHIPPING_API_KEY || '',
+        DEFAULT_SHIPPING_RATE: process.env.DEFAULT_SHIPPING_RATE || '9.99',
+        FREE_SHIPPING_THRESHOLD: process.env.FREE_SHIPPING_THRESHOLD || '100.00',
+    },
+    timeoutSeconds: 15,
+});
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicmVzb3VyY2UuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyJyZXNvdXJjZS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiOzs7QUFBQSxrREFBc0Q7QUFFdEQ7OztHQUdHO0FBQ1UsUUFBQSxrQkFBa0IsR0FBRyxJQUFBLHdCQUFjLEVBQUM7SUFDL0MsS0FBSyxFQUFFLGNBQWM7SUFDckIsV0FBVyxFQUFFO1FBQ1gsc0NBQXNDO1FBQ3RDLGdCQUFnQixFQUFFLE9BQU8sQ0FBQyxHQUFHLENBQUMsZ0JBQWdCLElBQUksRUFBRTtRQUNwRCxxQkFBcUIsRUFBRSxPQUFPLENBQUMsR0FBRyxDQUFDLHFCQUFxQixJQUFJLE1BQU07UUFDbEUsdUJBQXVCLEVBQUUsT0FBTyxDQUFDLEdBQUcsQ0FBQyx1QkFBdUIsSUFBSSxRQUFRO0tBQ3pFO0lBQ0QsY0FBYyxFQUFFLEVBQUU7Q0FDbkIsQ0FBQyxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgZGVmaW5lRnVuY3Rpb24gfSBmcm9tICdAYXdzLWFtcGxpZnkvYmFja2VuZCc7XHJcblxyXG4vKipcclxuICogU2hpcHBpbmcgQ2FsY3VsYXRvciBMYW1iZGEgRnVuY3Rpb25cclxuICogQ2FsY3VsYXRlcyBzaGlwcGluZyBjb3N0cyBiYXNlZCBvbiBsb2NhdGlvbiwgd2VpZ2h0LCBhbmQgc2hpcHBpbmcgbWV0aG9kXHJcbiAqL1xyXG5leHBvcnQgY29uc3Qgc2hpcHBpbmdDYWxjdWxhdG9yID0gZGVmaW5lRnVuY3Rpb24oe1xyXG4gIGVudHJ5OiAnLi9oYW5kbGVyLnRzJyxcclxuICBlbnZpcm9ubWVudDoge1xyXG4gICAgLy8gU2hpcHBpbmcgQVBJIGtleXMgYW5kIGNvbmZpZ3VyYXRpb25cclxuICAgIFNISVBQSU5HX0FQSV9LRVk6IHByb2Nlc3MuZW52LlNISVBQSU5HX0FQSV9LRVkgfHwgJycsXHJcbiAgICBERUZBVUxUX1NISVBQSU5HX1JBVEU6IHByb2Nlc3MuZW52LkRFRkFVTFRfU0hJUFBJTkdfUkFURSB8fCAnOS45OScsXHJcbiAgICBGUkVFX1NISVBQSU5HX1RIUkVTSE9MRDogcHJvY2Vzcy5lbnYuRlJFRV9TSElQUElOR19USFJFU0hPTEQgfHwgJzEwMC4wMCcsXHJcbiAgfSxcclxuICB0aW1lb3V0U2Vjb25kczogMTUsXHJcbn0pOyJdfQ==
