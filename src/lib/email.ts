@@ -62,7 +62,7 @@ function customerEmailHTML(data: OrderEmailPayload): string {
     <!-- Instrucciones Transferencia -->
     <div style="background:#fffbeb; border-left:4px solid #f59e0b; border-radius:8px; padding:20px; margin: 0 0 32px 0;">
       <h4 style="margin:0 0 8px; color:#b45309; font-size:15px; font-weight:700; display:flex; align-items:center; gap:6px;">
-        🏛️ Instrucciones para Transferencia Bancaria
+        Instrucciones para Transferencia Bancaria
       </h4>
       <p style="margin:0 0 12px; color:#78350f; font-size:14px; line-height:1.5;">
         Tu pedido ha sido registrado con éxito. Para proceder al envío, realiza el pago de <strong>${data.total.toFixed(2)}€</strong> a la cuenta indicada a continuación. Introduce el número de pedido como concepto del pago.
@@ -75,24 +75,20 @@ function customerEmailHTML(data: OrderEmailPayload): string {
       </table>
     </div>
   ` : data.paymentMethod === 'bizum' ? `
-    <!-- Instrucciones Bizum -->
+    <!-- Confirmación Bizum -->
     <div style="background:#ecfdf5; border-left:4px solid #10b981; border-radius:8px; padding:20px; margin: 0 0 32px 0;">
       <h4 style="margin:0 0 8px; color:#065f46; font-size:15px; font-weight:700;">
-        📲 Pago Comercial por Bizum
+        Pago por Bizum completado
       </h4>
-      <p style="margin:0 0 12px; color:#047857; font-size:14px; line-height:1.5;">
-        Para completar tu compra, realiza el envío de <strong>${data.total.toFixed(2)}€</strong> por Bizum al teléfono comercial de la empresa. Introduce tu número de pedido como asunto.
+      <p style="margin:0; color:#047857; font-size:14px; line-height:1.5;">
+        Hemos recibido correctamente tu pago de <strong>${data.total.toFixed(2)}€</strong> a través de Bizum.
       </p>
-      <table style="width:100%; font-size:13px; color:#047857;">
-        <tr><td style="padding:4px 0; width:120px;"><strong>Teléfono Bizum:</strong></td><td style="font-weight:bold; font-size:15px;">${BUSINESS_CONFIG.bizumPhone}</td></tr>
-        <tr><td style="padding:4px 0;"><strong>Concepto/Mensaje:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${data.orderNumber}</td></tr>
-      </table>
     </div>
   ` : data.paymentMethod === 'invoice' ? `
     <!-- Instrucciones Factura a 30 días -->
     <div style="background:#eff6ff; border-left:4px solid #3b82f6; border-radius:8px; padding:20px; margin: 0 0 32px 0;">
       <h4 style="margin:0 0 8px; color:#1d4ed8; font-size:15px; font-weight:700;">
-        📄 Pago a 30 días
+        Pago a 30 días
       </h4>
       <p style="margin:0 0 12px; color:#1e40af; font-size:14px; line-height:1.5;">
         Tu pedido ha sido registrado con éxito. Adjuntamos la factura en este correo, la cual deberá ser abonada en un plazo máximo de 30 días en la cuenta bancaria de la empresa.
@@ -129,7 +125,9 @@ function customerEmailHTML(data: OrderEmailPayload): string {
           <!-- Header -->
           <tr>
             <td style="background:linear-gradient(135deg, #1a365d, #2b6cb0); padding:48px 40px 40px; text-align:center;">
-              <div style="font-size:32px; margin-bottom:12px;">🛡️</div>
+              <div style="margin-bottom:20px;">
+                <img src="${process.env.NEXT_PUBLIC_BASE_URL || 'https://protexwear.es'}/logo.png" alt="Protex Wear" style="height:40px; width:auto; display:inline-block;" />
+              </div>
               <h1 style="margin:0; color:white; font-size:26px; font-weight:800; letter-spacing:-0.5px; line-height:1.2;">
                 ¡Tu pedido está en marcha!
               </h1>
@@ -185,28 +183,27 @@ function customerEmailHTML(data: OrderEmailPayload): string {
               <!-- Info columns -->
               <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:12px;">
                 <tr>
-                  <td width="50%" style="vertical-align:top; padding-right:12px;">
-                    <div style="background:#f7fafc; border-radius:10px; padding:20px; min-height:140px;">
-                      <h4 style="margin:0 0 10px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Dirección de Envío</h4>
-                      <p style="margin:0; color:#2d3748; font-size:13px; line-height:1.6;">
-                        <strong>${data.shippingAddress.firstName} ${data.shippingAddress.lastName}</strong><br>
-                        ${data.shippingAddress.street}<br>
-                        ${data.shippingAddress.postalCode} ${data.shippingAddress.city}<br>
-                        ${data.shippingAddress.country}
-                      </p>
-                    </div>
+                  <td style="background:#f7fafc; border-radius:10px; padding:20px;">
+                    <h4 style="margin:0 0 10px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Dirección de Envío</h4>
+                    <p style="margin:0; color:#2d3748; font-size:13px; line-height:1.6;">
+                      <strong>${data.shippingAddress.firstName} ${data.shippingAddress.lastName}</strong><br>
+                      ${data.shippingAddress.street}<br>
+                      ${data.shippingAddress.postalCode} ${data.shippingAddress.city}<br>
+                      ${data.shippingAddress.country}
+                    </p>
                   </td>
-                  <td width="50%" style="vertical-align:top; padding-left:12px;">
-                    <div style="background:#f7fafc; border-radius:10px; padding:20px; min-height:140px;">
-                      <h4 style="margin:0 0 10px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Método de Pago</h4>
-                      <p style="margin:0 0 12px; color:#2d3748; font-size:13px; font-weight:600;">
-                        ${paymentMethodLabel[data.paymentMethod] || data.paymentMethod}
-                      </p>
-                      <h4 style="margin:0 0 8px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Tipo de Envío</h4>
-                      <p style="margin:0; color:#2d3748; font-size:13px; font-weight:600;">
-                        ${data.shippingMethod === 'express' ? 'Seur Express (24h)' : 'Correos Standard'}
-                      </p>
-                    </div>
+                </tr>
+                <tr><td height="12"></td></tr>
+                <tr>
+                  <td style="background:#f7fafc; border-radius:10px; padding:20px;">
+                    <h4 style="margin:0 0 10px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Método de Pago</h4>
+                    <p style="margin:0 0 12px; color:#2d3748; font-size:13px; font-weight:600;">
+                      ${paymentMethodLabel[data.paymentMethod] || data.paymentMethod}
+                    </p>
+                    <h4 style="margin:0 0 8px; color:#718096; font-size:11px; text-transform:uppercase; letter-spacing:0.1em; font-weight:700;">Tipo de Envío</h4>
+                    <p style="margin:0; color:#2d3748; font-size:13px; font-weight:600;">
+                      ${data.shippingMethod === 'express' ? 'Seur Express (24h)' : 'Correos Standard'}
+                    </p>
                   </td>
                 </tr>
               </table>
@@ -258,7 +255,10 @@ function ownerEmailHTML(data: OrderEmailPayload): string {
         <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; box-shadow:0 4px 10px rgba(0,0,0,0.05); border-radius:12px; overflow:hidden; background:white;">
           <tr>
             <td style="background:#2f855a; padding:32px; text-align:center;">
-              <h1 style="margin:0; color:white; font-size:22px; font-weight:800;">🔔 NUEVO PEDIDO COMERCIAL RECIBIDO</h1>
+              <div style="margin-bottom:20px;">
+                <img src="${process.env.NEXT_PUBLIC_BASE_URL || 'https://protexwear.es'}/logo.png" alt="Protex Wear" style="height:40px; width:auto; display:inline-block;" />
+              </div>
+              <h1 style="margin:0; color:white; font-size:22px; font-weight:800;">NUEVO PEDIDO COMERCIAL RECIBIDO</h1>
               <p style="margin:6px 0 0; color:rgba(255,255,255,0.8); font-size:14px; font-family:monospace;">${data.orderNumber}</p>
             </td>
           </tr>
@@ -335,6 +335,9 @@ export async function sendOrderEmails(data: OrderEmailPayload) {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
+      tls: {
+        rejectUnauthorized: false
+      }
     });
 
     const fromEmail = process.env.EMAIL_FROM || 'pedidos@protexwear.com';
@@ -360,7 +363,7 @@ export async function sendOrderEmails(data: OrderEmailPayload) {
     await transporter.sendMail({
       from: `"Protex Wear" <${fromEmail}>`,
       to: data.customerEmail,
-      subject: `✅ Pedido ${data.orderNumber} confirmado — Protex Wear`,
+      subject: `Pedido ${data.orderNumber} confirmado — Protex Wear`,
       html: customerEmailHTML(data),
       attachments: [
         {
@@ -376,7 +379,7 @@ export async function sendOrderEmails(data: OrderEmailPayload) {
     await transporter.sendMail({
       from: `"Sistema Protex" <${fromEmail}>`,
       to: ownerEmail,
-      subject: `🛒 Nuevo pedido ${data.orderNumber} — ${data.total.toFixed(2)}€`,
+      subject: `Nuevo pedido ${data.orderNumber} — ${data.total.toFixed(2)}€`,
       html: ownerEmailHTML(data),
     });
 

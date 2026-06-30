@@ -110,6 +110,25 @@ export default function AdminUsuariosPage() {
     }
   };
 
+  const handlePromoteToAdmin = async (user: any) => {
+    if (!confirm(`¿Estás seguro de que quieres hacer ADMIN a ${user.email}?`)) return;
+    try {
+      setUsers(users.map(u => u.id === user.id ? { ...u, role: "ADMIN" } : u));
+      const res = await fetch('/api/admin/promote-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user.email, id: user.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.error || 'Error al hacer ADMIN');
+      alert(`Usuario ${user.email} es ahora ADMIN.`);
+    } catch (error) {
+      console.error("Error promoting user:", error);
+      alert("Hubo un error al promover al usuario.");
+      setUsers(users.map(u => u.id === user.id ? { ...u, role: user.role } : u));
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     if (!searchTerm) return true;
     return (
@@ -182,6 +201,14 @@ export default function AdminUsuariosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-3">
+                      {u.role !== "ADMIN" && (
+                        <button
+                          onClick={() => handlePromoteToAdmin(u)}
+                          className="inline-flex items-center px-3 py-1.5 text-sm font-semibold text-purple-700 bg-purple-100 rounded-lg hover:bg-purple-200 transition-colors"
+                        >
+                          Hacer Admin
+                        </button>
+                      )}
                         <button
                           onClick={() => handleToggleCanPayLater(u)}
                           className={`inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${

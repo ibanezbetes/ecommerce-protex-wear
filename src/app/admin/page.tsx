@@ -153,7 +153,7 @@ export default function AdminDashboardPage() {
             {stats.recentOrders.length > 0 ? (
               <div className="divide-y divide-gray-100">
                 {stats.recentOrders.map((order: any) => (
-                  <div key={order.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center">
+                  <Link href={`/admin/pedidos/${order.id}`} key={order.id} className="p-4 hover:bg-gray-50 transition-colors flex justify-between items-center block cursor-pointer">
                     <div>
                       <p className="font-semibold text-gray-900 m-0 text-sm">Pedido #{order.id.substring(0, 8)}</p>
                       <p className="text-sm text-gray-500 m-0 mt-0.5">{order.customerName}</p>
@@ -166,7 +166,7 @@ export default function AdminDashboardPage() {
                         {order.status}
                       </span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             ) : (

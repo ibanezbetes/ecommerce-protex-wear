@@ -22,7 +22,10 @@ export default function OrdersManagementPage() {
         filters.endDate = endDate;
       }
       const data = await adminOperations.listAllOrders(filters);
-      setOrders(data.items || []);
+      const sortedItems = (data.items || []).sort((a: any, b: any) => 
+        new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime()
+      );
+      setOrders(sortedItems);
     } catch (err) {
       console.error(err);
     } finally {

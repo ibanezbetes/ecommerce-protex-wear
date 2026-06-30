@@ -63,9 +63,20 @@ export async function POST(request: Request) {
           try {
             const lineItemsList = await stripe.checkout.sessions.listLineItems(session.id, { expand: ['data.price.product'] });
             
+            const parsedShippingAddress = session.metadata?.shippingAddress 
+                ? JSON.parse(session.metadata.shippingAddress)
+                : {
+                    firstName: session.customer_details?.name?.split(' ')[0] || '',
+                    lastName: session.customer_details?.name?.split(' ').slice(1).join(' ') || '',
+                    street: session.customer_details?.address?.line1 || '',
+                    city: session.customer_details?.address?.city || '',
+                    postalCode: session.customer_details?.address?.postal_code || '',
+                    country: session.customer_details?.address?.country || 'ES',
+                  };
+
             const emailPayload: OrderEmailPayload = {
               orderNumber: orderId,
-              customerName: session.customer_details?.name || 'Cliente',
+              customerName: session.customer_details?.name || (parsedShippingAddress.firstName ? `${parsedShippingAddress.firstName} ${parsedShippingAddress.lastName}`.trim() : 'Cliente'),
               customerEmail: session.customer_details?.email || session.customer_email || '',
               customerCif: session.metadata?.customerCif || '',
               items: lineItemsList.data
@@ -77,24 +88,23 @@ export async function POST(request: Request) {
                   // Si necesitas la imagen, asegúrate de añadirla en metadata al crear la sesión
                 })),
               subtotal: (session.amount_subtotal || 0) / 100, // Ajustar si hay envío
-              tax: 0, // Stripe no calcula tax_amount si no se configuró tax_rates, se calculará abajo
-              shippingCost: session.total_details?.amount_shipping ? session.total_details.amount_shipping / 100 : 0,
+              tax: session.metadata?.tax ? parseFloat(session.metadata.tax) : 0, 
+              shippingCost: session.metadata?.shippingCost ? parseFloat(session.metadata.shippingCost) : 0,
               total: (session.amount_total || 0) / 100,
               paymentMethod: session.payment_method_types?.[0] || 'card',
-              shippingAddress: {
-                firstName: session.customer_details?.name?.split(' ')[0] || '',
-                lastName: session.customer_details?.name?.split(' ').slice(1).join(' ') || '',
-                street: session.customer_details?.address?.line1 || '',
-                city: session.customer_details?.address?.city || '',
-                postalCode: session.customer_details?.address?.postal_code || '',
-                country: session.customer_details?.address?.country || 'ES',
-              },
+              shippingAddress: parsedShippingAddress,
               shippingMethod: 'agencia_externa',
             };
 
-            // Recalculate subtotal/tax roughly for display
-            emailPayload.tax = emailPayload.total - emailPayload.shippingCost - ((emailPayload.total - emailPayload.shippingCost) / 1.21);
-            emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            // Recalculate subtotal roughly for display if metadata wasn't passed (fallback)
+            if (!session.metadata?.tax && emailPayload.total > 0) {
+              emailPayload.tax = emailPayload.total - emailPayload.shippingCost - ((emailPayload.total - emailPayload.shippingCost) / 1.21);
+            }
+            if (emailPayload.total > 0 && !session.metadata?.shippingCost) {
+               emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            } else if (session.metadata?.shippingCost) {
+               emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            }
 
             await sendOrderEmails(emailPayload);
             console.log(`✉️ Email de confirmación enviado para pedido ${orderId}`);
@@ -126,9 +136,20 @@ export async function POST(request: Request) {
          try {
             const lineItemsList = await stripe.checkout.sessions.listLineItems(session.id, { expand: ['data.price.product'] });
             
+            const parsedShippingAddress = session.metadata?.shippingAddress 
+                ? JSON.parse(session.metadata.shippingAddress)
+                : {
+                    firstName: session.customer_details?.name?.split(' ')[0] || '',
+                    lastName: session.customer_details?.name?.split(' ').slice(1).join(' ') || '',
+                    street: session.customer_details?.address?.line1 || '',
+                    city: session.customer_details?.address?.city || '',
+                    postalCode: session.customer_details?.address?.postal_code || '',
+                    country: session.customer_details?.address?.country || 'ES',
+                  };
+
             const emailPayload: OrderEmailPayload = {
               orderNumber: orderId,
-              customerName: session.customer_details?.name || 'Cliente',
+              customerName: session.customer_details?.name || (parsedShippingAddress.firstName ? `${parsedShippingAddress.firstName} ${parsedShippingAddress.lastName}`.trim() : 'Cliente'),
               customerEmail: session.customer_details?.email || session.customer_email || '',
               customerCif: session.metadata?.customerCif || '',
               items: lineItemsList.data
@@ -139,23 +160,22 @@ export async function POST(request: Request) {
                   price: (li.price?.unit_amount || 0) / 100,
                 })),
               subtotal: 0,
-              tax: 0,
-              shippingCost: session.total_details?.amount_shipping ? session.total_details.amount_shipping / 100 : 0,
+              tax: session.metadata?.tax ? parseFloat(session.metadata.tax) : 0, 
+              shippingCost: session.metadata?.shippingCost ? parseFloat(session.metadata.shippingCost) : 0,
               total: (session.amount_total || 0) / 100,
               paymentMethod: 'bank_transfer',
-              shippingAddress: {
-                firstName: session.customer_details?.name?.split(' ')[0] || '',
-                lastName: session.customer_details?.name?.split(' ').slice(1).join(' ') || '',
-                street: session.customer_details?.address?.line1 || '',
-                city: session.customer_details?.address?.city || '',
-                postalCode: session.customer_details?.address?.postal_code || '',
-                country: session.customer_details?.address?.country || 'ES',
-              },
+              shippingAddress: parsedShippingAddress,
               shippingMethod: 'agencia_externa',
             };
 
-            emailPayload.tax = emailPayload.total - emailPayload.shippingCost - ((emailPayload.total - emailPayload.shippingCost) / 1.21);
-            emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            if (!session.metadata?.tax && emailPayload.total > 0) {
+              emailPayload.tax = emailPayload.total - emailPayload.shippingCost - ((emailPayload.total - emailPayload.shippingCost) / 1.21);
+            }
+            if (emailPayload.total > 0 && !session.metadata?.shippingCost) {
+               emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            } else if (session.metadata?.shippingCost) {
+               emailPayload.subtotal = emailPayload.total - emailPayload.shippingCost - emailPayload.tax;
+            }
 
             await sendOrderEmails(emailPayload);
             console.log(`✉️ Email de confirmación enviado para pedido ${orderId}`);

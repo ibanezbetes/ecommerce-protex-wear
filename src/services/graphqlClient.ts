@@ -457,8 +457,7 @@ export const adminOperations = {
   async updateOrderStatus(orderId: string, userId: string, status: string) {
     const data = await graphqlFetch<{ updateOrderStatus: any }>(
       UPDATE_ORDER_STATUS_MUTATION,
-      { orderId, userId, status },
-      true
+      { orderId, userId, status }
     );
     return data.updateOrderStatus;
   }
