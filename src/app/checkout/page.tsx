@@ -545,12 +545,21 @@ export default function CheckoutPage() {
                   <PaymentMethodSelector
                     selected={paymentMethod}
                     onChange={(m) => setPaymentMethod(m as PaymentMethod)}
+                    canPayLater={(user as any)?.can_pay_later}
                   />
 
                   {paymentMethod === 'bank_transfer' && (
                     <div className="mt-6 p-4 bg-amber-50 border border-amber-200 rounded-xl">
                       <p className="text-sm text-amber-800 font-medium leading-relaxed">
                         Al confirmar, serás redirigido a nuestra pasarela segura de Stripe donde se te proporcionarán las instrucciones (IBAN, concepto) para realizar la transferencia bancaria. Tu pedido se procesará automáticamente en cuanto recibamos el pago.
+                      </p>
+                    </div>
+                  )}
+
+                  {paymentMethod === 'invoice' && (
+                    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                      <p className="text-sm text-blue-800 font-medium leading-relaxed">
+                        Se procesará tu pedido de forma inmediata y recibirás la factura en tu correo electrónico con las instrucciones para su abono a 30 días.
                       </p>
                     </div>
                   )}
@@ -588,6 +597,7 @@ export default function CheckoutPage() {
                         {paymentMethod === 'card' && 'Tarjeta de Crédito / Débito'}
                         {paymentMethod === 'bizum' && 'Pago por Bizum'}
                         {paymentMethod === 'bank_transfer' && 'Transferencia Bancaria'}
+                        {paymentMethod === 'invoice' && 'Pago a 30 días (Factura)'}
                       </p>
                       <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mt-4 mb-2">Envío</h4>
                       <p className="font-bold text-gray-900">Agencia externa</p>

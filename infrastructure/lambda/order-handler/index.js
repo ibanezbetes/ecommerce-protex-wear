@@ -64,7 +64,17 @@ async function createOrder(input, userId, email) {
       payload: {
         email: email,
         orderId: orderId,
-        name: email.split('@')[0]
+        name: email.split('@')[0],
+        total: order.total
+      }
+    };
+    
+    const adminPayload = {
+      type: "AdminNewOrder",
+      payload: {
+        email: email,
+        orderId: orderId,
+        total: order.total
       }
     };
     
@@ -74,7 +84,14 @@ async function createOrder(input, userId, email) {
         InvocationType: "Event",
         Payload: Buffer.from(JSON.stringify(payload))
       }));
-      console.log(`Notification lambda invoked for order ${orderId}`);
+      console.log(`Notification lambda invoked for order ${orderId} (Customer)`);
+
+      await lambdaClient.send(new InvokeCommand({
+        FunctionName: NOTIFICATION_LAMBDA_NAME,
+        InvocationType: "Event",
+        Payload: Buffer.from(JSON.stringify(adminPayload))
+      }));
+      console.log(`Notification lambda invoked for order ${orderId} (Admin)`);
     } catch (e) {
       console.error("Failed to invoke notification lambda", e);
     }

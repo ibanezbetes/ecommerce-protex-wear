@@ -1,10 +1,11 @@
 import React from 'react';
 
-export type PaymentMethod = 'card' | 'bank_transfer' | 'bizum';
+export type PaymentMethod = 'card' | 'bank_transfer' | 'bizum' | 'invoice';
 
 interface PaymentMethodSelectorProps {
   selected: PaymentMethod;
   onChange: (method: PaymentMethod) => void;
+  canPayLater?: boolean;
 }
 
 interface MethodOption {
@@ -13,6 +14,7 @@ interface MethodOption {
   title: string;
   subtitle: string;
   badges?: string[];
+  requiresCanPayLater?: boolean;
 }
 
 const PAYMENT_METHODS: MethodOption[] = [
@@ -35,17 +37,6 @@ const PAYMENT_METHODS: MethodOption[] = [
     badges: ['Pago instantáneo', 'SSL cifrado'],
   },
   {
-    id: 'bank_transfer',
-    icon: (
-      <svg viewBox="0 0 24 24" className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
-      </svg>
-    ),
-    title: 'Transferencia Bancaria',
-    subtitle: 'Pago por transferencia con IBAN. 1-2 días hábiles',
-    badges: ['Sin comisiones'],
-  },
-  {
     id: 'bizum',
     icon: (
       <svg viewBox="0 0 122 36" className="w-16 h-8" xmlns="http://www.w3.org/2000/svg">
@@ -56,12 +47,42 @@ const PAYMENT_METHODS: MethodOption[] = [
     subtitle: 'Pago móvil instantáneo desde tu app bancaria',
     badges: ['Pago inmediato', 'Gratis'],
   },
+  {
+    id: 'bank_transfer',
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-8 h-8 text-gray-500" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 14v3M12 14v3M16 14v3" />
+      </svg>
+    ),
+    title: 'Transferencia Bancaria',
+    subtitle: 'Pago por transferencia con IBAN. 1-2 días hábiles',
+    badges: ['Sin comisiones'],
+    requiresCanPayLater: true,
+  },
+  {
+    id: 'invoice',
+    icon: (
+      <svg viewBox="0 0 24 24" className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" xmlns="http://www.w3.org/2000/svg">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+        <polyline points="14 2 14 8 20 8"></polyline>
+        <line x1="16" y1="13" x2="8" y2="13"></line>
+        <line x1="16" y1="17" x2="8" y2="17"></line>
+        <polyline points="10 9 9 9 8 9"></polyline>
+      </svg>
+    ),
+    title: 'Pago a 30 días (Factura)',
+    subtitle: 'Recibe tu pedido ahora y paga cómodamente en 30 días',
+    badges: ['Exclusivo B2B', 'Pago aplazado'],
+    requiresCanPayLater: true,
+  }
 ];
 
-export function PaymentMethodSelector({ selected, onChange }: PaymentMethodSelectorProps) {
+export function PaymentMethodSelector({ selected, onChange, canPayLater = false }: PaymentMethodSelectorProps) {
+  const availableMethods = PAYMENT_METHODS.filter(m => !m.requiresCanPayLater || canPayLater);
+
   return (
     <div className="flex flex-col gap-4" role="radiogroup" aria-label="Metodo de pago">
-      {PAYMENT_METHODS.map((method) => {
+      {availableMethods.map((method) => {
         const isSelected = selected === method.id;
         return (
           <div

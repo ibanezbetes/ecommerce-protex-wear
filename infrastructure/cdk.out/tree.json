@@ -64,6 +64,12 @@
                         "attributeName": "SK",
                         "keyType": "RANGE"
                       }
+                    ],
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
                     ]
                   }
                 },
@@ -86,10 +92,243 @@
               "version": "2.120.0"
             }
           },
+          "CognitoCustomMessageHandler": {
+            "id": "CognitoCustomMessageHandler",
+            "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler",
+            "children": {
+              "ServiceRole": {
+                "id": "ServiceRole",
+                "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole",
+                "children": {
+                  "ImportServiceRole": {
+                    "id": "ImportServiceRole",
+                    "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/ImportServiceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.Resource",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "Resource": {
+                    "id": "Resource",
+                    "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/Resource",
+                    "attributes": {
+                      "aws:cdk:cloudformation:type": "AWS::IAM::Role",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {
+                          "Statement": [
+                            {
+                              "Action": "sts:AssumeRole",
+                              "Effect": "Allow",
+                              "Principal": {
+                                "Service": "lambda.amazonaws.com"
+                              }
+                            }
+                          ],
+                          "Version": "2012-10-17"
+                        },
+                        "managedPolicyArns": [
+                          {
+                            "Fn::Join": [
+                              "",
+                              [
+                                "arn:",
+                                {
+                                  "Ref": "AWS::Partition"
+                                },
+                                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+                              ]
+                            ]
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
+                          }
+                        ]
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "DefaultPolicy": {
+                    "id": "DefaultPolicy",
+                    "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/DefaultPolicy",
+                    "children": {
+                      "Resource": {
+                        "id": "Resource",
+                        "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/DefaultPolicy/Resource",
+                        "attributes": {
+                          "aws:cdk:cloudformation:type": "AWS::IAM::Policy",
+                          "aws:cdk:cloudformation:props": {
+                            "policyDocument": {
+                              "Statement": [
+                                {
+                                  "Action": [
+                                    "ses:SendEmail",
+                                    "ses:SendRawEmail"
+                                  ],
+                                  "Effect": "Allow",
+                                  "Resource": "*"
+                                }
+                              ],
+                              "Version": "2012-10-17"
+                            },
+                            "policyName": "CognitoCustomMessageHandlerServiceRoleDefaultPolicy3AA5B8B7",
+                            "roles": [
+                              {
+                                "Ref": "CognitoCustomMessageHandlerServiceRole0DFC2B39"
+                              }
+                            ]
+                          }
+                        },
+                        "constructInfo": {
+                          "fqn": "aws-cdk-lib.aws_iam.CfnPolicy",
+                          "version": "2.120.0"
+                        }
+                      }
+                    },
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.Policy",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_iam.Role",
+                  "version": "2.120.0"
+                }
+              },
+              "Code": {
+                "id": "Code",
+                "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/Code",
+                "children": {
+                  "Stage": {
+                    "id": "Stage",
+                    "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/Code/Stage",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.AssetStaging",
+                      "version": "2.120.0"
+                    }
+                  },
+                  "AssetBucket": {
+                    "id": "AssetBucket",
+                    "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/Code/AssetBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.BucketBase",
+                      "version": "2.120.0"
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_s3_assets.Asset",
+                  "version": "2.120.0"
+                }
+              },
+              "Resource": {
+                "id": "Resource",
+                "path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/Resource",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Function",
+                  "aws:cdk:cloudformation:props": {
+                    "code": {
+                      "s3Bucket": {
+                        "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
+                      },
+                      "s3Key": "348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7.zip"
+                    },
+                    "environment": {
+                      "variables": {
+                        "SENDER_EMAIL": "Daniel.guillen@protexwear.es"
+                      }
+                    },
+                    "handler": "index.handler",
+                    "role": {
+                      "Fn::GetAtt": [
+                        "CognitoCustomMessageHandlerServiceRole0DFC2B39",
+                        "Arn"
+                      ]
+                    },
+                    "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                  "version": "2.120.0"
+                }
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_lambda.Function",
+              "version": "2.120.0"
+            }
+          },
           "ProtexWearUserPool": {
             "id": "ProtexWearUserPool",
             "path": "EcommerceProtexWearStack/ProtexWearUserPool",
             "children": {
+              "CustomMessageCognito": {
+                "id": "CustomMessageCognito",
+                "path": "EcommerceProtexWearStack/ProtexWearUserPool/CustomMessageCognito",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "CognitoCustomMessageHandler6EC7D923",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "cognito-idp.amazonaws.com",
+                    "sourceArn": {
+                      "Fn::GetAtt": [
+                        "ProtexWearUserPoolFD12D2AD",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.120.0"
+                }
+              },
+              "PostConfirmationCognito": {
+                "id": "PostConfirmationCognito",
+                "path": "EcommerceProtexWearStack/ProtexWearUserPool/PostConfirmationCognito",
+                "attributes": {
+                  "aws:cdk:cloudformation:type": "AWS::Lambda::Permission",
+                  "aws:cdk:cloudformation:props": {
+                    "action": "lambda:InvokeFunction",
+                    "functionName": {
+                      "Fn::GetAtt": [
+                        "CognitoCustomMessageHandler6EC7D923",
+                        "Arn"
+                      ]
+                    },
+                    "principal": "cognito-idp.amazonaws.com",
+                    "sourceArn": {
+                      "Fn::GetAtt": [
+                        "ProtexWearUserPoolFD12D2AD",
+                        "Arn"
+                      ]
+                    }
+                  }
+                },
+                "constructInfo": {
+                  "fqn": "aws-cdk-lib.aws_lambda.CfnPermission",
+                  "version": "2.120.0"
+                }
+              },
               "Resource": {
                 "id": "Resource",
                 "path": "EcommerceProtexWearStack/ProtexWearUserPool/Resource",
@@ -137,6 +376,20 @@
                     },
                     "emailVerificationMessage": "The verification code to your new account is {####}",
                     "emailVerificationSubject": "Verify your new account",
+                    "lambdaConfig": {
+                      "customMessage": {
+                        "Fn::GetAtt": [
+                          "CognitoCustomMessageHandler6EC7D923",
+                          "Arn"
+                        ]
+                      },
+                      "postConfirmation": {
+                        "Fn::GetAtt": [
+                          "CognitoCustomMessageHandler6EC7D923",
+                          "Arn"
+                        ]
+                      }
+                    },
                     "policies": {
                       "passwordPolicy": {
                         "minimumLength": 8,
@@ -146,6 +399,9 @@
                       }
                     },
                     "smsVerificationMessage": "The verification code to your new account is {####}",
+                    "userPoolTags": {
+                      "project": "protexwear"
+                    },
                     "usernameAttributes": [
                       "email"
                     ],
@@ -264,6 +520,12 @@
                               ]
                             ]
                           }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
+                          }
                         ]
                       }
                     },
@@ -308,7 +570,13 @@
                       },
                       "fieldLogLevel": "ALL"
                     },
-                    "name": "protex-wear-api"
+                    "name": "protex-wear-api",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -328,7 +596,7 @@
                         "ApiId"
                       ]
                     },
-                    "definition": "type Product @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  name: String!\r\n  description: String\r\n  brand: String!\r\n  category: String\r\n  variants: [Variant!]!\r\n  createdAt: String\r\n  updatedAt: String\r\n}\r\n\r\ntype Variant @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  sku: String!\r\n  size: String\r\n  color: String\r\n  basePrice: Float!\r\n  images: [String]\r\n}\r\n\r\ntype Query {\r\n  # Obtener un producto por ID. Usa Lambda resolver para inyectar precio VIP si el usuario está logueado.\r\n  getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Listar productos (con paginación simple y filtro)\r\n  listProducts(brand: String, category: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools\r\n\r\n  # Perfil de usuario logueado\r\n  getUserProfile: User @aws_cognito_user_pools\r\n  \r\n  # Listar pedidos del usuario logueado\r\n  listUserOrders: [Order!]! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar todos los pedidos con filtros\r\n  listAllOrders(status: String, email: String, startDate: String, endDate: String, limit: Int, nextToken: String): OrderConnection! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar usuarios\r\n  listUsers(limit: Int, nextToken: String): UserConnection! @aws_cognito_user_pools\r\n}\r\n\r\ntype ProductConnection @aws_api_key @aws_cognito_user_pools {\r\n  items: [Product!]!\r\n  nextToken: String\r\n}\r\n\r\nenum PaymentMethod {\r\n  STANDARD\r\n  DEFERRED\r\n}\r\n\r\ninput CreateOrderInput {\r\n  type: PaymentMethod!\r\n  items: [OrderItemInput!]!\r\n}\r\n\r\ninput OrderItemInput {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n}\r\n\r\ntype OrderResponse {\r\n  orderId: ID!\r\n  checkoutUrl: String\r\n  status: String!\r\n}\r\n\r\ntype Mutation {\r\n  createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Actualizar datos del perfil de usuario (envío/facturación)\r\n  updateUserProfile(input: UpdateUserProfileInput!): User @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto\r\n  setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools\r\n}\r\n\r\n# --- NUEVOS MODELOS Y TIPOS ---\r\n\r\ntype User @aws_cognito_user_pools {\r\n  id: ID!\r\n  email: String!\r\n  name: String\r\n  role: String! # \"USER\" o \"ADMIN\"\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n  specialPrices: [UserPrice]\r\n}\r\n\r\ntype UserConnection @aws_cognito_user_pools {\r\n  items: [User!]!\r\n  nextToken: String\r\n}\r\n\r\ntype Address @aws_cognito_user_pools {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ninput UpdateUserProfileInput {\r\n  name: String\r\n  shippingAddress: AddressInput\r\n  billingAddress: AddressInput\r\n}\r\n\r\ninput AddressInput {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ntype UserPrice @aws_cognito_user_pools {\r\n  userId: ID!\r\n  productId: ID!\r\n  specialPrice: Float!\r\n}\r\n\r\ntype Order @aws_cognito_user_pools {\r\n  id: ID!\r\n  userId: String!\r\n  customerEmail: String!\r\n  orderDate: String!\r\n  status: String!\r\n  totalAmount: Float!\r\n  items: [OrderItem!]!\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n}\r\n\r\ntype OrderConnection @aws_cognito_user_pools {\r\n  items: [Order!]!\r\n  nextToken: String\r\n}\r\n\r\ntype OrderItem @aws_cognito_user_pools {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n  priceAtPurchase: Float!\r\n  name: String\r\n}\r\n"
+                    "definition": "type Product @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  name: String!\r\n  description: String\r\n  brand: String!\r\n  category: String\r\n  variants: [Variant!]!\r\n  createdAt: String\r\n  updatedAt: String\r\n}\r\n\r\ntype Variant @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  sku: String!\r\n  size: String\r\n  color: String\r\n  basePrice: Float!\r\n  images: [String]\r\n}\r\n\r\ntype Query {\r\n  # Obtener un producto por ID. Usa Lambda resolver para inyectar precio VIP si el usuario está logueado.\r\n  getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Listar productos (con paginación simple y filtro)\r\n  listProducts(brand: String, category: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools\r\n\r\n  # Perfil de usuario logueado\r\n  getUserProfile: User @aws_cognito_user_pools\r\n  \r\n  # Listar pedidos del usuario logueado\r\n  listUserOrders: [Order!]! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar todos los pedidos con filtros\r\n  listAllOrders(status: String, email: String, startDate: String, endDate: String, limit: Int, nextToken: String): OrderConnection! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar usuarios\r\n  listUsers(limit: Int, nextToken: String): UserConnection! @aws_cognito_user_pools\r\n}\r\n\r\ntype ProductConnection @aws_api_key @aws_cognito_user_pools {\r\n  items: [Product!]!\r\n  nextToken: String\r\n}\r\n\r\nenum PaymentMethod {\r\n  STANDARD\r\n  DEFERRED\r\n}\r\n\r\ninput CreateOrderInput {\r\n  type: PaymentMethod!\r\n  items: [OrderItemInput!]!\r\n}\r\n\r\ninput OrderItemInput {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n}\r\n\r\ntype OrderResponse {\r\n  orderId: ID!\r\n  checkoutUrl: String\r\n  status: String!\r\n}\r\n\r\ntype Mutation {\r\n  createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Actualizar datos del perfil de usuario (envío/facturación)\r\n  updateUserProfile(input: UpdateUserProfileInput!): User @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto\r\n  setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Habilitar o deshabilitar pago a 30 días\r\n  setCanPayLater(userId: ID!, canPayLater: Boolean!): User @aws_cognito_user_pools\r\n}\r\n\r\n# --- NUEVOS MODELOS Y TIPOS ---\r\n\r\ntype User @aws_cognito_user_pools {\r\n  id: ID!\r\n  email: String!\r\n  name: String\r\n  role: String! # \"USER\" o \"ADMIN\"\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n  specialPrices: [UserPrice]\r\n  can_pay_later: Boolean\r\n  cif: String\r\n}\r\n\r\ntype UserConnection @aws_cognito_user_pools {\r\n  items: [User!]!\r\n  nextToken: String\r\n}\r\n\r\ntype Address @aws_cognito_user_pools {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ninput UpdateUserProfileInput {\r\n  name: String\r\n  shippingAddress: AddressInput\r\n  billingAddress: AddressInput\r\n}\r\n\r\ninput AddressInput {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ntype UserPrice @aws_cognito_user_pools {\r\n  userId: ID!\r\n  productId: ID!\r\n  specialPrice: Float!\r\n}\r\n\r\ntype Order @aws_cognito_user_pools {\r\n  id: ID!\r\n  userId: String!\r\n  customerEmail: String!\r\n  orderDate: String!\r\n  status: String!\r\n  totalAmount: Float!\r\n  items: [OrderItem!]!\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n}\r\n\r\ntype OrderConnection @aws_cognito_user_pools {\r\n  items: [Order!]!\r\n  nextToken: String\r\n}\r\n\r\ntype OrderItem @aws_cognito_user_pools {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n  priceAtPurchase: Float!\r\n  name: String\r\n}\r\n"
                   }
                 },
                 "constructInfo": {
@@ -348,7 +616,7 @@
                         "ApiId"
                       ]
                     },
-                    "expires": 1814271825
+                    "expires": 1814359506
                   }
                 },
                 "constructInfo": {
@@ -397,7 +665,13 @@
                                 }
                               ],
                               "Version": "2012-10-17"
-                            }
+                            },
+                            "tags": [
+                              {
+                                "key": "project",
+                                "value": "protexwear"
+                              }
+                            ]
                           }
                         },
                         "constructInfo": {
@@ -578,7 +852,13 @@
                                 }
                               ],
                               "Version": "2012-10-17"
-                            }
+                            },
+                            "tags": [
+                              {
+                                "key": "project",
+                                "value": "protexwear"
+                              }
+                            ]
                           }
                         },
                         "constructInfo": {
@@ -858,7 +1138,13 @@
                                 }
                               ],
                               "Version": "2012-10-17"
-                            }
+                            },
+                            "tags": [
+                              {
+                                "key": "project",
+                                "value": "protexwear"
+                              }
+                            ]
                           }
                         },
                         "constructInfo": {
@@ -1105,7 +1391,13 @@
                                 }
                               ],
                               "Version": "2012-10-17"
-                            }
+                            },
+                            "tags": [
+                              {
+                                "key": "project",
+                                "value": "protexwear"
+                              }
+                            ]
                           }
                         },
                         "constructInfo": {
@@ -1321,6 +1613,12 @@
                               ]
                             ]
                           }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
+                          }
                         ]
                       }
                     },
@@ -1456,7 +1754,13 @@
                         "Arn"
                       ]
                     },
-                    "runtime": "nodejs20.x"
+                    "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -1516,6 +1820,12 @@
                                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
                               ]
                             ]
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
                           }
                         ]
                       }
@@ -1640,7 +1950,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "8d369ddcb5b0d6840bf71f1698d485216b872a95109c59912ee8905aae15c8c1.zip"
+                      "s3Key": "d85d9fc8d3c0c7acf5cac5c4470d66f9845ae55882d29dca2d6dd85efe021154.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1656,7 +1966,13 @@
                         "Arn"
                       ]
                     },
-                    "runtime": "nodejs20.x"
+                    "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -1716,6 +2032,12 @@
                                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
                               ]
                             ]
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
                           }
                         ]
                       }
@@ -1866,7 +2188,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "a6852ca50feb4f37bd48105ff60d6ff91be89e8f1d3b2efd05ffd1e8b86a8aaf.zip"
+                      "s3Key": "6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4.zip"
                     },
                     "environment": {
                       "variables": {
@@ -1885,7 +2207,13 @@
                         "Arn"
                       ]
                     },
-                    "runtime": "nodejs20.x"
+                    "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -1970,6 +2298,10 @@
                       {
                         "key": "aws-cdk:auto-delete-objects",
                         "value": "true"
+                      },
+                      {
+                        "key": "project",
+                        "value": "protexwear"
                       }
                     ]
                   }
@@ -2202,6 +2534,12 @@
                               ]
                             ]
                           }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
+                          }
                         ]
                       }
                     },
@@ -2366,6 +2704,12 @@
                       ]
                     },
                     "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ],
                     "timeout": 300
                   }
                 },
@@ -2426,6 +2770,12 @@
                                 ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
                               ]
                             ]
+                          }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
                           }
                         ]
                       }
@@ -2541,6 +2891,12 @@
                               ]
                             ]
                           }
+                        ],
+                        "tags": [
+                          {
+                            "key": "project",
+                            "value": "protexwear"
+                          }
                         ]
                       }
                     },
@@ -2633,7 +2989,7 @@
                       "s3Bucket": {
                         "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
                       },
-                      "s3Key": "cdce8eeebf6bfae42144b0e49844a02f6c4a178df55cdca292f12cfca8fc49a2.zip"
+                      "s3Key": "f46ea74b554bc9187f1876d2bf0498d17f235d21a3991dd446828abfc473899f.zip"
                     },
                     "environment": {
                       "variables": {
@@ -2647,7 +3003,13 @@
                         "Arn"
                       ]
                     },
-                    "runtime": "nodejs20.x"
+                    "runtime": "nodejs20.x",
+                    "tags": [
+                      {
+                        "key": "project",
+                        "value": "protexwear"
+                      }
+                    ]
                   }
                 },
                 "constructInfo": {
@@ -2666,6 +3028,175 @@
             "path": "EcommerceProtexWearStack/UploadsBucketName",
             "constructInfo": {
               "fqn": "aws-cdk-lib.CfnOutput",
+              "version": "2.120.0"
+            }
+          },
+          "ProtexWearCostBudget": {
+            "id": "ProtexWearCostBudget",
+            "path": "EcommerceProtexWearStack/ProtexWearCostBudget",
+            "attributes": {
+              "aws:cdk:cloudformation:type": "AWS::Budgets::Budget",
+              "aws:cdk:cloudformation:props": {
+                "budget": {
+                  "budgetType": "COST",
+                  "timeUnit": "MONTHLY",
+                  "budgetLimit": {
+                    "amount": 50,
+                    "unit": "USD"
+                  },
+                  "budgetName": "ProtexWear-Alertas-Coste",
+                  "costFilters": {
+                    "TagKeyValue": [
+                      "user:project$protexwear"
+                    ]
+                  }
+                },
+                "notificationsWithSubscribers": [
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 5,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 10,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 15,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 20,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 25,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 30,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 35,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 40,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 45,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  },
+                  {
+                    "notification": {
+                      "notificationType": "ACTUAL",
+                      "comparisonOperator": "GREATER_THAN",
+                      "threshold": 50,
+                      "thresholdType": "ABSOLUTE_VALUE"
+                    },
+                    "subscribers": [
+                      {
+                        "subscriptionType": "EMAIL",
+                        "address": "danielibabet@gmail.com"
+                      }
+                    ]
+                  }
+                ]
+              }
+            },
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.aws_budgets.CfnBudget",
               "version": "2.120.0"
             }
           },

@@ -6,6 +6,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as cognito from 'aws-cdk-lib/aws-cognito';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3n from 'aws-cdk-lib/aws-s3-notifications';
+import * as budgets from 'aws-cdk-lib/aws-budgets';
 import * as path from 'path';
 
 export class EcommerceStack extends cdk.Stack {
@@ -26,7 +27,21 @@ export class EcommerceStack extends cdk.Stack {
       sortKey: { name: 'GSI1SK', type: dynamodb.AttributeType.STRING },
     });
 
-    // 1.5. Cognito User Pool
+    // 1.5. Cognito User Pool and Email Lambda
+    const cognitoEmailLambda = new lambda.Function(this, 'CognitoCustomMessageHandler', {
+      runtime: lambda.Runtime.NODEJS_20_X,
+      handler: 'index.handler',
+      code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/cognito-custom-message')),
+      environment: {
+        SENDER_EMAIL: 'Daniel.guillen@protexwear.es',
+      },
+    });
+
+    cognitoEmailLambda.addToRolePolicy(new cdk.aws_iam.PolicyStatement({
+      actions: ['ses:SendEmail', 'ses:SendRawEmail'],
+      resources: ['*'],
+    }));
+
     const userPool = new cognito.UserPool(this, 'ProtexWearUserPool', {
       userPoolName: 'ProtexWearUsers',
       selfSignUpEnabled: true,
@@ -44,6 +59,10 @@ export class EcommerceStack extends cdk.Stack {
         replyTo: 'Daniel.guillen@protexwear.es',
         sesRegion: 'eu-west-1',
       }),
+      lambdaTriggers: {
+        customMessage: cognitoEmailLambda,
+        postConfirmation: cognitoEmailLambda,
+      },
     });
 
     const userPoolClient = new cognito.UserPoolClient(this, 'ProtexWearUserPoolClient', {
@@ -239,5 +258,34 @@ export class EcommerceStack extends cdk.Stack {
     orderHandlerLambda.addEnvironment('NOTIFICATION_LAMBDA_NAME', notificationLambda.functionName);
 
     new cdk.CfnOutput(this, 'UploadsBucketName', { value: uploadsBucket.bucketName });
+
+    // 9. AWS Budget
+    // Límite mensual de $50, con notificaciones cada $5 gastados (máximo 10 notificaciones por presupuesto)
+    new budgets.CfnBudget(this, 'ProtexWearCostBudget', {
+      budget: {
+        budgetType: 'COST',
+        timeUnit: 'MONTHLY',
+        budgetLimit: {
+          amount: 50,
+          unit: 'USD',
+        },
+        budgetName: 'ProtexWear-Alertas-Coste',
+        costFilters: {
+          TagKeyValue: ['user:project$protexwear'],
+        },
+      },
+      notificationsWithSubscribers: [5, 10, 15, 20, 25, 30, 35, 40, 45, 50].map((amount) => ({
+        notification: {
+          notificationType: 'ACTUAL',
+          comparisonOperator: 'GREATER_THAN',
+          threshold: amount,
+          thresholdType: 'ABSOLUTE_VALUE',
+        },
+        subscribers: [{
+          subscriptionType: 'EMAIL',
+          address: 'danielibabet@gmail.com',
+        }],
+      })),
+    });
   }
 }

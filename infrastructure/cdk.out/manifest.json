@@ -15,10 +15,13 @@
       "properties": {
         "templateFile": "EcommerceProtexWearStack.template.json",
         "terminationProtection": false,
+        "tags": {
+          "project": "protexwear"
+        },
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/1a34e6826b0a2c21385f272e47a7e45d68270de65474010c693252218a87136c.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/d2d50f1c02db8aafdc0f649724c916921ed19e616ff0006d828e5459d58273f9.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -34,10 +37,51 @@
         "EcommerceProtexWearStack.assets"
       ],
       "metadata": {
+        "/EcommerceProtexWearStack": [
+          {
+            "type": "aws:cdk:stack-tags",
+            "data": [
+              {
+                "Key": "project",
+                "Value": "protexwear"
+              }
+            ]
+          }
+        ],
         "/EcommerceProtexWearStack/ProtexWearTable/Resource": [
           {
             "type": "aws:cdk:logicalId",
             "data": "ProtexWearTableF73247B0"
+          }
+        ],
+        "/EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoCustomMessageHandlerServiceRole0DFC2B39"
+          }
+        ],
+        "/EcommerceProtexWearStack/CognitoCustomMessageHandler/ServiceRole/DefaultPolicy/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoCustomMessageHandlerServiceRoleDefaultPolicy3AA5B8B7"
+          }
+        ],
+        "/EcommerceProtexWearStack/CognitoCustomMessageHandler/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "CognitoCustomMessageHandler6EC7D923"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearUserPool/CustomMessageCognito": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearUserPoolCustomMessageCognitoF42DDEE5"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearUserPool/PostConfirmationCognito": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearUserPoolPostConfirmationCognitoCDB104C0"
           }
         ],
         "/EcommerceProtexWearStack/ProtexWearUserPool/Resource": [
@@ -386,6 +430,12 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "UploadsBucketName"
+          }
+        ],
+        "/EcommerceProtexWearStack/ProtexWearCostBudget": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "ProtexWearCostBudget"
           }
         ],
         "/EcommerceProtexWearStack/CDKMetadata/Default": [

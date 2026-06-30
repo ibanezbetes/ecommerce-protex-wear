@@ -239,6 +239,8 @@ const GET_USER_PROFILE_QUERY = `
       email
       name
       role
+      can_pay_later
+      cif
       shippingAddress {
         street
         city
@@ -348,6 +350,8 @@ const LIST_USERS_QUERY = `
         email
         name
         role
+        can_pay_later
+        cif
       }
       nextToken
     }
@@ -382,5 +386,21 @@ export const adminOperations = {
       specialPrice
     });
     return data.setSpecialPrice;
+  },
+
+  async setCanPayLater(userId: string, canPayLater: boolean) {
+    const SET_CAN_PAY_LATER_MUTATION = `
+      mutation SetCanPayLater($userId: ID!, $canPayLater: Boolean!) {
+        setCanPayLater(userId: $userId, canPayLater: $canPayLater) {
+          id
+          can_pay_later
+        }
+      }
+    `;
+    const data = await graphqlFetch<{ setCanPayLater: Record<string, unknown> }>(SET_CAN_PAY_LATER_MUTATION, {
+      userId,
+      canPayLater
+    });
+    return data.setCanPayLater;
   }
 };

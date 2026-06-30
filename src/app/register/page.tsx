@@ -37,7 +37,7 @@ export default function RegisterPage() {
       return;
     }
 
-    if (!validateDocument(cif)) {
+    if (accountType === 'B2B' && !validateDocument(cif)) {
       setError('El CIF/NIF introducido no tiene un formato válido en España');
       setLoading(false);
       return;
@@ -56,8 +56,8 @@ export default function RegisterPage() {
         UserAttributes: [
           { Name: 'email', Value: email },
           { Name: 'name', Value: accountType === 'B2B' ? `${name} (B2B)` : name },
-          // Store CIF in nickname or another standard attribute temporarily for MVP
-          { Name: 'nickname', Value: cif },
+          // Solo guardar CIF si es B2B
+          ...(accountType === 'B2B' ? [{ Name: 'nickname', Value: cif }] : []),
         ],
       });
 
@@ -170,20 +170,22 @@ export default function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1.5" htmlFor="cif">
-                {accountType === 'B2B' ? 'CIF / NIF' : 'DNI / NIE'}
-              </label>
-              <input
-                id="cif"
-                type="text"
-                required
-                className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white transition-all outline-none uppercase"
-                placeholder={accountType === 'B2B' ? 'B12345678' : '12345678Z'}
-                value={cif}
-                onChange={(e) => setCif(e.target.value.toUpperCase())}
-              />
-            </div>
+            {accountType === 'B2B' && (
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1.5" htmlFor="cif">
+                  CIF / NIF
+                </label>
+                <input
+                  id="cif"
+                  type="text"
+                  required={accountType === 'B2B'}
+                  className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white transition-all outline-none uppercase"
+                  placeholder="B12345678"
+                  value={cif}
+                  onChange={(e) => setCif(e.target.value.toUpperCase())}
+                />
+              </div>
+            )}
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5" htmlFor="email">Email</label>
               <input

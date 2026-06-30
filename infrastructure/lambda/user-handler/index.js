@@ -17,10 +17,12 @@ exports.handler = async (event) => {
 
   const userId = identity.sub;
   const userEmail = identity.claims?.email || "";
+  const userName = identity.claims?.name || "";
+  const userCif = identity.claims?.nickname || "";
 
   switch (fieldName) {
     case 'getUserProfile':
-      return await getUserProfile(userId, userEmail);
+      return await getUserProfile(userId, userEmail, userName, userCif);
     case 'updateUserProfile':
       return await updateUserProfile(userId, userEmail, args.input);
     case 'listUsers':
@@ -29,6 +31,9 @@ exports.handler = async (event) => {
     case 'setSpecialPrice':
       await requireAdmin(userId);
       return await setSpecialPrice(args.userId, args.productId, args.specialPrice);
+    case 'setCanPayLater':
+      await requireAdmin(userId);
+      return await setCanPayLater(args.userId, args.canPayLater);
     default:
       throw new Error(`Unsupported field: ${fieldName}`);
   }
@@ -44,7 +49,7 @@ async function requireAdmin(userId) {
   }
 }
 
-async function getUserProfile(userId, defaultEmail) {
+async function getUserProfile(userId, defaultEmail, defaultName = "", defaultCif = "") {
   const { Item } = await docClient.send(new GetCommand({
     TableName: TABLE_NAME,
     Key: { PK: `USER#${userId}`, SK: `USER#${userId}` }
@@ -70,6 +75,8 @@ async function getUserProfile(userId, defaultEmail) {
     type: 'User',
     id: userId,
     email: defaultEmail,
+    name: defaultName,
+    cif: defaultCif,
     role: 'USER', // Default role
   };
 
@@ -141,4 +148,23 @@ async function setSpecialPrice(userId, productId, specialPrice) {
   }));
 
   return item;
+}
+
+async function setCanPayLater(targetUserId, canPayLater) {
+  const existingUser = await getUserProfile(targetUserId, "", "", "");
+  
+  const updatedUser = {
+    ...existingUser,
+    can_pay_later: canPayLater
+  };
+  
+  // No guardamos specialPrices en el item principal de usuario
+  delete updatedUser.specialPrices;
+
+  await docClient.send(new PutCommand({
+    TableName: TABLE_NAME,
+    Item: updatedUser
+  }));
+
+  return updatedUser;
 }

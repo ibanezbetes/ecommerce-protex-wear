@@ -157,8 +157,19 @@ export default function ProfilePage() {
                     className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 text-sm font-medium cursor-not-allowed focus:outline-none"
                   />
                 </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-bold text-gray-700 block">Nombre Completo</label>
+                {profile?.cif && (
+                  <div className="space-y-2">
+                    <label className="text-sm font-bold text-gray-700 block">CIF / NIF (Empresa)</label>
+                    <input
+                      type="text"
+                      value={profile?.cif}
+                      disabled
+                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-500 text-sm font-medium cursor-not-allowed focus:outline-none uppercase"
+                    />
+                  </div>
+                )}
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-sm font-bold text-gray-700 block">Nombre / Razón Social</label>
                   <input
                     type="text"
                     value={profile?.name || ""}

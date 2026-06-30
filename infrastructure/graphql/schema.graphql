@@ -73,6 +73,9 @@ type Mutation {
   
   # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto
   setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools
+  
+  # ADMINISTRADOR: Habilitar o deshabilitar pago a 30 días
+  setCanPayLater(userId: ID!, canPayLater: Boolean!): User @aws_cognito_user_pools
 }
 
 # --- NUEVOS MODELOS Y TIPOS ---
@@ -85,6 +88,8 @@ type User @aws_cognito_user_pools {
   shippingAddress: Address
   billingAddress: Address
   specialPrices: [UserPrice]
+  can_pay_later: Boolean
+  cif: String
 }
 
 type UserConnection @aws_cognito_user_pools {

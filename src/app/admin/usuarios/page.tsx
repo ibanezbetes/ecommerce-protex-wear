@@ -57,6 +57,20 @@ export default function AdminUsuariosPage() {
     }
   };
 
+  const handleToggleCanPayLater = async (user: any) => {
+    try {
+      const newValue = !user.can_pay_later;
+      // Optimistic update
+      setUsers(users.map(u => u.id === user.id ? { ...u, can_pay_later: newValue } : u));
+      await adminOperations.setCanPayLater(user.id, newValue);
+    } catch (error) {
+      console.error("Error toggling can_pay_later:", error);
+      alert("Error al actualizar la opción de pago aplazado.");
+      // Revert on error
+      setUsers(users.map(u => u.id === user.id ? { ...u, can_pay_later: user.can_pay_later } : u));
+    }
+  };
+
   const filteredUsers = users.filter((u) => {
     if (!searchTerm) return true;
     return (
@@ -128,12 +142,24 @@ export default function AdminUsuariosPage() {
                         {u.role || "USER"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 py-4 text-right flex items-center justify-end gap-3">
+                      {u.name?.includes('(B2B)') && (
+                        <button
+                          onClick={() => handleToggleCanPayLater(u)}
+                          className={`inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
+                            u.can_pay_later 
+                              ? 'text-emerald-700 bg-emerald-100 hover:bg-emerald-200' 
+                              : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
+                          }`}
+                        >
+                          {u.can_pay_later ? 'Pago 30 días: ON' : 'Pago 30 días: OFF'}
+                        </button>
+                      )}
                       <button
                         onClick={() => handleOpenSpecialPrice(u)}
                         className="inline-flex items-center px-3 py-1.5 text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
                       >
-                        Asignar Precio Especial
+                        Asignar Precio
                       </button>
                     </td>
                   </tr>
