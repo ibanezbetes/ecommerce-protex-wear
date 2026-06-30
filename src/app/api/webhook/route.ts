@@ -77,7 +77,7 @@ export async function POST(request: Request) {
             const emailPayload: OrderEmailPayload = {
               orderNumber: orderId,
               customerName: session.customer_details?.name || (parsedShippingAddress.firstName ? `${parsedShippingAddress.firstName} ${parsedShippingAddress.lastName}`.trim() : 'Cliente'),
-              customerEmail: session.customer_details?.email || session.customer_email || '',
+              customerEmail: session.customer_details?.email || session.customer_email || session.metadata?.customerEmail || '',
               customerCif: session.metadata?.customerCif || '',
               items: lineItemsList.data
                 .filter(li => li.description !== 'Gastos de envío')

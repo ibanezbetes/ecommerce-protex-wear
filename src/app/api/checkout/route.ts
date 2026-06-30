@@ -136,6 +136,7 @@ export async function POST(request: Request) {
       metadata: {
         orderNumber: orderNumber || '',
         customerCif: customerCif || '',
+        customerEmail: customerEmail || '',
         shippingCost: shippingCost?.toString() || '0',
         tax: tax?.toString() || '0',
         shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
