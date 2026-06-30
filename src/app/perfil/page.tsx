@@ -1,10 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useAuth } from "@/store/useAuth";
 import { userOperations } from "@/services/graphqlClient";
 import { useRouter } from "next/navigation";
-import { User, Package, MapPin, Loader2, Save, CreditCard } from "lucide-react";
+import { User, Package, MapPin, Loader2, Save, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
 
 export default function ProfilePage() {
   const { user, isGuest } = useAuth();
@@ -16,8 +18,21 @@ export default function ProfilePage() {
   
   const [profile, setProfile] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
+  const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  const toggleOrder = (orderId: string) => {
+    setExpandedOrderId(prev => prev === orderId ? null : orderId);
+  };
+
+  const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
+    setHasHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+
     if (isGuest || !user) {
       router.push("/login");
       return;
@@ -29,7 +44,10 @@ export default function ProfilePage() {
         setProfile(userProfile);
         
         const userOrders = await userOperations.listUserOrders();
-        setOrders(userOrders || []);
+        const sortedOrders = (userOrders || []).sort((a: any, b: any) => {
+          return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
+        });
+        setOrders(sortedOrders);
       } catch (error) {
         console.error("Error cargando perfil:", error);
       } finally {
@@ -38,7 +56,7 @@ export default function ProfilePage() {
     };
 
     fetchData();
-  }, [user, isGuest, router]);
+  }, [user, isGuest, router, hasHydrated]);
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -295,24 +313,112 @@ export default function ProfilePage() {
                   </thead>
                   <tbody className="divide-y divide-gray-50">
                     {orders.map((order: any) => (
-                      <tr key={order.id} className="hover:bg-gray-50/50 transition-colors">
-                        <td className="py-4 px-4">
-                          <span className="font-mono font-bold text-gray-900 text-sm bg-gray-100 px-2.5 py-1 rounded-md">
-                            #{order.id.split("-").pop() || order.id}
-                          </span>
-                        </td>
-                        <td className="py-4 px-4 text-sm text-gray-500 font-medium">
-                          {new Date(order.orderDate).toLocaleDateString()}
-                        </td>
-                        <td className="py-4 px-4 text-sm font-bold text-gray-900">
-                          {order.totalAmount.toFixed(2)} €
-                        </td>
-                        <td className="py-4 px-4">
-                          <span className="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
-                            {order.status}
-                          </span>
-                        </td>
-                      </tr>
+                      <React.Fragment key={order.id}>
+                        <tr 
+                          className="hover:bg-gray-50/50 transition-colors cursor-pointer"
+                          onClick={() => toggleOrder(order.id)}
+                        >
+                          <td className="py-4 px-4">
+                            <div className="flex items-center gap-3">
+                              <span className="font-mono font-bold text-gray-900 text-sm bg-gray-100 px-2.5 py-1 rounded-md">
+                                #{order.id.split("-").pop() || order.id}
+                              </span>
+                            </div>
+                          </td>
+                          <td className="py-4 px-4 text-sm text-gray-500 font-medium">
+                            {new Date(order.orderDate).toLocaleDateString()}
+                          </td>
+                          <td className="py-4 px-4 text-sm font-bold text-gray-900">
+                            {order.totalAmount.toFixed(2)} €
+                          </td>
+                          <td className="py-4 px-4">
+                            <div className="flex items-center justify-between">
+                              <span className="inline-flex items-center px-3 py-1 text-xs font-bold rounded-full bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-wide">
+                                {order.status}
+                              </span>
+                              {expandedOrderId === order.id ? (
+                                <ChevronUp className="w-5 h-5 text-gray-400" />
+                              ) : (
+                                <ChevronDown className="w-5 h-5 text-gray-400" />
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                        {expandedOrderId === order.id && (
+                          <tr>
+                            <td colSpan={4} className="p-0 border-b border-gray-100">
+                              <div className="bg-gray-50 p-6 grid grid-cols-1 md:grid-cols-2 gap-8 shadow-inner">
+                                
+                                {/* Detalles de Artículos */}
+                                <div>
+                                  <h4 className="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                    <Package className="w-4 h-4 text-indigo-600" />
+                                    Artículos del Pedido
+                                  </h4>
+                                  <ul className="space-y-3">
+                                    {(order.items || []).map((item: any, idx: number) => (
+                                      <li key={idx} className="flex justify-between items-center text-sm bg-white p-3 rounded-lg border border-gray-200">
+                                        <div className="flex items-center gap-4">
+                                          {item.image ? (
+                                            <div className="w-12 h-12 bg-gray-100 rounded-md overflow-hidden relative flex-shrink-0">
+                                              <Image src={item.image} alt={item.name || "Producto"} fill className="object-cover" sizes="48px" />
+                                            </div>
+                                          ) : (
+                                            <div className="w-12 h-12 bg-gray-100 rounded-md flex-shrink-0 flex items-center justify-center text-gray-400">
+                                              <Package size={20} />
+                                            </div>
+                                          )}
+                                          <div className="flex flex-col">
+                                            <Link href={`/productos/${item.productId}`} className="font-semibold text-gray-900 hover:text-indigo-600 line-clamp-1 transition-colors">
+                                              {item.name || `Producto ${item.productId}`}
+                                            </Link>
+                                            <span className="text-gray-500 text-xs mt-0.5">Cant: {item.quantity}</span>
+                                          </div>
+                                        </div>
+                                        <div className="font-bold text-gray-900">
+                                          {(item.priceAtPurchase * item.quantity).toFixed(2)} €
+                                        </div>
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+
+                                {/* Detalles de Direcciones */}
+                                <div className="space-y-6">
+                                  {order.shippingAddress && (
+                                    <div>
+                                      <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                        <MapPin className="w-4 h-4 text-indigo-600" />
+                                        Dirección de Envío
+                                      </h4>
+                                      <div className="text-sm text-gray-600 bg-white p-4 rounded-lg border border-gray-200">
+                                        <p>{order.shippingAddress.street}</p>
+                                        <p>{order.shippingAddress.city}, {order.shippingAddress.postalCode}</p>
+                                        {order.shippingAddress.country && <p>{order.shippingAddress.country}</p>}
+                                      </div>
+                                    </div>
+                                  )}
+
+                                  {order.billingAddress && (
+                                    <div>
+                                      <h4 className="text-sm font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                        <CreditCard className="w-4 h-4 text-purple-600" />
+                                        Dirección de Facturación
+                                      </h4>
+                                      <div className="text-sm text-gray-600 bg-white p-4 rounded-lg border border-gray-200">
+                                        <p>{order.billingAddress.street}</p>
+                                        <p>{order.billingAddress.city}, {order.billingAddress.postalCode}</p>
+                                        {order.billingAddress.country && <p>{order.billingAddress.country}</p>}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                                
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </React.Fragment>
                     ))}
                   </tbody>
                 </table>

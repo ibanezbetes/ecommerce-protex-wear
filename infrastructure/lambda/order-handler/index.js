@@ -1,5 +1,5 @@
 const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
-const { DynamoDBDocumentClient, QueryCommand, ScanCommand, GetCommand, PutCommand } = require("@aws-sdk/lib-dynamodb");
+const { DynamoDBDocumentClient, QueryCommand, ScanCommand, GetCommand, PutCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
 const { LambdaClient, InvokeCommand } = require("@aws-sdk/client-lambda");
 
 const client = new DynamoDBClient({});
@@ -27,10 +27,47 @@ exports.handler = async (event) => {
       return await listAllOrders(args);
     case 'createOrder':
       return await createOrder(args.input, userId, identity.claims ? identity.claims.email : null);
+    case 'updateOrderStatus':
+      await requireAdmin(userId);
+      return await updateOrderStatus(args.orderId, args.userId, args.status);
     default:
       throw new Error(`Unsupported field: ${fieldName}`);
   }
 };
+
+async function updateOrderStatus(orderId, customerUserId, status) {
+  const params = {
+    TableName: TABLE_NAME,
+    Key: {
+      PK: `ORDER#USER#${customerUserId}`,
+      SK: `ORDER#${orderId}`
+    },
+    UpdateExpression: "SET #st = :status",
+    ExpressionAttributeNames: {
+      "#st": "status"
+    },
+    ExpressionAttributeValues: {
+      ":status": status
+    },
+    ReturnValues: "ALL_NEW"
+  };
+
+  const { Attributes } = await docClient.send(new UpdateCommand(params));
+  
+  if (!Attributes) {
+    throw new Error("Order not found");
+  }
+
+  return {
+    ...Attributes,
+    id: Attributes.orderId || Attributes.id,
+    totalAmount: Attributes.totalAmount || Attributes.total || 0,
+    items: (Attributes.items || []).map(i => ({
+      ...i,
+      priceAtPurchase: i.priceAtPurchase || i.price || 0
+    }))
+  };
+}
 
 async function requireAdmin(userId) {
   const { Item } = await docClient.send(new GetCommand({
@@ -97,7 +134,7 @@ async function createOrder(input, userId, email) {
     }
   }
 
-  return { success: true, orderId: orderId, message: "Order created successfully" };
+  return { success: true, orderId: orderId, status: 'PENDING', message: "Order created successfully" };
 }
 
 async function listUserOrders(userId) {
@@ -109,7 +146,18 @@ async function listUserOrders(userId) {
       ":skPrefix": "ORDER#"
     }
   }));
-  return Items || [];
+  const items = Items || [];
+  return items.map(item => ({
+    ...item,
+    id: item.orderId || item.id,
+    totalAmount: item.totalAmount || item.total || 0,
+    customerEmail: item.customerEmail || item.email || "N/A",
+    items: (item.items || []).map(i => ({
+      ...i,
+      priceAtPurchase: i.priceAtPurchase || i.price || 0,
+      image: i.image || null
+    }))
+  }));
 }
 
 async function listAllOrders(args) {
@@ -118,9 +166,9 @@ async function listAllOrders(args) {
   // Para desarrollo, usaremos un Scan filtrado ya que GSI no está totalmente configurado para órdenes.
   // En producción, esto debería usar un GSI.
   
-  let filterExpressions = ["#type = :type"];
-  let expressionAttributeNames = { "#type": "type" };
-  let expressionAttributeValues = { ":type": "Order" };
+  let filterExpressions = ["begins_with(PK, :pkPrefix)"];
+  let expressionAttributeNames = {};
+  let expressionAttributeValues = { ":pkPrefix": "ORDER#USER#" };
 
   if (status) {
     filterExpressions.push("#status = :status");
@@ -142,10 +190,13 @@ async function listAllOrders(args) {
   const params = {
     TableName: TABLE_NAME,
     FilterExpression: filterExpressions.join(" AND "),
-    ExpressionAttributeNames: expressionAttributeNames,
     ExpressionAttributeValues: expressionAttributeValues,
     Limit: limit
   };
+  
+  if (Object.keys(expressionAttributeNames).length > 0) {
+    params.ExpressionAttributeNames = expressionAttributeNames;
+  }
 
   if (nextToken) {
     params.ExclusiveStartKey = JSON.parse(Buffer.from(nextToken, 'base64').toString('utf8'));
@@ -153,8 +204,19 @@ async function listAllOrders(args) {
 
   const { Items, LastEvaluatedKey } = await docClient.send(new ScanCommand(params));
 
+  const items = Items || [];
   return {
-    items: Items || [],
+    items: items.map(item => ({
+      ...item,
+      id: item.orderId || item.id,
+      totalAmount: item.totalAmount || item.total || 0,
+      customerEmail: item.customerEmail || item.email || "N/A",
+      items: (item.items || []).map(i => ({
+        ...i,
+        priceAtPurchase: i.priceAtPurchase || i.price || 0,
+        image: i.image || null
+      }))
+    })),
     nextToken: LastEvaluatedKey ? Buffer.from(JSON.stringify(LastEvaluatedKey)).toString('base64') : null
   };
 }

@@ -2,6 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
+import { adminOperations, productOperations } from '@/services/graphqlClient';
+
 export default function AdminDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState<any>({
@@ -14,31 +16,67 @@ export default function AdminDashboardPage() {
   });
 
   useEffect(() => {
-    // Simulate fetching data for the dashboard since real AppSync operations aren't fully migrated yet
     const fetchStats = async () => {
       try {
         setLoading(true);
-        await new Promise(r => setTimeout(r, 800)); // Simulate network
+        // Fetch orders
+        const ordersData = await adminOperations.listAllOrders();
+        const orders = ordersData?.items || [];
+        
+        // Fetch all products with pagination
+        let allProducts: any[] = [];
+        let nextToken: string | undefined = undefined;
+        let hasMore = true;
+        while (hasMore) {
+          const pData = await productOperations.listProducts(undefined, undefined, 100, nextToken);
+          if (pData?.items) {
+            allProducts = [...allProducts, ...pData.items];
+          }
+          if (pData?.nextToken) {
+            nextToken = pData.nextToken;
+          } else {
+            hasMore = false;
+          }
+        }
+        
+        const products = allProducts;
+        
+        // Calculate total revenue from non-cancelled orders
+        const validOrders = orders.filter((o: any) => o.status !== 'CANCELLED' && o.status !== 'CANCELADO');
+        const totalRevenue = validOrders.reduce((sum: number, o: any) => sum + (o.totalAmount || 0), 0);
+        const pendingOrders = orders.filter((o: any) => o.status === 'PENDING' || o.status === 'PENDIENTE').length;
+        
+        // Sort orders by date descending for recent orders
+        const sortedOrders = [...orders].sort((a: any, b: any) => {
+          return new Date(b.orderDate).getTime() - new Date(a.orderDate).getTime();
+        });
+        
         setStats({
-          totalOrders: 42,
-          totalRevenue: 3450.50,
-          totalProducts: 15,
-          pendingOrders: 3,
-          recentOrders: [
-            { id: 'ORD-123456', customerName: 'María García', totalAmount: 120.50, status: 'PENDING' },
-            { id: 'ORD-123457', customerName: 'Juan Pérez', totalAmount: 45.00, status: 'COMPLETED' },
-          ],
-          topProducts: [
-            { id: 'PROD-1', name: 'Camiseta Básica', sku: 'CAM-BAS-01', price: 15.99, stock: 120 },
-            { id: 'PROD-2', name: 'Pantalón de Trabajo', sku: 'PAN-TRAB-01', price: 35.50, stock: 45 },
-          ]
+          totalOrders: orders.length,
+          totalRevenue: totalRevenue,
+          totalProducts: products.length,
+          pendingOrders: pendingOrders,
+          recentOrders: sortedOrders.slice(0, 5).map((o: any) => ({
+            id: o.id,
+            customerName: o.customerName || o.customerEmail || 'Sin nombre',
+            totalAmount: o.totalAmount || 0,
+            status: o.status
+          })),
+          topProducts: products.slice(0, 5).map((p: any) => ({
+            id: p.id,
+            name: p.name,
+            sku: p.variants?.[0]?.sku || '-',
+            price: p.variants?.[0]?.basePrice || 0,
+            stock: 0 // Stock tracking not yet implemented in variants fully
+          }))
         });
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching dashboard stats:", err);
       } finally {
         setLoading(false);
       }
     };
+    
     fetchStats();
   }, []);
 

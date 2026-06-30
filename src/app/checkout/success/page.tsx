@@ -9,6 +9,7 @@ import { useCart } from '@/store/useCart';
 function CheckoutSuccessContent() {
   const searchParams = useSearchParams();
   const orderNumber = searchParams.get('order') || 'ORD-DEMO';
+  const method = searchParams.get('method') || 'card';
   const [mounted, setMounted] = useState(false);
   const { clearCart } = useCart();
 
@@ -99,22 +100,67 @@ function CheckoutSuccessContent() {
           </div>
         </div>
 
+        {method === 'bank_transfer' && (
+          <div style={{
+            background: '#fffbeb',
+            border: '1px solid #fde68a',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            marginBottom: '2rem',
+            textAlign: 'left',
+            color: '#92400e',
+          }}>
+            <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#b45309', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <CheckCircle size={20} /> Instrucciones de Transferencia
+            </h3>
+            <p style={{ margin: '0 0 0.5rem' }}>Por favor, realiza la transferencia a la siguiente cuenta:</p>
+            <ul style={{ margin: '0 0 1rem', paddingLeft: '1.5rem', fontWeight: 600 }}>
+              <li><strong>Banco:</strong> Banco Santander</li>
+              <li><strong>IBAN:</strong> ES12 3456 7890 1234 5678 9012</li>
+              <li><strong>Titular:</strong> Protex Wear S.L.</li>
+              <li><strong>Concepto:</strong> Pedido {orderNumber}</li>
+            </ul>
+            <p style={{ margin: 0, fontSize: '0.875rem' }}>Tu pedido se procesará tan pronto como recibamos el pago en nuestra cuenta bancaria.</p>
+          </div>
+        )}
+
+        {method === 'invoice' && (
+          <div style={{
+            background: '#eff6ff',
+            border: '1px solid #bfdbfe',
+            borderRadius: '12px',
+            padding: '1.5rem',
+            marginBottom: '2rem',
+            textAlign: 'left',
+            color: '#1e40af',
+          }}>
+            <h3 style={{ marginTop: 0, marginBottom: '0.5rem', color: '#1d4ed8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <CheckCircle size={20} /> Pago a 30 Días
+            </h3>
+            <p style={{ margin: 0, fontSize: '0.9375rem' }}>
+              Procesaremos tu pedido de inmediato. Recibirás la factura por correo electrónico con las instrucciones para abonarla en un plazo de 30 días.
+            </p>
+          </div>
+        )}
+
         {/* Trust message */}
-        <div style={{
-          background: '#f0fdf4',
-          border: '1px solid #bbf7d0',
-          borderRadius: '12px',
-          padding: '1rem 1.5rem',
-          marginBottom: '2rem',
-          fontSize: '0.9375rem',
-          color: '#166534',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem',
-        }}>
-          <CheckCircle size={20} color="#16a34a" />
-          <span>Pago procesado de forma <strong>segura</strong> con encriptación SSL de Stripe.</span>
-        </div>
+        {(method === 'card' || method === 'bizum') && (
+          <div style={{
+            background: '#f0fdf4',
+            border: '1px solid #bbf7d0',
+            borderRadius: '12px',
+            padding: '1rem 1.5rem',
+            marginBottom: '2rem',
+            fontSize: '0.9375rem',
+            color: '#166534',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+          }}>
+            <CheckCircle size={20} color="#16a34a" />
+            <span>Pago procesado de forma <strong>segura</strong> con encriptación SSL de Stripe.</span>
+          </div>
+        )}
 
         <Link
           href="/productos"

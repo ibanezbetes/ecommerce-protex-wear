@@ -421,7 +421,7 @@
       "ApiId"
      ]
     },
-    "Definition": "type Product @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  name: String!\r\n  description: String\r\n  brand: String!\r\n  category: String\r\n  variants: [Variant!]!\r\n  createdAt: String\r\n  updatedAt: String\r\n}\r\n\r\ntype Variant @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  sku: String!\r\n  size: String\r\n  color: String\r\n  basePrice: Float!\r\n  images: [String]\r\n}\r\n\r\ntype Query {\r\n  # Obtener un producto por ID. Usa Lambda resolver para inyectar precio VIP si el usuario está logueado.\r\n  getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Listar productos (con paginación simple y filtro)\r\n  listProducts(brand: String, category: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools\r\n\r\n  # Perfil de usuario logueado\r\n  getUserProfile: User @aws_cognito_user_pools\r\n  \r\n  # Listar pedidos del usuario logueado\r\n  listUserOrders: [Order!]! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar todos los pedidos con filtros\r\n  listAllOrders(status: String, email: String, startDate: String, endDate: String, limit: Int, nextToken: String): OrderConnection! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar usuarios\r\n  listUsers(limit: Int, nextToken: String): UserConnection! @aws_cognito_user_pools\r\n}\r\n\r\ntype ProductConnection @aws_api_key @aws_cognito_user_pools {\r\n  items: [Product!]!\r\n  nextToken: String\r\n}\r\n\r\nenum PaymentMethod {\r\n  STANDARD\r\n  DEFERRED\r\n}\r\n\r\ninput CreateOrderInput {\r\n  type: PaymentMethod!\r\n  items: [OrderItemInput!]!\r\n}\r\n\r\ninput OrderItemInput {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n}\r\n\r\ntype OrderResponse {\r\n  orderId: ID!\r\n  checkoutUrl: String\r\n  status: String!\r\n}\r\n\r\ntype Mutation {\r\n  createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Actualizar datos del perfil de usuario (envío/facturación)\r\n  updateUserProfile(input: UpdateUserProfileInput!): User @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto\r\n  setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Habilitar o deshabilitar pago a 30 días\r\n  setCanPayLater(userId: ID!, canPayLater: Boolean!): User @aws_cognito_user_pools\r\n}\r\n\r\n# --- NUEVOS MODELOS Y TIPOS ---\r\n\r\ntype User @aws_cognito_user_pools {\r\n  id: ID!\r\n  email: String!\r\n  name: String\r\n  role: String! # \"USER\" o \"ADMIN\"\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n  specialPrices: [UserPrice]\r\n  can_pay_later: Boolean\r\n  cif: String\r\n}\r\n\r\ntype UserConnection @aws_cognito_user_pools {\r\n  items: [User!]!\r\n  nextToken: String\r\n}\r\n\r\ntype Address @aws_cognito_user_pools {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ninput UpdateUserProfileInput {\r\n  name: String\r\n  shippingAddress: AddressInput\r\n  billingAddress: AddressInput\r\n}\r\n\r\ninput AddressInput {\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n}\r\n\r\ntype UserPrice @aws_cognito_user_pools {\r\n  userId: ID!\r\n  productId: ID!\r\n  specialPrice: Float!\r\n}\r\n\r\ntype Order @aws_cognito_user_pools {\r\n  id: ID!\r\n  userId: String!\r\n  customerEmail: String!\r\n  orderDate: String!\r\n  status: String!\r\n  totalAmount: Float!\r\n  items: [OrderItem!]!\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n}\r\n\r\ntype OrderConnection @aws_cognito_user_pools {\r\n  items: [Order!]!\r\n  nextToken: String\r\n}\r\n\r\ntype OrderItem @aws_cognito_user_pools {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n  priceAtPurchase: Float!\r\n  name: String\r\n}\r\n"
+    "Definition": "type Product @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  name: String!\r\n  description: String\r\n  brand: String!\r\n  category: String\r\n  variants: [Variant!]!\r\n  createdAt: String\r\n  updatedAt: String\r\n}\r\n\r\ntype Variant @aws_api_key @aws_cognito_user_pools {\r\n  id: ID!\r\n  sku: String!\r\n  size: String\r\n  color: String\r\n  basePrice: Float!\r\n  images: [String]\r\n}\r\n\r\ntype Query {\r\n  # Obtener un producto por ID. Usa Lambda resolver para inyectar precio VIP si el usuario está logueado.\r\n  getProduct(id: ID!): Product @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Listar productos (con paginación simple y filtro)\r\n  listProducts(brand: String, category: String, limit: Int, nextToken: String): ProductConnection! @aws_api_key @aws_cognito_user_pools\r\n\r\n  # Perfil de usuario logueado\r\n  getUserProfile: User @aws_cognito_user_pools\r\n  \r\n  # Listar pedidos del usuario logueado\r\n  listUserOrders: [Order!]! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar todos los pedidos con filtros\r\n  listAllOrders(status: String, email: String, startDate: String, endDate: String, limit: Int, nextToken: String): OrderConnection! @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Listar usuarios\r\n  listUsers(limit: Int, nextToken: String): UserConnection! @aws_cognito_user_pools\r\n}\r\n\r\ntype ProductConnection @aws_api_key @aws_cognito_user_pools {\r\n  items: [Product!]!\r\n  nextToken: String\r\n}\r\n\r\nenum PaymentMethod {\r\n  STANDARD\r\n  DEFERRED\r\n}\r\n\r\ninput CreateOrderInput {\r\n  type: PaymentMethod!\r\n  items: [OrderItemInput!]!\r\n  totalAmount: Float!\r\n  customerEmail: String\r\n  customerName: String\r\n  paymentMethod: String\r\n  shippingAddress: AddressInput\r\n  billingAddress: AddressInput\r\n}\r\n\r\ninput OrderItemInput {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n  priceAtPurchase: Float!\r\n  name: String\r\n  image: String\r\n}\r\n\r\ntype OrderResponse @aws_api_key @aws_cognito_user_pools {\r\n  orderId: ID!\r\n  checkoutUrl: String\r\n  status: String!\r\n}\r\n\r\ntype Mutation {\r\n  createOrder(input: CreateOrderInput!): OrderResponse @aws_api_key @aws_cognito_user_pools\r\n  \r\n  # Actualizar datos del perfil de usuario (envío/facturación)\r\n  updateUserProfile(input: UpdateUserProfileInput!): User @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Asignar un precio especial a un usuario para un producto\r\n  setSpecialPrice(userId: ID!, productId: ID!, specialPrice: Float!): UserPrice @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Habilitar o deshabilitar pago a 30 días\r\n  setCanPayLater(userId: ID!, canPayLater: Boolean!): User @aws_cognito_user_pools\r\n  \r\n  # ADMINISTRADOR: Actualizar estado de un pedido\r\n  updateOrderStatus(orderId: ID!, userId: String!, status: String!): Order @aws_cognito_user_pools\r\n}\r\n\r\n# --- NUEVOS MODELOS Y TIPOS ---\r\n\r\ntype User @aws_cognito_user_pools {\r\n  id: ID!\r\n  email: String!\r\n  name: String\r\n  role: String! # \"USER\" o \"ADMIN\"\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n  specialPrices: [UserPrice]\r\n  can_pay_later: Boolean\r\n  cif: String\r\n}\r\n\r\ntype UserConnection @aws_cognito_user_pools {\r\n  items: [User!]!\r\n  nextToken: String\r\n}\r\n\r\ntype Address @aws_cognito_user_pools {\r\n  name: String\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n  cif: String\r\n}\r\n\r\ninput UpdateUserProfileInput {\r\n  name: String\r\n  shippingAddress: AddressInput\r\n  billingAddress: AddressInput\r\n}\r\n\r\ninput AddressInput {\r\n  name: String\r\n  street: String\r\n  city: String\r\n  postalCode: String\r\n  country: String\r\n  cif: String\r\n}\r\n\r\ntype UserPrice @aws_cognito_user_pools {\r\n  userId: ID!\r\n  productId: ID!\r\n  specialPrice: Float!\r\n}\r\n\r\ntype Order @aws_cognito_user_pools {\r\n  id: ID!\r\n  userId: String!\r\n  customerEmail: String!\r\n  customerName: String\r\n  paymentMethod: String\r\n  orderDate: String!\r\n  status: String!\r\n  totalAmount: Float!\r\n  items: [OrderItem!]!\r\n  shippingAddress: Address\r\n  billingAddress: Address\r\n}\r\n\r\ntype OrderConnection @aws_cognito_user_pools {\r\n  items: [Order!]!\r\n  nextToken: String\r\n}\r\n\r\ntype OrderItem @aws_cognito_user_pools {\r\n  productId: ID!\r\n  variantId: ID!\r\n  quantity: Int!\r\n  priceAtPurchase: Float!\r\n  name: String\r\n  image: String\r\n}\r\n"
    },
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/Schema"
@@ -436,7 +436,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1814359506
+    "Expires": 1814371251
    },
    "DependsOn": [
     "ProtexWearApiSchemaCF7F059D"
@@ -757,6 +757,28 @@
     "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/SetSpecialPriceResolver/Resource"
    }
   },
+  "ProtexWearApiSetCanPayLaterResolver62DFE741": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ProtexWearApi2D35C46F",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "UserDataSource",
+    "FieldName": "setCanPayLater",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ProtexWearApiSchemaCF7F059D",
+    "ProtexWearApiUserDataSource5452A458"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/SetCanPayLaterResolver/Resource"
+   }
+  },
   "ProtexWearApiOrderDataSourceServiceRoleCC048DCC": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -924,6 +946,28 @@
     "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/CreateOrderResolver/Resource"
    }
   },
+  "ProtexWearApiUpdateOrderStatusResolver00F1864D": {
+   "Type": "AWS::AppSync::Resolver",
+   "Properties": {
+    "ApiId": {
+     "Fn::GetAtt": [
+      "ProtexWearApi2D35C46F",
+      "ApiId"
+     ]
+    },
+    "DataSourceName": "OrderDataSource",
+    "FieldName": "updateOrderStatus",
+    "Kind": "UNIT",
+    "TypeName": "Mutation"
+   },
+   "DependsOn": [
+    "ProtexWearApiOrderDataSource84B0EA53",
+    "ProtexWearApiSchemaCF7F059D"
+   ],
+   "Metadata": {
+    "aws:cdk:path": "EcommerceProtexWearStack/ProtexWearApi/UpdateOrderStatusResolver/Resource"
+   }
+  },
   "ProtexWearApiDbDataSourceServiceRole3818109A": {
    "Type": "AWS::IAM::Role",
    "Properties": {
@@ -1050,7 +1094,7 @@
     "DataSourceName": "DbDataSource",
     "FieldName": "listProducts",
     "Kind": "UNIT",
-    "RequestMappingTemplate": "\n        {\n          \"version\": \"2017-02-28\",\n          \"operation\": \"Scan\",\n          \"limit\": $util.defaultIfNull($ctx.args.limit, 24)\n          #if($ctx.args.nextToken)\n            ,\"nextToken\": \"$ctx.args.nextToken\"\n          #end\n          #set($expression = \"\")\n          #set($expressionValues = {})\n          \n          #if($ctx.args.brand)\n            #set($expression = \"brand = :brand\")\n            $util.qr($expressionValues.put(\":brand\", { \"S\": \"$ctx.args.brand\" }))\n          #end\n          \n          #if($ctx.args.category)\n            #if($expression != \"\")\n              #set($expression = \"$expression AND category = :category\")\n            #else\n              #set($expression = \"category = :category\")\n            #end\n            $util.qr($expressionValues.put(\":category\", { \"S\": \"$ctx.args.category\" }))\n          #end\n          \n          #if($expression != \"\")\n            ,\"filter\": {\n              \"expression\": \"$expression\",\n              \"expressionValues\": $util.toJson($expressionValues)\n            }\n          #end\n        }\n      ",
+    "RequestMappingTemplate": "\n        {\n          \"version\": \"2017-02-28\",\n          \"operation\": \"Scan\",\n          \"limit\": $util.defaultIfNull($ctx.args.limit, 24)\n          #if($ctx.args.nextToken)\n            ,\"nextToken\": \"$ctx.args.nextToken\"\n          #end\n          #set($expression = \"begins_with(PK, :prodPrefix)\")\n          #set($expressionValues = { \":prodPrefix\": { \"S\": \"PRODUCT#\" } })\n          \n          #if($ctx.args.brand)\n            #set($expression = \"$expression AND brand = :brand\")\n            $util.qr($expressionValues.put(\":brand\", { \"S\": \"$ctx.args.brand\" }))\n          #end\n          \n          #if($ctx.args.category)\n            #set($expression = \"$expression AND category = :category\")\n            $util.qr($expressionValues.put(\":category\", { \"S\": \"$ctx.args.category\" }))\n          #end\n          \n          ,\"filter\": {\n            \"expression\": \"$expression\",\n            \"expressionValues\": $util.toJson($expressionValues)\n          }\n        }\n      ",
     "ResponseMappingTemplate": "\n        {\n          \"items\": $util.toJson($ctx.result.items),\n          \"nextToken\": $util.toJson($util.defaultIfNullOrBlank($context.result.nextToken, null))\n        }\n      ",
     "TypeName": "Query"
    },
@@ -1469,7 +1513,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4.zip"
+     "S3Key": "99badd6a6d840e121eb8895ee667d148184d4066999507a2d1aad715b9e77d37.zip"
     },
     "Environment": {
      "Variables": {
@@ -1502,7 +1546,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/OrderOperationsHandler/Resource",
-    "aws:asset:path": "asset.6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4",
+    "aws:asset:path": "asset.99badd6a6d840e121eb8895ee667d148184d4066999507a2d1aad715b9e77d37",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -1907,7 +1951,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "aabb3c685b5b03a728e922f5227102b648515479876a876f111f0f14936e2b1c.zip"
+     "S3Key": "ad983bf38af86c24a8377ece324a4cb32f7fa534e97c75b6707ddcb8d0f0bc3e.zip"
     },
     "Environment": {
      "Variables": {
@@ -1939,7 +1983,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/ProcessExcelHandler/Resource",
-    "aws:asset:path": "asset.aabb3c685b5b03a728e922f5227102b648515479876a876f111f0f14936e2b1c",
+    "aws:asset:path": "asset.ad983bf38af86c24a8377ece324a4cb32f7fa534e97c75b6707ddcb8d0f0bc3e",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }

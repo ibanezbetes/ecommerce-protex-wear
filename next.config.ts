@@ -11,6 +11,14 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'forli.es',
+      },
+      {
+        protocol: 'http',
+        hostname: 'anbor.eu',
+      },
+      {
+        protocol: 'https',
+        hostname: 'anbor.eu',
       }
     ],
   },

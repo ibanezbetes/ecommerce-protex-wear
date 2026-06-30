@@ -8,17 +8,22 @@ import styles from './layout.module.css';
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
   const { user, isGuest, logout } = useAuth();
 
   React.useEffect(() => {
-    if (!isGuest && user && user.role !== 'ADMIN') {
+    setHasHydrated(true);
+  }, []);
+
+  React.useEffect(() => {
+    if (hasHydrated && !isGuest && user && user.role !== 'ADMIN') {
       router.push('/');
     }
-  }, [user, isGuest, router]);
+  }, [user, isGuest, router, hasHydrated]);
 
-  if (isGuest || (user && user.role !== 'ADMIN')) {
+  if (!hasHydrated || isGuest || (user && user.role !== 'ADMIN')) {
     // Evitar renderizar el panel si no es admin, mientras se redirige
     return null;
   }

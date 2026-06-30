@@ -7,6 +7,7 @@ import { useCart } from '@/store/useCart';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import { PaymentMethodSelector, PaymentMethod } from '@/components/checkout/PaymentMethodSelector';
 import { MapPin, Truck, CreditCard, CheckCircle, ShieldCheck, ShoppingCart, ArrowLeft, Lock, Package } from 'lucide-react';
+import { userOperations } from '@/services/graphqlClient';
 
 export interface Address {
   id?: string;
@@ -57,6 +58,8 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const { items, subtotal, clearCart } = useCart();
   const toast = useToast();
+  
+  const [canPayLater, setCanPayLater] = useState<boolean>((user as any)?.can_pay_later || false);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -116,6 +119,16 @@ export default function CheckoutPage() {
       router.push('/');
     }
   }, [items, router, orderPlaced]);
+
+  useEffect(() => {
+    if (user) {
+      userOperations.getUserProfile().then(profile => {
+        if (profile && profile.can_pay_later !== undefined) {
+          setCanPayLater(profile.can_pay_later);
+        }
+      }).catch(console.error);
+    }
+  }, [user]);
 
   useEffect(() => {
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY;
@@ -267,11 +280,34 @@ export default function CheckoutPage() {
       productId: item.productId,
       variantId: item.variantId || item.productId,
       quantity: item.quantity,
+      priceAtPurchase: item.price,
+      name: item.name,
+      image: item.image,
     }));
 
     const orderInput = {
       type: paymentMethod === 'card' ? 'STANDARD' : 'DEFERRED',
       items: orderItems,
+      totalAmount: total,
+      customerEmail: shippingAddress.email || user?.email || '',
+      customerName: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
+      paymentMethod: paymentMethod === 'card' ? 'STRIPE' : paymentMethod === 'bizum' ? 'BIZUM' : paymentMethod === 'bank_transfer' ? 'TRANSFER' : 'INVOICE',
+      shippingAddress: {
+        name: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
+        street: shippingAddress.street,
+        city: shippingAddress.city,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+        cif: shippingAddress.cif || ''
+      },
+      billingAddress: {
+        name: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
+        street: shippingAddress.street,
+        city: shippingAddress.city,
+        postalCode: shippingAddress.postalCode,
+        country: shippingAddress.country,
+        cif: shippingAddress.cif || ''
+      }
     };
 
     let actualOrderId = orderNumber;
@@ -299,7 +335,7 @@ export default function CheckoutPage() {
       sessionStorage.setItem('protex_orders', JSON.stringify(fallbackOrders));
     }
 
-    if (paymentMethod === 'card' || paymentMethod === 'bizum' || paymentMethod === 'bank_transfer') {
+    if (paymentMethod === 'card' || paymentMethod === 'bizum') {
       try {
         const res = await fetch('/api/checkout', {
           method: 'POST',
@@ -313,6 +349,8 @@ export default function CheckoutPage() {
               image: item.image,
             })),
             shippingCost,
+            tax,
+            total,
             customerEmail: shippingAddress.email || user?.email,
             customerCif: shippingAddress.cif,
             orderNumber: actualOrderId,
@@ -346,7 +384,7 @@ export default function CheckoutPage() {
 
         setOrderPlaced(true);
         clearCart();
-        router.push(`/checkout/success?order=${actualOrderId}`);
+        router.push(`/checkout/success?order=${actualOrderId}&method=${paymentMethod}`);
       } catch (err: any) {
         setError(err.message || 'Error al procesar el pedido.');
         toast.error({
@@ -545,7 +583,7 @@ export default function CheckoutPage() {
                   <PaymentMethodSelector
                     selected={paymentMethod}
                     onChange={(m) => setPaymentMethod(m as PaymentMethod)}
-                    canPayLater={(user as any)?.can_pay_later}
+                    canPayLater={canPayLater}
                   />
 
                   {paymentMethod === 'bank_transfer' && (

@@ -88,6 +88,21 @@ function customerEmailHTML(data: OrderEmailPayload): string {
         <tr><td style="padding:4px 0;"><strong>Concepto/Mensaje:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${data.orderNumber}</td></tr>
       </table>
     </div>
+  ` : data.paymentMethod === 'invoice' ? `
+    <!-- Instrucciones Factura a 30 días -->
+    <div style="background:#eff6ff; border-left:4px solid #3b82f6; border-radius:8px; padding:20px; margin: 0 0 32px 0;">
+      <h4 style="margin:0 0 8px; color:#1d4ed8; font-size:15px; font-weight:700;">
+        📄 Pago a 30 días
+      </h4>
+      <p style="margin:0 0 12px; color:#1e40af; font-size:14px; line-height:1.5;">
+        Tu pedido ha sido registrado con éxito. Adjuntamos la factura en este correo, la cual deberá ser abonada en un plazo máximo de 30 días en la cuenta bancaria de la empresa.
+      </p>
+      <table style="width:100%; font-size:13px; color:#1e40af;">
+        <tr><td style="padding:4px 0; width:100px;"><strong>Banco:</strong></td><td>${BUSINESS_CONFIG.bankName}</td></tr>
+        <tr><td style="padding:4px 0;"><strong>IBAN:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${BUSINESS_CONFIG.bankIBAN}</td></tr>
+        <tr><td style="padding:4px 0;"><strong>Concepto:</strong></td><td style="font-family:monospace; font-weight:bold; font-size:14px;">${data.orderNumber}</td></tr>
+      </table>
+    </div>
   ` : '';
 
   const discountRow = (data.discountCode && data.discountAmount && data.discountAmount > 0) ? `

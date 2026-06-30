@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   try {
-    const { items, shippingCost, customerEmail, customerCif, orderNumber, paymentMethod } =
+    const { items, shippingCost, tax, total, customerEmail, customerCif, orderNumber, paymentMethod } =
       await request.json();
 
     // ── Line Items ────────────────────────────────────────────────────────
@@ -52,6 +52,45 @@ export async function POST(request: Request) {
         },
         quantity: 1,
       });
+    }
+
+    // Add tax as a separate line item
+    if (tax && tax > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'IVA (21%)',
+          },
+          unit_amount: Math.round(tax * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Adjust for any rounding differences between frontend and Stripe
+    if (total) {
+      const expectedTotalInCents = Math.round(total * 100);
+      let currentTotalInCents = 0;
+      
+      for (const item of lineItems) {
+        currentTotalInCents += item.price_data.unit_amount * item.quantity;
+      }
+      
+      const difference = expectedTotalInCents - currentTotalInCents;
+      
+      if (difference !== 0) {
+        lineItems.push({
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Ajuste de redondeo',
+            },
+            unit_amount: difference,
+          },
+          quantity: 1,
+        });
+      }
     }
 
     // Determinar los métodos de pago en función de la selección del usuario
