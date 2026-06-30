@@ -37,7 +37,9 @@ export async function POST(request: Request) {
         <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border-radius:16px; overflow:hidden; background:white;">
           <tr>
             <td style="background:linear-gradient(135deg, #10b981, #059669); padding:48px 40px 40px; text-align:center;">
-              <div style="font-size:32px; margin-bottom:12px;">📦</div>
+              <div style="margin-bottom:20px;">
+                <img src="${process.env.NEXT_PUBLIC_BASE_URL || 'https://protexwear.es'}/logo.png" alt="Protex Wear" style="height:40px; width:auto; display:inline-block;" />
+              </div>
               <h1 style="margin:0; color:white; font-size:26px; font-weight:800; letter-spacing:-0.5px; line-height:1.2;">
                 ¡Tu pedido está en camino!
               </h1>
@@ -79,7 +81,7 @@ export async function POST(request: Request) {
     await transporter.sendMail({
       from: `"Protex Wear" <${fromEmail}>`,
       to: customerEmail,
-      subject: `📦 Tu pedido ${orderId} está en camino`,
+      subject: `Tu pedido ${orderId} está en camino`,
       html: html,
     });
 

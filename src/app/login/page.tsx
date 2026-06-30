@@ -73,7 +73,7 @@ export default function LoginPage() {
           if (profile?.role) {
             useAuth.setState((state) => ({
               ...state,
-              user: state.user ? { ...state.user, role: profile.role as string } : null
+              user: state.user ? { ...state.user, role: profile.role as string, specialPrices: profile.specialPrices as any } : null
             }));
             document.cookie = `protex_role=${profile.role}; path=/; max-age=86400`;
           }
@@ -161,7 +161,7 @@ export default function LoginPage() {
           if (profile?.role) {
             useAuth.setState((state) => ({
               ...state,
-              user: state.user ? { ...state.user, role: profile.role as string } : null
+              user: state.user ? { ...state.user, role: profile.role as string, specialPrices: profile.specialPrices as any } : null
             }));
             document.cookie = `protex_role=${profile.role}; path=/; max-age=86400`;
           }

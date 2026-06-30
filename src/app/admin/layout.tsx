@@ -48,9 +48,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { path: '/admin/pedidos', label: 'Pedidos', icon: Icons.Orders },
     { path: '/admin/usuarios', label: 'Usuarios', icon: Icons.Users },
     { path: '/admin/importar', label: 'Importar Excel', icon: Icons.Upload },
-    { path: '/admin/testing', label: 'Testing', icon: Icons.Testing },
-    { path: '/admin/reportes', label: 'Reportes', icon: Icons.Reports },
-    { path: '/admin/configuracion', label: 'Configuración', icon: Icons.Settings },
   ];
 
   const isActive = (path: string, exact = false) => {

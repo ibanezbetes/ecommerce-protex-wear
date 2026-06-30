@@ -62,14 +62,14 @@ export function generateInvoicePDF(data: InvoiceData): Promise<Buffer> {
       const formattedDate = data.date.toLocaleDateString('es-ES', { year: 'numeric', month: '2-digit', day: '2-digit' });
       doc.fontSize(10).fillColor(TEXT_MUTED);
       
-      doc.font('Helvetica-Bold').text('Nº Factura:', 350, 80, { width: 90, align: 'right' });
-      doc.font('Helvetica').fillColor(TEXT_MAIN).text(data.orderNumber, 450, 80, { width: 90, align: 'right' });
+      doc.font('Helvetica-Bold').text('Nº Factura:', 310, 80, { width: 90, align: 'right' });
+      doc.font('Helvetica').fillColor(TEXT_MAIN).text(data.orderNumber, 410, 80, { width: 130, align: 'right' });
       
-      doc.font('Helvetica-Bold').fillColor(TEXT_MUTED).text('Fecha Emisión:', 350, 95, { width: 90, align: 'right' });
-      doc.font('Helvetica').fillColor(TEXT_MAIN).text(formattedDate, 450, 95, { width: 90, align: 'right' });
+      doc.font('Helvetica-Bold').fillColor(TEXT_MUTED).text('Fecha Emisión:', 310, 95, { width: 90, align: 'right' });
+      doc.font('Helvetica').fillColor(TEXT_MAIN).text(formattedDate, 410, 95, { width: 130, align: 'right' });
       
-      doc.font('Helvetica-Bold').fillColor(TEXT_MUTED).text('Pedido Ref:', 350, 110, { width: 90, align: 'right' });
-      doc.font('Helvetica').fillColor(TEXT_MAIN).text(data.orderNumber, 450, 110, { width: 90, align: 'right' });
+      doc.font('Helvetica-Bold').fillColor(TEXT_MUTED).text('Pedido Ref:', 310, 110, { width: 90, align: 'right' });
+      doc.font('Helvetica').fillColor(TEXT_MAIN).text(data.orderNumber, 410, 110, { width: 130, align: 'right' });
 
       // --- COMPANY DETAILS (Below Logo) ---
       let compY = 120;

@@ -30,6 +30,8 @@ interface User {
   role?: string;
   /** JWT de Cognito (IdToken) para autorizar peticiones */
   token?: string;
+  /** Precios especiales asignados por el admin */
+  specialPrices?: Array<{ productId: string; specialPrice: number }>;
 }
 
 /** Estado y acciones del store de autenticación */

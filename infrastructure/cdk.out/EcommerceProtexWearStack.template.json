@@ -137,7 +137,7 @@
      "S3Bucket": {
       "Fn::Sub": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}"
      },
-     "S3Key": "348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7.zip"
+     "S3Key": "78c8c1d1ea9bca079c4d5be2174b6934d764e4e82a1c6d31ebe3cdba91582339.zip"
     },
     "Environment": {
      "Variables": {
@@ -165,7 +165,7 @@
    ],
    "Metadata": {
     "aws:cdk:path": "EcommerceProtexWearStack/CognitoCustomMessageHandler/Resource",
-    "aws:asset:path": "asset.348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7",
+    "aws:asset:path": "asset.78c8c1d1ea9bca079c4d5be2174b6934d764e4e82a1c6d31ebe3cdba91582339",
     "aws:asset:is-bundled": false,
     "aws:asset:property": "Code"
    }
@@ -436,7 +436,7 @@
       "ApiId"
      ]
     },
-    "Expires": 1814371251
+    "Expires": 1814380472
    },
    "DependsOn": [
     "ProtexWearApiSchemaCF7F059D"

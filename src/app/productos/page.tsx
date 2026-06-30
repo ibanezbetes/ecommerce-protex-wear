@@ -2,7 +2,8 @@
 import { useEffect, useState, Suspense, useRef } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { graphqlFetch } from '@/services/graphqlClient';
+import { graphqlFetch, userOperations } from '@/services/graphqlClient';
+import { useAuth } from '@/store/useAuth';
 
 interface ProductVariant {
   basePrice: number;
@@ -47,6 +48,7 @@ const LIST_PRODUCTS = `
 `;
 
 function CatalogContent() {
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const urlCategory = searchParams.get('categoria') || undefined;
   const urlQuery = searchParams.get('q') || '';
@@ -129,6 +131,19 @@ function CatalogContent() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedBrand, urlCategory]);
 
+  useEffect(() => {
+    if (user && !user.specialPrices) {
+      userOperations.getUserProfile().then(profile => {
+        if (profile?.specialPrices) {
+          useAuth.setState(state => ({
+            ...state,
+            user: state.user ? { ...state.user, specialPrices: profile.specialPrices as any } : null
+          }));
+        }
+      }).catch(console.error);
+    }
+  }, [user]);
+
   // Aplicar filtros locales (búsqueda, talla, color, precio)
   const filteredProducts = products.filter(product => {
     // Buscar por texto
@@ -139,7 +154,14 @@ function CatalogContent() {
     const hasMatchingVariant = product.variants?.some(v => {
       const matchSize = selectedSize === 'ALL' || v.size?.toLowerCase() === selectedSize.toLowerCase();
       const matchColor = selectedColor === 'ALL' || v.color?.toLowerCase() === selectedColor.toLowerCase();
-      const matchPrice = v.basePrice <= maxPrice;
+      
+      let variantPrice = v.basePrice;
+      if (user?.specialPrices) {
+        const sp = user.specialPrices.find((s: any) => s.productId === product.id);
+        if (sp) variantPrice = sp.specialPrice;
+      }
+      
+      const matchPrice = variantPrice <= maxPrice;
       return matchSize && matchColor && matchPrice;
     });
 
@@ -329,7 +351,15 @@ function CatalogContent() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                 {filteredProducts.map((product) => {
                   const firstVariant = product.variants?.[0];
-                  const price = firstVariant?.basePrice || 0;
+                  let price = firstVariant?.basePrice || 0;
+                  
+                  if (user?.specialPrices) {
+                    const sp = user.specialPrices.find((s: any) => s.productId === product.id);
+                    if (sp) {
+                      price = sp.specialPrice;
+                    }
+                  }
+
                   let image = firstVariant?.images?.[0];
                   
                   if (!image || image.includes('.html') || !image.match(/\.(jpeg|jpg|gif|png|webp)/i)) {

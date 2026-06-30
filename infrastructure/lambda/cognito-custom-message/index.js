@@ -26,7 +26,7 @@ exports.handler = async (event) => {
     <body>
       <div class="container">
         <div class="header">
-          <h1>PROTEX WEAR</h1>
+          <img src="https://protexwear.es/logo.png" alt="Protex Wear" style="height:40px; width:auto; display:inline-block;" />
         </div>
         <div class="content">
           <h2 style="margin-top: 0; color: #111827;">${title}</h2>

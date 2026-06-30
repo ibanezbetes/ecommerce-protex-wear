@@ -1,15 +1,15 @@
 {
   "version": "36.0.0",
   "files": {
-    "348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7": {
+    "78c8c1d1ea9bca079c4d5be2174b6934d764e4e82a1c6d31ebe3cdba91582339": {
       "source": {
-        "path": "asset.348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7",
+        "path": "asset.78c8c1d1ea9bca079c4d5be2174b6934d764e4e82a1c6d31ebe3cdba91582339",
         "packaging": "zip"
       },
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "348720af05b42c7d7e01293e199beab8f4bd9adfef5b04c10cc0426eafa0d5e7.zip",
+          "objectKey": "78c8c1d1ea9bca079c4d5be2174b6934d764e4e82a1c6d31ebe3cdba91582339.zip",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }
@@ -92,7 +92,7 @@
         }
       }
     },
-    "a0199a0edd81c83b29c92cc7c7d826da06763a5465995ecd6a48ff3aaa8d9f79": {
+    "aecdfc2f07261443be8be44c5fb762d0ce3fa681c23fc01b5cd83dda24e30255": {
       "source": {
         "path": "EcommerceProtexWearStack.template.json",
         "packaging": "file"
@@ -100,7 +100,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "a0199a0edd81c83b29c92cc7c7d826da06763a5465995ecd6a48ff3aaa8d9f79.json",
+          "objectKey": "aecdfc2f07261443be8be44c5fb762d0ce3fa681c23fc01b5cd83dda24e30255.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

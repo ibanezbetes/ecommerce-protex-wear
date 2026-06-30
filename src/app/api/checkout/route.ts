@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   try {
-    const { items, shippingCost, tax, total, customerEmail, customerCif, orderNumber, paymentMethod } =
+    const { items, shippingCost, tax, total, customerEmail, customerCif, orderNumber, paymentMethod, shippingAddress } =
       await request.json();
 
     // ── Line Items ────────────────────────────────────────────────────────
@@ -136,6 +136,9 @@ export async function POST(request: Request) {
       metadata: {
         orderNumber: orderNumber || '',
         customerCif: customerCif || '',
+        shippingCost: shippingCost?.toString() || '0',
+        tax: tax?.toString() || '0',
+        shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : '',
       },
       billing_address_collection: 'auto',
       tax_id_collection: { enabled: true },

@@ -124,7 +124,7 @@ export default function CheckoutPage() {
     if (user) {
       userOperations.getUserProfile().then(profile => {
         if (profile && profile.can_pay_later !== undefined) {
-          setCanPayLater(profile.can_pay_later);
+          setCanPayLater(Boolean(profile.can_pay_later));
         }
       }).catch(console.error);
     }
@@ -239,7 +239,7 @@ export default function CheckoutPage() {
 
   const sendOrderEmail = async (actualOrderId: string) => {
     try {
-      await fetch('/api/send-order-email', {
+      const res = await fetch('/api/send-order-email', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -264,7 +264,14 @@ export default function CheckoutPage() {
           shippingMethod: 'agencia_externa',
         }),
       });
-    } catch (e) {}
+      const data = await res.json();
+      if (!res.ok || (data && !data.sent && !data.skipped)) {
+        console.error('Error enviando email:', data.error);
+        toast.error({ title: 'Error de email', message: 'El pedido se ha completado, pero no pudimos enviar el email de confirmación. (SES Sandbox o email no válido)' });
+      }
+    } catch (e) {
+      console.error('Network error enviando email:', e);
+    }
   };
 
   const handleSubmitOrder = async () => {
@@ -355,6 +362,14 @@ export default function CheckoutPage() {
             customerCif: shippingAddress.cif,
             orderNumber: actualOrderId,
             paymentMethod: paymentMethod,
+            shippingAddress: {
+              firstName: shippingAddress.firstName || '',
+              lastName: shippingAddress.lastName || '',
+              street: shippingAddress.street || '',
+              city: shippingAddress.city || '',
+              postalCode: shippingAddress.postalCode || '',
+              country: shippingAddress.country || 'ES',
+            },
           }),
         });
         const data = await res.json();
@@ -473,21 +488,21 @@ export default function CheckoutPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">Nombre *</label>
-                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.firstName || ''} onChange={e => handleAddressChange('firstName', e.target.value)} required />
+                        <input type="text" autoComplete="given-name" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.firstName || ''} onChange={e => handleAddressChange('firstName', e.target.value)} required />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">Apellidos *</label>
-                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
+                        <input type="text" autoComplete="family-name" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
                       </div>
                     </div>
                     <div className="space-y-2">
                       <label className="text-sm font-bold text-gray-700">Correo electrónico *</label>
-                      <input type="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
+                      <input type="email" autoComplete="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">Empresa (opcional)</label>
-                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
+                        <input type="text" autoComplete="organization" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">NIF/CIF/DNI (Factura B2B)</label>
@@ -499,6 +514,7 @@ export default function CheckoutPage() {
                       <input
                         type="text"
                         id="street-input"
+                        autoComplete="street-address"
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all"
                         value={shippingAddress.street || ''}
                         onChange={e => {
@@ -555,11 +571,11 @@ export default function CheckoutPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">Ciudad *</label>
-                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.city || ''} onChange={e => handleAddressChange('city', e.target.value)} required />
+                        <input type="text" autoComplete="address-level2" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.city || ''} onChange={e => handleAddressChange('city', e.target.value)} required />
                       </div>
                       <div className="space-y-2">
                         <label className="text-sm font-bold text-gray-700">Código Postal *</label>
-                        <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
+                        <input type="text" autoComplete="postal-code" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.postalCode || ''} onChange={e => handleAddressChange('postalCode', e.target.value)} required />
                       </div>
                     </div>
                   </form>
