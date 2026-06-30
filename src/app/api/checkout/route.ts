@@ -84,14 +84,15 @@ export async function POST(request: Request) {
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL;
     const sessionParams: any = {
       ...(pmTypes ? { payment_method_types: pmTypes } : {}),
       ...(pmOptions ? { payment_method_options: pmOptions } : {}),
       ...(customerId ? { customer: customerId } : { customer_email: customerEmail || undefined }),
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
+      success_url: `${origin}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/checkout`,
       client_reference_id: orderNumber,
       metadata: {
         orderNumber: orderNumber || '',
