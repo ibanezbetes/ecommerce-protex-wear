@@ -40,15 +40,15 @@
         }
       }
     },
-    "6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4": {
+    "99badd6a6d840e121eb8895ee667d148184d4066999507a2d1aad715b9e77d37": {
       "source": {
-        "path": "asset.6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4",
+        "path": "asset.99badd6a6d840e121eb8895ee667d148184d4066999507a2d1aad715b9e77d37",
         "packaging": "zip"
       },
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "6b9b7bda67fae440f00bc3a7fd34461690b56b9bef20c2658f912f4c9790eaa4.zip",
+          "objectKey": "99badd6a6d840e121eb8895ee667d148184d4066999507a2d1aad715b9e77d37.zip",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }
@@ -66,15 +66,15 @@
         }
       }
     },
-    "aabb3c685b5b03a728e922f5227102b648515479876a876f111f0f14936e2b1c": {
+    "ad983bf38af86c24a8377ece324a4cb32f7fa534e97c75b6707ddcb8d0f0bc3e": {
       "source": {
-        "path": "asset.aabb3c685b5b03a728e922f5227102b648515479876a876f111f0f14936e2b1c",
+        "path": "asset.ad983bf38af86c24a8377ece324a4cb32f7fa534e97c75b6707ddcb8d0f0bc3e",
         "packaging": "zip"
       },
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "aabb3c685b5b03a728e922f5227102b648515479876a876f111f0f14936e2b1c.zip",
+          "objectKey": "ad983bf38af86c24a8377ece324a4cb32f7fa534e97c75b6707ddcb8d0f0bc3e.zip",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }
@@ -92,7 +92,7 @@
         }
       }
     },
-    "d2d50f1c02db8aafdc0f649724c916921ed19e616ff0006d828e5459d58273f9": {
+    "a0199a0edd81c83b29c92cc7c7d826da06763a5465995ecd6a48ff3aaa8d9f79": {
       "source": {
         "path": "EcommerceProtexWearStack.template.json",
         "packaging": "file"
@@ -100,7 +100,7 @@
       "destinations": {
         "current_account-current_region": {
           "bucketName": "cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}",
-          "objectKey": "d2d50f1c02db8aafdc0f649724c916921ed19e616ff0006d828e5459d58273f9.json",
+          "objectKey": "a0199a0edd81c83b29c92cc7c7d826da06763a5465995ecd6a48ff3aaa8d9f79.json",
           "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-file-publishing-role-${AWS::AccountId}-${AWS::Region}"
         }
       }

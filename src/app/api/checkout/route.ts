@@ -19,7 +19,7 @@ export async function POST(request: Request) {
   const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
   try {
-    const { items, shippingCost, customerEmail, customerCif, orderNumber, paymentMethod } =
+    const { items, shippingCost, tax, total, customerEmail, customerCif, orderNumber, paymentMethod } =
       await request.json();
 
     // ── Line Items ────────────────────────────────────────────────────────
@@ -54,6 +54,45 @@ export async function POST(request: Request) {
       });
     }
 
+    // Add tax as a separate line item
+    if (tax && tax > 0) {
+      lineItems.push({
+        price_data: {
+          currency: 'eur',
+          product_data: {
+            name: 'IVA (21%)',
+          },
+          unit_amount: Math.round(tax * 100),
+        },
+        quantity: 1,
+      });
+    }
+
+    // Adjust for any rounding differences between frontend and Stripe
+    if (total) {
+      const expectedTotalInCents = Math.round(total * 100);
+      let currentTotalInCents = 0;
+      
+      for (const item of lineItems) {
+        currentTotalInCents += item.price_data.unit_amount * item.quantity;
+      }
+      
+      const difference = expectedTotalInCents - currentTotalInCents;
+      
+      if (difference !== 0) {
+        lineItems.push({
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'Ajuste de redondeo',
+            },
+            unit_amount: difference,
+          },
+          quantity: 1,
+        });
+      }
+    }
+
     // Determinar los métodos de pago en función de la selección del usuario
     let pmTypes: any[] | undefined;
     let pmOptions: any | undefined;
@@ -84,14 +123,15 @@ export async function POST(request: Request) {
     // ── Descuento (re-validación server-side) ─────────────────────────────
     // Aunque el cliente ya validó el código, lo verificamos de nuevo aquí
     // para prevenir manipulación.
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_BASE_URL;
     const sessionParams: any = {
       ...(pmTypes ? { payment_method_types: pmTypes } : {}),
       ...(pmOptions ? { payment_method_options: pmOptions } : {}),
       ...(customerId ? { customer: customerId } : { customer_email: customerEmail || undefined }),
       line_items: lineItems,
       mode: 'payment',
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/checkout`,
+      success_url: `${origin}/checkout/success?order=${orderNumber}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${origin}/checkout`,
       client_reference_id: orderNumber,
       metadata: {
         orderNumber: orderNumber || '',

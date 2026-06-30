@@ -180,7 +180,17 @@ export default function OrdersManagementPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border ${getStatusStyle(order.status)}`}>
-                        {order.status}
+                        {
+                          order.status === 'PENDING' ? 'Pendiente' :
+                          order.status === 'CONFIRMED' ? 'Confirmado' :
+                          order.status === 'PROCESSING' ? 'Procesando' :
+                          order.status === 'SHIPPED' ? 'Enviado' :
+                          order.status === 'DELIVERED' ? 'Entregado' :
+                          order.status === 'COMPLETED' ? 'Completado' :
+                          order.status === 'CANCELLED' ? 'Cancelado' :
+                          order.status === 'REFUNDED' ? 'Reembolsado' :
+                          order.status
+                        }
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right">

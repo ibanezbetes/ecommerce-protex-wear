@@ -68,8 +68,8 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity">
-            <Image src="/logo.png" alt="Protex Wear" width={140} height={40} className="w-auto h-auto object-contain" priority />
+          <Link href="/" className="flex-shrink-0 flex items-center hover:opacity-80 transition-opacity ml-4 md:ml-10">
+            <Image src="/logo.png" alt="Protex Wear" width={110} height={32} className="w-auto h-auto object-contain" priority />
           </Link>
 
           {/* Desktop Navigation */}

@@ -7,6 +7,10 @@ export async function POST(request: Request) {
     const result = await sendOrderEmails(data);
     
     if (!result.sent) {
+      if (result.reason === 'Faltan variables SMTP') {
+        // En entorno local o sin configurar, no bloqueamos el flujo de compra
+        return NextResponse.json({ sent: false, skipped: true, reason: result.reason }, { status: 200 });
+      }
       return NextResponse.json({ sent: false, error: result.error || result.reason }, { status: 500 });
     }
 

@@ -17,10 +17,23 @@ export default function ProductManagementPage() {
     try {
       setLoading(true);
       setError(null);
-      // Currently using the lightweight client which doesn't support complex filters out of the box without more setup,
-      // but we can list them and filter client-side for now or just fetch all.
-      const data = await productOperations.listProducts(undefined, undefined, 50);
-      setProducts(data?.items || []);
+      let allProducts: any[] = [];
+      let nextToken: string | undefined = undefined;
+      let hasMore = true;
+
+      while (hasMore) {
+        const data = await productOperations.listProducts(undefined, undefined, 100, nextToken);
+        if (data?.items) {
+          allProducts = [...allProducts, ...data.items];
+        }
+        if (data?.nextToken) {
+          nextToken = data.nextToken;
+        } else {
+          hasMore = false;
+        }
+      }
+
+      setProducts(allProducts);
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Error al cargar los productos');
@@ -157,15 +170,15 @@ export default function ProductManagementPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4">
-                      <span className="font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs">{product.sku}</span>
+                      <span className="font-mono text-gray-600 bg-gray-100 px-2 py-1 rounded text-xs">{product.variants?.[0]?.sku || '-'}</span>
                     </td>
                     <td className="px-6 py-4 font-semibold text-gray-900">
-                      €{product.price?.toFixed(2)}
+                      {product.variants?.[0]?.basePrice !== undefined ? `€${product.variants[0].basePrice.toFixed(2)}` : '-'}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5">
-                        <div className={`w-2 h-2 rounded-full ${product.stock > 10 ? 'bg-green-500' : product.stock > 0 ? 'bg-orange-500' : 'bg-red-500'}`}></div>
-                        <span className="text-gray-700">{product.stock > 0 ? `${product.stock} un.` : 'Agotado'}</span>
+                        <div className={`w-2 h-2 rounded-full bg-gray-400`}></div>
+                        <span className="text-gray-700">No gestionado</span>
                       </div>
                     </td>
                     <td className="px-6 py-4">

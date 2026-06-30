@@ -132,16 +132,15 @@ const LIST_PRODUCTS_QUERY = `
     listProducts(brand: $brand, category: $category, limit: $limit, nextToken: $nextToken) {
       items {
         id
-        sku
         name
         description
         brand
-        price
-        stock
-        imageUrl
         category
-        isActive
         variants {
+          id
+          sku
+          size
+          color
           basePrice
           images
         }
@@ -242,16 +241,20 @@ const GET_USER_PROFILE_QUERY = `
       can_pay_later
       cif
       shippingAddress {
+        name
         street
         city
         postalCode
         country
+        cif
       }
       billingAddress {
+        name
         street
         city
         postalCode
         country
+        cif
       }
       specialPrices {
         productId
@@ -286,6 +289,8 @@ const LIST_USER_ORDERS_QUERY = `
   query ListUserOrders {
     listUserOrders {
       id
+      customerName
+      paymentMethod
       orderDate
       status
       totalAmount
@@ -294,6 +299,23 @@ const LIST_USER_ORDERS_QUERY = `
         name
         quantity
         priceAtPurchase
+        image
+      }
+      shippingAddress {
+        name
+        street
+        city
+        postalCode
+        country
+        cif
+      }
+      billingAddress {
+        name
+        street
+        city
+        postalCode
+        country
+        cif
       }
     }
   }
@@ -327,6 +349,8 @@ const LIST_ALL_ORDERS_QUERY = `
         id
         userId
         customerEmail
+        customerName
+        paymentMethod
         orderDate
         status
         totalAmount
@@ -335,9 +359,35 @@ const LIST_ALL_ORDERS_QUERY = `
           name
           quantity
           priceAtPurchase
+          image
+        }
+        shippingAddress {
+          name
+          street
+          city
+          postalCode
+          country
+          cif
+        }
+        billingAddress {
+          name
+          street
+          city
+          postalCode
+          country
+          cif
         }
       }
       nextToken
+    }
+  }
+`;
+
+const UPDATE_ORDER_STATUS_MUTATION = `
+  mutation UpdateOrderStatus($orderId: ID!, $userId: String!, $status: String!) {
+    updateOrderStatus(orderId: $orderId, userId: $userId, status: $status) {
+      id
+      status
     }
   }
 `;
@@ -402,5 +452,14 @@ export const adminOperations = {
       canPayLater
     });
     return data.setCanPayLater;
+  },
+
+  async updateOrderStatus(orderId: string, userId: string, status: string) {
+    const data = await graphqlFetch<{ updateOrderStatus: any }>(
+      UPDATE_ORDER_STATUS_MUTATION,
+      { orderId, userId, status },
+      true
+    );
+    return data.updateOrderStatus;
   }
 };

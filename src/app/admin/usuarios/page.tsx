@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { adminOperations } from "@/services/graphqlClient";
+import { adminOperations, productOperations } from "@/services/graphqlClient";
 import { Loader2, Users, Search, Save, X } from "lucide-react";
 
 export default function AdminUsuariosPage() {
@@ -16,12 +16,28 @@ export default function AdminUsuariosPage() {
   const [productId, setProductId] = useState("");
   const [specialPrice, setSpecialPrice] = useState("");
   const [savingPrice, setSavingPrice] = useState(false);
+  
+  const [products, setProducts] = useState<any[]>([]);
 
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await adminOperations.listUsers();
-      setUsers(data.items || []);
+      let allUsers: any[] = [];
+      let nextToken: string | undefined = undefined;
+      let hasMore = true;
+
+      while (hasMore) {
+        const data = await adminOperations.listUsers(50, nextToken);
+        if (data?.items) {
+          allUsers = [...allUsers, ...data.items];
+        }
+        if (data?.nextToken) {
+          nextToken = data.nextToken;
+        } else {
+          hasMore = false;
+        }
+      }
+      setUsers(allUsers);
     } catch (error) {
       console.error("Error cargando usuarios:", error);
     } finally {
@@ -29,8 +45,31 @@ export default function AdminUsuariosPage() {
     }
   };
 
+  const fetchProducts = async () => {
+    try {
+      let allProducts: any[] = [];
+      let nextToken: string | undefined = undefined;
+      let hasMore = true;
+      while (hasMore) {
+        const pData = await productOperations.listProducts(undefined, undefined, 100, nextToken);
+        if (pData?.items) {
+          allProducts = [...allProducts, ...pData.items];
+        }
+        if (pData?.nextToken) {
+          nextToken = pData.nextToken;
+        } else {
+          hasMore = false;
+        }
+      }
+      setProducts(allProducts);
+    } catch (error) {
+      console.error("Error cargando productos:", error);
+    }
+  };
+
   useEffect(() => {
     fetchUsers();
+    fetchProducts();
   }, []);
 
   const handleOpenSpecialPrice = (user: any) => {
@@ -143,7 +182,6 @@ export default function AdminUsuariosPage() {
                       </span>
                     </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-3">
-                      {u.name?.includes('(B2B)') && (
                         <button
                           onClick={() => handleToggleCanPayLater(u)}
                           className={`inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
@@ -154,7 +192,6 @@ export default function AdminUsuariosPage() {
                         >
                           {u.can_pay_later ? 'Pago 30 días: ON' : 'Pago 30 días: OFF'}
                         </button>
-                      )}
                       <button
                         onClick={() => handleOpenSpecialPrice(u)}
                         className="inline-flex items-center px-3 py-1.5 text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
@@ -186,15 +223,23 @@ export default function AdminUsuariosPage() {
 
             <form onSubmit={handleSaveSpecialPrice} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">ID del Producto (SKU o ID)</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Seleccionar Producto</label>
                 <input
                   type="text"
                   required
+                  list="products-list"
                   value={productId}
                   onChange={(e) => setProductId(e.target.value)}
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
-                  placeholder="Ej: PROD-12345"
+                  placeholder="Buscar o seleccionar producto..."
                 />
+                <datalist id="products-list">
+                  {products.map(p => (
+                    <option key={p.id} value={p.id}>
+                      {p.name} ({p.variants?.[0]?.sku || '-'})
+                    </option>
+                  ))}
+                </datalist>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Nuevo Precio (€)</label>

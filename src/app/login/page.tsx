@@ -272,6 +272,7 @@ export default function LoginPage() {
                   id="password"
                   type="password"
                   required
+                  autoComplete="current-password"
                   className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white transition-all outline-none"
                   placeholder="••••••••"
                   value={password}

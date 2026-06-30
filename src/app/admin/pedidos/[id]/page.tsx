@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { adminOperations } from '@/services/graphqlClient';
 
 // Usamos el "any" aquí para que funcione sin problemas de tipos (ya que Next.js page props types cambian un poco con App Router)
 export default function OrderDetailPage({ params }: { params: any }) {
@@ -27,33 +28,29 @@ export default function OrderDetailPage({ params }: { params: any }) {
     const fetchOrder = async () => {
       try {
         setLoading(true);
-        await new Promise(r => setTimeout(r, 600));
-        setOrder({
-          id: orderId,
-          orderDate: '2023-10-25T14:30:00Z',
-          status: 'PENDING',
-          customerName: 'María García',
-          customerEmail: 'maria.g@example.com',
-          customerCompany: 'Tech Solutions LLC',
-          shippingAddress: JSON.stringify({
-            street: 'Av. de la Innovación 45, Planta 2',
-            city: 'Madrid',
-            state: 'Madrid',
-            postalCode: '28020',
-            country: 'España'
-          }),
-          items: JSON.stringify([
-            { name: 'Casco de Seguridad', sku: 'CAS-001', quantity: 2, price: 45.00 },
-            { name: 'Guantes de Protección', sku: 'GUA-002', quantity: 5, price: 12.50 }
-          ]),
-          subtotal: 152.50,
-          taxAmount: 32.02,
-          shippingAmount: 5.00,
-          discountAmount: 0,
-          totalAmount: 189.52,
-          paymentMethod: 'TARJETA',
-          paymentStatus: 'PAID'
-        });
+        const data = await adminOperations.listAllOrders();
+        const foundOrder = data.items?.find((o: any) => o.id === orderId);
+        
+        if (foundOrder) {
+          // Parse addresses if they are strings, otherwise use them directly
+          const shipping = typeof foundOrder.shippingAddress === 'string' ? JSON.parse(foundOrder.shippingAddress) : foundOrder.shippingAddress;
+          const billing = typeof foundOrder.billingAddress === 'string' ? JSON.parse(foundOrder.billingAddress) : foundOrder.billingAddress;
+          
+          setOrder({
+            ...foundOrder,
+            customerName: shipping?.name || foundOrder.customerEmail,
+            customerCompany: '',
+            shippingAddress: typeof foundOrder.shippingAddress === 'string' ? foundOrder.shippingAddress : JSON.stringify(foundOrder.shippingAddress || {}),
+            billingAddress: typeof foundOrder.billingAddress === 'string' ? foundOrder.billingAddress : JSON.stringify(foundOrder.billingAddress || {}),
+            items: typeof foundOrder.items === 'string' ? foundOrder.items : JSON.stringify(foundOrder.items || []),
+            subtotal: foundOrder.totalAmount, // Assuming total includes everything for now, or you can calculate
+            taxAmount: 0,
+            shippingAmount: 0,
+            discountAmount: 0,
+            paymentMethod: foundOrder.paymentMethod || 'NO ESPECIFICADO',
+            paymentStatus: foundOrder.status === 'PENDING' ? 'PENDING' : 'PAID'
+          });
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -103,10 +100,19 @@ export default function OrderDetailPage({ params }: { params: any }) {
     }
 
     setUpdating(true);
-    // Simulate update
-    await new Promise(r => setTimeout(r, 500));
-    setOrder((prev: any) => ({ ...prev, status: newStatus }));
-    setUpdating(false);
+    try {
+      await adminOperations.updateOrderStatus(orderId as string, order.userId, newStatus);
+      setOrder((prev: any) => ({
+        ...prev,
+        status: newStatus,
+        paymentStatus: newStatus === 'PENDING' || newStatus === 'CANCELLED' ? 'PENDING' : 'PAID'
+      }));
+    } catch (error) {
+      console.error("Failed to update order status:", error);
+      alert("Error al actualizar el estado del pedido.");
+    } finally {
+      setUpdating(false);
+    }
   };
 
   const getStatusStyle = (status: string) => {
@@ -168,16 +174,16 @@ export default function OrderDetailPage({ params }: { params: any }) {
             value={order.status}
             onChange={(e) => updateStatus(e.target.value)}
             disabled={updating}
-            className={`w-full md:w-48 px-4 py-2.5 rounded-xl border-2 font-bold focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors ${getStatusStyle(order.status)}`}
+            className={`px-4 py-3 rounded-xl font-bold uppercase tracking-wide text-sm outline-none border appearance-none cursor-pointer pr-10 ${getStatusStyle(order.status)}`}
           >
-            <option value="PENDING">PENDING</option>
-            <option value="CONFIRMED">CONFIRMED</option>
-            <option value="PROCESSING">PROCESSING</option>
-            <option value="SHIPPED">SHIPPED</option>
-            <option value="COMPLETED">COMPLETED</option>
-            <option value="DELIVERED">DELIVERED</option>
-            <option value="CANCELLED">CANCELLED</option>
-            <option value="REFUNDED">REFUNDED</option>
+            <option value="PENDING">Pendiente</option>
+            <option value="CONFIRMED">Confirmado</option>
+            <option value="PROCESSING">Procesando</option>
+            <option value="SHIPPED">Enviado</option>
+            <option value="DELIVERED">Entregado</option>
+            <option value="COMPLETED">Completado</option>
+            <option value="CANCELLED">Cancelado</option>
+            <option value="REFUNDED">Reembolsado</option>
           </select>
         </div>
       </div>
@@ -234,15 +240,18 @@ export default function OrderDetailPage({ params }: { params: any }) {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {items.map((item: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-gray-50 transition-colors">
-                      <td className="px-6 py-4 font-semibold text-gray-900">{item.name}</td>
-                      <td className="px-6 py-4 text-gray-500 font-mono text-xs">{item.sku || '-'}</td>
-                      <td className="px-6 py-4 text-right font-medium">{item.quantity}</td>
-                      <td className="px-6 py-4 text-right text-gray-600">€{item.price.toFixed(2)}</td>
-                      <td className="px-6 py-4 text-right font-bold text-gray-900">€{(item.quantity * item.price).toFixed(2)}</td>
-                    </tr>
-                  ))}
+                  {items.map((item: any, idx: number) => {
+                    const price = item.priceAtPurchase || item.price || 0;
+                    return (
+                      <tr key={idx} className="hover:bg-gray-50 transition-colors">
+                        <td className="px-6 py-4 font-semibold text-gray-900">{item.name}</td>
+                        <td className="px-6 py-4 text-gray-500 font-mono text-xs">{item.sku || '-'}</td>
+                        <td className="px-6 py-4 text-right font-medium">{item.quantity}</td>
+                        <td className="px-6 py-4 text-right text-gray-600">€{Number(price).toFixed(2)}</td>
+                        <td className="px-6 py-4 text-right font-bold text-gray-900">€{(item.quantity * Number(price)).toFixed(2)}</td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -293,18 +302,21 @@ export default function OrderDetailPage({ params }: { params: any }) {
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-1">Método de Pago</p>
                 <div className="flex items-center gap-2 text-gray-900 font-semibold">
-                  {order.paymentMethod === 'TARJETA' ? (
+                  {order.paymentMethod === 'STRIPE' || order.paymentMethod === 'TARJETA' ? (
                     <svg className="text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
                   ) : (
                     <svg className="text-indigo-600" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"></path><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"></path><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"></path></svg>
                   )}
-                  {order.paymentMethod || 'No especificado'}
+                  {order.paymentMethod === 'STRIPE' ? 'Tarjeta (Stripe)' : 
+                   order.paymentMethod === 'BIZUM' ? 'Bizum' : 
+                   order.paymentMethod === 'TARJETA' ? 'Tarjeta' :
+                   'No especificado'}
                 </div>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-500 mb-2">Estado del Pago</p>
                 <span className={`inline-flex px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide border ${order.paymentStatus === 'PAID' ? 'bg-green-100 text-green-800 border-green-200' : 'bg-yellow-100 text-yellow-800 border-yellow-200'}`}>
-                  {order.paymentStatus || 'PENDING'}
+                  {order.paymentStatus === 'PAID' ? 'PAGADO' : 'PENDIENTE'}
                 </span>
               </div>
             </div>

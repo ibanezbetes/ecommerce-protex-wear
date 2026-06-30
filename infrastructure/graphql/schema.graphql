@@ -51,15 +51,24 @@ enum PaymentMethod {
 input CreateOrderInput {
   type: PaymentMethod!
   items: [OrderItemInput!]!
+  totalAmount: Float!
+  customerEmail: String
+  customerName: String
+  paymentMethod: String
+  shippingAddress: AddressInput
+  billingAddress: AddressInput
 }
 
 input OrderItemInput {
   productId: ID!
   variantId: ID!
   quantity: Int!
+  priceAtPurchase: Float!
+  name: String
+  image: String
 }
 
-type OrderResponse {
+type OrderResponse @aws_api_key @aws_cognito_user_pools {
   orderId: ID!
   checkoutUrl: String
   status: String!
@@ -76,6 +85,9 @@ type Mutation {
   
   # ADMINISTRADOR: Habilitar o deshabilitar pago a 30 días
   setCanPayLater(userId: ID!, canPayLater: Boolean!): User @aws_cognito_user_pools
+  
+  # ADMINISTRADOR: Actualizar estado de un pedido
+  updateOrderStatus(orderId: ID!, userId: String!, status: String!): Order @aws_cognito_user_pools
 }
 
 # --- NUEVOS MODELOS Y TIPOS ---
@@ -98,10 +110,12 @@ type UserConnection @aws_cognito_user_pools {
 }
 
 type Address @aws_cognito_user_pools {
+  name: String
   street: String
   city: String
   postalCode: String
   country: String
+  cif: String
 }
 
 input UpdateUserProfileInput {
@@ -111,10 +125,12 @@ input UpdateUserProfileInput {
 }
 
 input AddressInput {
+  name: String
   street: String
   city: String
   postalCode: String
   country: String
+  cif: String
 }
 
 type UserPrice @aws_cognito_user_pools {
@@ -127,6 +143,8 @@ type Order @aws_cognito_user_pools {
   id: ID!
   userId: String!
   customerEmail: String!
+  customerName: String
+  paymentMethod: String
   orderDate: String!
   status: String!
   totalAmount: Float!
@@ -146,4 +164,5 @@ type OrderItem @aws_cognito_user_pools {
   quantity: Int!
   priceAtPurchase: Float!
   name: String
+  image: String
 }

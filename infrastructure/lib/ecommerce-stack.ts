@@ -132,6 +132,7 @@ export class EcommerceStack extends cdk.Stack {
     userDataSource.createResolver('ListUsersResolver', { typeName: 'Query', fieldName: 'listUsers' });
     userDataSource.createResolver('UpdateUserProfileResolver', { typeName: 'Mutation', fieldName: 'updateUserProfile' });
     userDataSource.createResolver('SetSpecialPriceResolver', { typeName: 'Mutation', fieldName: 'setSpecialPrice' });
+    userDataSource.createResolver('SetCanPayLaterResolver', { typeName: 'Mutation', fieldName: 'setCanPayLater' });
 
     // 4.2. Order Operations Lambda
     const orderHandlerLambda = new lambda.Function(this, 'OrderOperationsHandler', {
@@ -148,6 +149,7 @@ export class EcommerceStack extends cdk.Stack {
     orderDataSource.createResolver('ListUserOrdersResolver', { typeName: 'Query', fieldName: 'listUserOrders' });
     orderDataSource.createResolver('ListAllOrdersResolver', { typeName: 'Query', fieldName: 'listAllOrders' });
     orderDataSource.createResolver('CreateOrderResolver', { typeName: 'Mutation', fieldName: 'createOrder' });
+    orderDataSource.createResolver('UpdateOrderStatusResolver', { typeName: 'Mutation', fieldName: 'updateOrderStatus' });
 
     // Resolver básico de listado directo a DynamoDB (opcional, si se quiere paginar sin lambda)
     const dbDataSource = api.addDynamoDbDataSource('DbDataSource', table);
@@ -162,29 +164,23 @@ export class EcommerceStack extends cdk.Stack {
           #if($ctx.args.nextToken)
             ,"nextToken": "$ctx.args.nextToken"
           #end
-          #set($expression = "")
-          #set($expressionValues = {})
+          #set($expression = "begins_with(PK, :prodPrefix)")
+          #set($expressionValues = { ":prodPrefix": { "S": "PRODUCT#" } })
           
           #if($ctx.args.brand)
-            #set($expression = "brand = :brand")
+            #set($expression = "$expression AND brand = :brand")
             $util.qr($expressionValues.put(":brand", { "S": "$ctx.args.brand" }))
           #end
           
           #if($ctx.args.category)
-            #if($expression != "")
-              #set($expression = "$expression AND category = :category")
-            #else
-              #set($expression = "category = :category")
-            #end
+            #set($expression = "$expression AND category = :category")
             $util.qr($expressionValues.put(":category", { "S": "$ctx.args.category" }))
           #end
           
-          #if($expression != "")
-            ,"filter": {
-              "expression": "$expression",
-              "expressionValues": $util.toJson($expressionValues)
-            }
-          #end
+          ,"filter": {
+            "expression": "$expression",
+            "expressionValues": $util.toJson($expressionValues)
+          }
         }
       `),
       responseMappingTemplate: appsync.MappingTemplate.fromString(`
