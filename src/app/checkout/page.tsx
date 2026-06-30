@@ -683,7 +683,7 @@ export default function CheckoutPage() {
                   <div className="w-full bg-amber-200 h-1.5 rounded-full overflow-hidden">
                     <div 
                       className="bg-amber-500 h-full transition-all duration-500" 
-                      style={{ width: `\${Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100)}%` }} 
+                      style={{ width: `${Math.min((subtotalWithTax / SHIPPING_THRESHOLD) * 100, 100)}%` }} 
                     />
                   </div>
                 </>
@@ -702,7 +702,7 @@ export default function CheckoutPage() {
               <div className="flex justify-between text-sm font-bold text-gray-600">
                 <span>Envío (Agencia)</span>
                 <span className={shippingCost === 0 ? 'text-emerald-600' : 'text-gray-900'}>
-                  {shippingCost === 0 ? 'Gratis' : `\${shippingCost.toFixed(2)}€`}
+                  {shippingCost === 0 ? 'Gratis' : `${shippingCost.toFixed(2)}€`}
                 </span>
               </div>
               <div className="pt-4 mt-4 border-t border-gray-200 flex justify-between items-end">
