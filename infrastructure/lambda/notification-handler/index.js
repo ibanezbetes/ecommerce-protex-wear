@@ -1,7 +1,7 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
 const client = new SESClient({});
-const SENDER_EMAIL = process.env.SENDER_EMAIL || "Daniel.guillen@protexwear.es";
+const SENDER_EMAIL = process.env.SENDER_EMAIL || "administracion@protexwear.es";
 
 // Base HTML template
 const htmlTemplate = (title, content) => `
