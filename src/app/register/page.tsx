@@ -158,14 +158,14 @@ export default function RegisterPage() {
           <form onSubmit={handleRegister} className="space-y-5">
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-1.5" htmlFor="name">
-                {accountType === 'B2B' ? 'Razón Social' : 'Nombre Completo'}
+                {accountType === 'B2B' ? 'Razón Social' : 'Nombre y Apellidos'}
               </label>
               <input
                 id="name"
                 type="text"
                 required
                 className="w-full px-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-600 focus:border-indigo-600 focus:bg-white transition-all outline-none"
-                placeholder={accountType === 'B2B' ? 'Ej. Construcciones Paco S.L.' : 'Ej. Juan Pérez'}
+                placeholder={accountType === 'B2B' ? 'Ej. Construcciones Paco S.L.' : 'Ej. Juan Pérez García'}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />

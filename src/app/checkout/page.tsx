@@ -123,8 +123,36 @@ export default function CheckoutPage() {
   useEffect(() => {
     if (user) {
       userOperations.getUserProfile().then(profile => {
-        if (profile && profile.can_pay_later !== undefined) {
-          setCanPayLater(Boolean(profile.can_pay_later));
+        if (profile) {
+          if (profile.can_pay_later !== undefined) {
+            setCanPayLater(Boolean(profile.can_pay_later));
+          }
+          
+          setShippingAddress(prev => {
+            const hasExistingData = prev.street || prev.city || prev.postalCode;
+            if (hasExistingData) return prev; // No sobreescribir si ya escribió algo
+            
+            const pAddr = profile.shippingAddress || {};
+            let fName = prev.firstName;
+            let lName = prev.lastName;
+            
+            if (profile.name) {
+              const parts = profile.name.split(' ');
+              fName = parts[0] || '';
+              lName = parts.slice(1).join(' ') || '';
+            }
+
+            return {
+              ...prev,
+              firstName: fName,
+              lastName: lName,
+              street: pAddr.street || prev.street || '',
+              city: pAddr.city || prev.city || '',
+              postalCode: pAddr.postalCode || prev.postalCode || '',
+              country: pAddr.country || prev.country || 'ES',
+              cif: profile.cif || prev.cif || '',
+            };
+          });
         }
       }).catch(console.error);
     }
@@ -316,6 +344,19 @@ export default function CheckoutPage() {
         cif: shippingAddress.cif || ''
       }
     };
+
+    // Auto-guardar los datos en el perfil si el usuario está logueado
+    if (user) {
+      try {
+        userOperations.updateUserProfile({
+          name: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
+          shippingAddress: orderInput.shippingAddress,
+          billingAddress: orderInput.billingAddress
+        }).catch(err => console.error('Error auto-guardando perfil:', err));
+      } catch (e) {
+        console.error('Error auto-guardando perfil:', e);
+      }
+    }
 
     let actualOrderId = orderNumber;
 
