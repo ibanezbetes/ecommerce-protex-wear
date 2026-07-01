@@ -150,7 +150,7 @@ export default function CheckoutPage() {
               city: pAddr.city || prev.city || '',
               postalCode: pAddr.postalCode || prev.postalCode || '',
               country: pAddr.country || prev.country || 'ES',
-              cif: profile.cif || prev.cif || '',
+              cif: (typeof profile.cif === 'string' ? profile.cif : undefined) || prev.cif || '',
             };
           });
         }
