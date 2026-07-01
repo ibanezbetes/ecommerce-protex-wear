@@ -137,7 +137,7 @@ export default function CheckoutPage() {
             let fName = prev.firstName;
             let lName = prev.lastName;
             
-            if (profile.name) {
+            if (profile.name && typeof profile.name === 'string') {
               const parts = profile.name.split(' ');
               fName = parts[0] || '';
               lName = parts.slice(1).join(' ') || '';
