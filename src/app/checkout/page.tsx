@@ -20,6 +20,7 @@ export interface Address {
   company?: string;
   cif?: string;
   email?: string;
+  phone?: string;
 }
 
 export const SHIPPING_THRESHOLD = 100;
@@ -151,6 +152,7 @@ export default function CheckoutPage() {
               postalCode: pAddr.postalCode || prev.postalCode || '',
               country: pAddr.country || prev.country || 'ES',
               cif: (typeof profile.cif === 'string' ? profile.cif : undefined) || prev.cif || '',
+              phone: pAddr.phone || prev.phone || '',
             };
           });
         }
@@ -240,7 +242,7 @@ export default function CheckoutPage() {
   };
 
   const validateAddress = () => {
-    const required = ['firstName', 'lastName', 'email', 'street', 'city', 'postalCode'];
+    const required = ['firstName', 'lastName', 'email', 'phone', 'street', 'city', 'postalCode'];
     for (const field of required) {
       if (!shippingAddress[field as keyof Address]) {
         toast.error({ title: 'Error', message: 'Por favor completa todos los campos obligatorios.' });
@@ -288,6 +290,7 @@ export default function CheckoutPage() {
             postalCode: shippingAddress.postalCode || '',
             country: shippingAddress.country || 'ES',
             cif: shippingAddress.cif || '',
+            phone: shippingAddress.phone || '',
           },
           shippingMethod: 'agencia_externa',
         }),
@@ -333,7 +336,8 @@ export default function CheckoutPage() {
         city: shippingAddress.city,
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
-        cif: shippingAddress.cif || ''
+        cif: shippingAddress.cif || '',
+        phone: shippingAddress.phone || ''
       },
       billingAddress: {
         name: `${shippingAddress.firstName || ''} ${shippingAddress.lastName || ''}`.trim(),
@@ -341,7 +345,8 @@ export default function CheckoutPage() {
         city: shippingAddress.city,
         postalCode: shippingAddress.postalCode,
         country: shippingAddress.country,
-        cif: shippingAddress.cif || ''
+        cif: shippingAddress.cif || '',
+        phone: shippingAddress.phone || ''
       }
     };
 
@@ -410,6 +415,7 @@ export default function CheckoutPage() {
               city: shippingAddress.city || '',
               postalCode: shippingAddress.postalCode || '',
               country: shippingAddress.country || 'ES',
+              phone: shippingAddress.phone || '',
             },
           }),
         });
@@ -536,9 +542,15 @@ export default function CheckoutPage() {
                         <input type="text" autoComplete="family-name" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.lastName || ''} onChange={e => handleAddressChange('lastName', e.target.value)} required />
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-sm font-bold text-gray-700">Correo electrónico *</label>
-                      <input type="email" autoComplete="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Correo electrónico *</label>
+                        <input type="email" autoComplete="email" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.email || ''} onChange={e => handleAddressChange('email', e.target.value)} placeholder="tu@email.com" required />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-bold text-gray-700">Teléfono de contacto *</label>
+                        <input type="tel" autoComplete="tel" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.phone || ''} onChange={e => handleAddressChange('phone', e.target.value)} placeholder="600 000 000" required />
+                      </div>
                     </div>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                       <div className="space-y-2">

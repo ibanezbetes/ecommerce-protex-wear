@@ -27,6 +27,7 @@ export interface OrderEmailPayload {
     city: string;
     postalCode: string;
     country: string;
+    phone?: string;
   };
   shippingMethod: string;
   discountCode?: string | null;
@@ -189,7 +190,8 @@ function customerEmailHTML(data: OrderEmailPayload): string {
                       <strong>${data.shippingAddress.firstName} ${data.shippingAddress.lastName}</strong><br>
                       ${data.shippingAddress.street}<br>
                       ${data.shippingAddress.postalCode} ${data.shippingAddress.city}<br>
-                      ${data.shippingAddress.country}
+                      ${data.shippingAddress.country}<br>
+                      ${data.shippingAddress.phone ? `Tlf: ${data.shippingAddress.phone}` : ''}
                     </p>
                   </td>
                 </tr>
@@ -275,7 +277,8 @@ function ownerEmailHTML(data: OrderEmailPayload): string {
                     ${data.shippingAddress.firstName} ${data.shippingAddress.lastName}<br>
                     ${data.shippingAddress.street}<br>
                     ${data.shippingAddress.postalCode} ${data.shippingAddress.city}<br>
-                    ${data.shippingAddress.country}
+                    ${data.shippingAddress.country}<br>
+                    ${data.shippingAddress.phone ? `<strong>Tlf:</strong> ${data.shippingAddress.phone}` : ''}
                   </td>
                 </tr>
                 <tr>
