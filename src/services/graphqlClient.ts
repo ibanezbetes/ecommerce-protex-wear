@@ -247,6 +247,7 @@ const GET_USER_PROFILE_QUERY = `
         postalCode
         country
         cif
+        phone
       }
       billingAddress {
         name
@@ -255,6 +256,7 @@ const GET_USER_PROFILE_QUERY = `
         postalCode
         country
         cif
+        phone
       }
       specialPrices {
         productId
@@ -274,12 +276,14 @@ const UPDATE_USER_PROFILE_MUTATION = `
         city
         postalCode
         country
+        phone
       }
       billingAddress {
         street
         city
         postalCode
         country
+        phone
       }
     }
   }
@@ -308,6 +312,7 @@ const LIST_USER_ORDERS_QUERY = `
         postalCode
         country
         cif
+        phone
       }
       billingAddress {
         name
@@ -316,6 +321,7 @@ const LIST_USER_ORDERS_QUERY = `
         postalCode
         country
         cif
+        phone
       }
     }
   }
@@ -368,6 +374,7 @@ const LIST_ALL_ORDERS_QUERY = `
           postalCode
           country
           cif
+          phone
         }
         billingAddress {
           name
@@ -376,6 +383,7 @@ const LIST_ALL_ORDERS_QUERY = `
           postalCode
           country
           cif
+          phone
         }
       }
       nextToken
