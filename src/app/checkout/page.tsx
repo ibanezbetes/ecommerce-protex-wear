@@ -133,7 +133,7 @@ export default function CheckoutPage() {
             const hasExistingData = prev.street || prev.city || prev.postalCode;
             if (hasExistingData) return prev; // No sobreescribir si ya escribió algo
             
-            const pAddr = profile.shippingAddress || {};
+            const pAddr = (profile.shippingAddress || {}) as Partial<Address>;
             let fName = prev.firstName;
             let lName = prev.lastName;
             
