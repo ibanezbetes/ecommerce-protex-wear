@@ -116,6 +116,7 @@ type Address @aws_cognito_user_pools {
   postalCode: String
   country: String
   cif: String
+  phone: String
 }
 
 input UpdateUserProfileInput {
@@ -131,6 +132,7 @@ input AddressInput {
   postalCode: String
   country: String
   cif: String
+  phone: String
 }
 
 type UserPrice @aws_cognito_user_pools {

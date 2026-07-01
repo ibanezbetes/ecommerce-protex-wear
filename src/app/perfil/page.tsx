@@ -234,6 +234,15 @@ export default function ProfilePage() {
                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none"
                   />
                 </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 block">Teléfono</label>
+                  <input
+                    type="tel"
+                    value={profile?.shippingAddress?.phone || ""}
+                    onChange={(e) => updateAddress("shipping", "phone", e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none"
+                  />
+                </div>
               </div>
             </section>
 
@@ -270,6 +279,15 @@ export default function ProfilePage() {
                     type="text"
                     value={profile?.billingAddress?.postalCode || ""}
                     onChange={(e) => updateAddress("billing", "postalCode", e.target.value)}
+                    className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-bold text-gray-700 block">Teléfono</label>
+                  <input
+                    type="tel"
+                    value={profile?.billingAddress?.phone || ""}
+                    onChange={(e) => updateAddress("billing", "phone", e.target.value)}
                     className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-gray-900 text-sm font-medium focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-shadow outline-none"
                   />
                 </div>
