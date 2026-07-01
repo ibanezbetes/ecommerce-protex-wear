@@ -1,7 +1,7 @@
 const { SESClient, SendEmailCommand } = require("@aws-sdk/client-ses");
 
 const sesClient = new SESClient({});
-const SENDER_EMAIL = process.env.SENDER_EMAIL || "Daniel.guillen@protexwear.es";
+const SENDER_EMAIL = process.env.SENDER_EMAIL || "info@protexwear.es";
 
 exports.handler = async (event) => {
   console.log("Cognito Event received:", JSON.stringify(event));

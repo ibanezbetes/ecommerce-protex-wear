@@ -20,7 +20,7 @@ export const BUSINESS_CONFIG = {
   address: 'CALLE L (POLÍGONO INDUSTRIAL MALPICA II), NAV 1, 50016 Zaragoza, España',
 
   /** Email de contacto para pedidos */
-  email: 'Daniel.guillen@protexwear.es',
+  email: 'info@protexwear.es',
 
   /** Teléfono principal de contacto */
   phone: '+34 876 44 12 75',

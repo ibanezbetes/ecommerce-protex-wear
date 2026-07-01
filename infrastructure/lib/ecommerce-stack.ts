@@ -33,7 +33,7 @@ export class EcommerceStack extends cdk.Stack {
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/cognito-custom-message')),
       environment: {
-        SENDER_EMAIL: 'Daniel.guillen@protexwear.es',
+        SENDER_EMAIL: 'info@protexwear.es',
       },
     });
 
@@ -54,9 +54,9 @@ export class EcommerceStack extends cdk.Stack {
         requireDigits: true,
       },
       email: cognito.UserPoolEmail.withSES({
-        fromEmail: 'Daniel.guillen@protexwear.es',
+        fromEmail: 'info@protexwear.es',
         fromName: 'Protex Wear',
-        replyTo: 'Daniel.guillen@protexwear.es',
+        replyTo: 'info@protexwear.es',
         sesRegion: 'eu-west-1',
       }),
       lambdaTriggers: {
@@ -241,7 +241,7 @@ export class EcommerceStack extends cdk.Stack {
       handler: 'index.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../lambda/notification-handler')),
       environment: {
-        SENDER_EMAIL: 'Daniel.guillen@protexwear.es',
+        SENDER_EMAIL: 'administracion@protexwear.es',
       },
     });
 

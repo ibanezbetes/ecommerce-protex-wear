@@ -19,6 +19,21 @@ Portal de venta de Equipos de Protección Individual (EPIs) para empresas y part
 
 ---
 
+## ☁️ Arquitectura AWS (Backend)
+
+Toda la infraestructura en la nube está definida como código (IaC) usando **AWS CDK** en el directorio `/infrastructure`. Al desplegar el stack, se aprovisionan y conectan automáticamente los siguientes recursos:
+
+- **Base de Datos**: Una tabla de **Amazon DynamoDB** optimizada bajo el patrón *Single Table Design*, almacenando productos, perfiles de usuario y pedidos de forma consolidada y eficiente.
+- **API GraphQL**: Un endpoint unificado de **AWS AppSync** protegido mediante *API Keys* (para acceso público al catálogo) y tokens JWT (para acciones autenticadas).
+- **Autenticación y Usuarios**: Un *User Pool* de **Amazon Cognito** configurado para inicio de sesión seguro. Utiliza una función Lambda personalizada para enviar códigos OTP de confirmación de cuenta vía **Amazon SES** (`info@protexwear.es`).
+- **Lógica de Negocio (AWS Lambda)**:
+  - Funciones conectadas directamente a AppSync como *DataSources* (`get-product`, `user-handler`, `order-handler`).
+  - `notification-handler`: Servicio dedicado al envío de correos transaccionales y de confirmación de compra, también a través de **Amazon SES** (`administracion@protexwear.es`).
+- **Ingesta de Catálogo Automatizada**: Un bucket de **Amazon S3** diseñado para recibir listados de productos en Excel. Su subida dispara un evento S3 que invoca la función Lambda `process-excel`, automatizando la actualización del catálogo en DynamoDB.
+- **Control de Costes**: Una regla de **AWS Budgets** configurada para monitorizar el gasto mensual del proyecto y enviar alertas automatizadas si se aproxima a un límite preventivo (50 USD/mes).
+
+---
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -69,8 +84,6 @@ Portal de venta de Equipos de Protección Individual (EPIs) para empresas y part
 │   ├── graphql/                    # Esquemas GraphQL
 │   ├── lambda/                     # Funciones Lambda
 │   └── lib/                        # Stacks de CDK
-├── migration/                      # Scripts de migración de datos a DynamoDB
-├── docs/                           # Documentación del equipo
 ├── excels/                         # Fuentes de datos de proveedores
 ├── .env.local.example              # Plantilla de variables de entorno
 ├── package.json                    # Dependencias y scripts
