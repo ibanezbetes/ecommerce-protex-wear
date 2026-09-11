@@ -47,6 +47,94 @@ const LIST_PRODUCTS = `
   }
 `;
 
+// Definición de las categorías jerárquicas (idénticas a la pestaña de Productos / Mega Menú)
+interface CategorySubitem {
+  name: string;
+  slug: string;
+}
+
+interface CategoryGroup {
+  id: string;
+  groupTitle: string;
+  items: CategorySubitem[];
+}
+
+const SIDEBAR_CATEGORIES: CategoryGroup[] = [
+  {
+    id: 'ropa',
+    groupTitle: 'Ropa de Trabajo',
+    items: [
+      { name: 'Pantalones de trabajo', slug: 'pantalones' },
+      { name: 'Ropa de alta visibilidad', slug: 'ropa' },
+      { name: 'Polos y camisetas', slug: 'camisetas' },
+      { name: 'Chalecos de trabajo', slug: 'chalecos' },
+      { name: 'Monos de trabajo', slug: 'ropa de trabajo' },
+      { name: 'Sudaderas y polares', slug: 'sudaderas' },
+      { name: 'Chaquetas y abrigos', slug: 'chaquetas' },
+      { name: 'Ropa impermeable', slug: 'ropa' },
+    ],
+  },
+  {
+    id: 'calzado',
+    groupTitle: 'Calzado de Seguridad',
+    items: [
+      { name: 'Zapatos de seguridad S1P / S3', slug: 'calzado' },
+      { name: 'Botas de seguridad', slug: 'calzado' },
+      { name: 'Zapatillas de trabajo', slug: 'calzado' },
+      { name: 'Botas de agua y PVC', slug: 'calzado' },
+      { name: 'Calcetines y plantillas', slug: 'calcetines' },
+    ],
+  },
+  {
+    id: 'guantes',
+    groupTitle: 'Protección de Manos',
+    items: [
+      { name: 'Guantes anticorte', slug: 'guantes' },
+      { name: 'Guantes de nitrilo y látex', slug: 'guantes' },
+      { name: 'Guantes térmicos para frío', slug: 'guantes' },
+      { name: 'Guantes de cuero y soldador', slug: 'guantes' },
+      { name: 'Guantes riesgo químico', slug: 'guantes' },
+      { name: 'Guantes desechables', slug: 'guantes' },
+    ],
+  },
+  {
+    id: 'cabeza',
+    groupTitle: 'Protección de Cabeza y Facial',
+    items: [
+      { name: 'Cascos de seguridad', slug: 'cascos' },
+      { name: 'Gorras antigolpes', slug: 'cascos' },
+      { name: 'Gafas de seguridad', slug: 'gafas' },
+      { name: 'Pantallas faciales', slug: 'pantallas' },
+      { name: 'Mascarillas FFP2 / FFP3', slug: 'mascarillas' },
+      { name: 'Protectores auditivos', slug: 'auditiva' },
+    ],
+  },
+  {
+    id: 'especial',
+    groupTitle: 'Sectores Especializados',
+    items: [
+      { name: 'Industria e Instaladores', slug: 'industria' },
+      { name: 'Construcción y Obra', slug: 'construccion' },
+      { name: 'Hostelería y Cocina', slug: 'hosteleria' },
+      { name: 'Sanidad y Laboratorio', slug: 'sanidad' },
+      { name: 'Arneses y Alturas', slug: 'arneses' },
+      { name: 'Accesorios y Otros', slug: 'accesorios' },
+    ],
+  },
+];
+
+const COLOR_PALETTE = [
+  { id: 'ALL', name: 'Todos los colores', hex: 'linear-gradient(135deg, #f43f5e 0%, #3b82f6 50%, #10b981 100%)', border: '#e2e8f0' },
+  { id: 'Negro', name: 'Negro', hex: '#09090b', border: '#27272a' },
+  { id: 'Blanco', name: 'Blanco', hex: '#ffffff', border: '#cbd5e1' },
+  { id: 'Azul', name: 'Azul Marino / Royal', hex: '#1e3a8a', border: '#1e40af' },
+  { id: 'Gris', name: 'Gris', hex: '#64748b', border: '#475569' },
+  { id: 'Rojo', name: 'Rojo', hex: '#dc2626', border: '#b91c1c' },
+  { id: 'Amarillo', name: 'Amarillo A.V.', hex: '#eab308', border: '#ca8a04' },
+  { id: 'Naranja', name: 'Naranja A.V.', hex: '#ea580c', border: '#c2410c' },
+  { id: 'Verde', name: 'Verde', hex: '#16a34a', border: '#15803d' },
+];
+
 function CatalogContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
@@ -56,23 +144,36 @@ function CatalogContent() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [nextToken, setNextToken] = useState<string | null>(null);
-  const [selectedBrand, setSelectedBrand] = useState<string>('ALL');
   const [usingMockCatalog, setUsingMockCatalog] = useState(false);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // Filters State
+  // Filtros de barra lateral
   const [selectedSize, setSelectedSize] = useState<string>('ALL');
   const [selectedColor, setSelectedColor] = useState<string>('ALL');
   const [maxPrice, setMaxPrice] = useState<number>(500);
 
-  const scroll = (direction: 'left' | 'right') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = 300;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'left' ? -scrollAmount : scrollAmount,
-        behavior: 'smooth'
-      });
+  // Estado de acordeones desplegables para grupos de categorías (por defecto todos recogidos)
+  const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({
+    ropa: false,
+    calzado: false,
+    guantes: false,
+    cabeza: false,
+    especial: false,
+  });
+
+  // Si el usuario entra con una categoría seleccionada en la URL, auto-desplegar solo ese grupo
+  useEffect(() => {
+    if (urlCategory) {
+      const activeGroup = SIDEBAR_CATEGORIES.find((g) =>
+        g.items.some((item) => item.slug.toLowerCase() === urlCategory.toLowerCase())
+      );
+      if (activeGroup) {
+        setOpenGroups((prev) => ({ ...prev, [activeGroup.id]: true }));
+      }
     }
+  }, [urlCategory]);
+
+  const toggleGroup = (groupId: string) => {
+    setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
   const fetchProducts = async (isLoadMore = false) => {
@@ -87,8 +188,7 @@ function CatalogContent() {
       let currentNextToken = isLoadMore && nextToken ? nextToken : undefined;
 
       while (fetchedItems.length < 50) {
-        const variables: { brand?: string; category?: string; limit: number; nextToken?: string } = { limit: 100 };
-        if (selectedBrand !== 'ALL') variables.brand = selectedBrand;
+        const variables: { category?: string; limit: number; nextToken?: string } = { limit: 100 };
         if (urlCategory) variables.category = urlCategory;
         if (currentNextToken) variables.nextToken = currentNextToken;
 
@@ -104,15 +204,11 @@ function CatalogContent() {
       setNextToken(currentNextToken || null);
       setUsingMockCatalog(false);
     } catch (error) {
-      console.warn('[CatalogPage] Error cargando productos de AppSync. Activando catálogo local simulado (Sandbox Fallback)...', error);
+      console.warn('[CatalogPage] Error cargando productos de AppSync. Activando catálogo local simulado...', error);
       
       const { MOCK_PRODUCTS } = await import('@/utils/mockCatalog');
 
-      // Filtrar catálogo simulado local según marca seleccionada y categoría si aplica
-      let mockItems = selectedBrand === 'ALL'
-        ? MOCK_PRODUCTS
-        : MOCK_PRODUCTS.filter((p) => p.brand.toLowerCase() === selectedBrand.toLowerCase());
-
+      let mockItems = MOCK_PRODUCTS;
       if (urlCategory) {
         mockItems = mockItems.filter(p => p.category?.toLowerCase() === urlCategory.toLowerCase());
       }
@@ -129,7 +225,7 @@ function CatalogContent() {
   useEffect(() => {
     fetchProducts(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedBrand, urlCategory]);
+  }, [urlCategory]);
 
   useEffect(() => {
     if (user && !user.specialPrices) {
@@ -146,7 +242,6 @@ function CatalogContent() {
 
   // Aplicar filtros locales (búsqueda, talla, color, precio)
   const filteredProducts = products.filter(product => {
-    // Buscar por texto
     if (urlQuery && !product.name.toLowerCase().includes(urlQuery.toLowerCase()) && !product.brand.toLowerCase().includes(urlQuery.toLowerCase())) {
       return false;
     }
@@ -174,166 +269,238 @@ function CatalogContent() {
       ? `Catálogo de ${urlCategory.charAt(0).toUpperCase() + urlCategory.slice(1)}` 
       : 'Catálogo de Productos';
 
-  const categories = [
-    { id: 'ALL', label: 'Todas' },
-    { id: 'pantalones', label: 'Pantalones' },
-    { id: 'camisetas', label: 'Camisetas' },
-    { id: 'sudaderas', label: 'Sudaderas' },
-    { id: 'chaquetas', label: 'Chaquetas' },
-    { id: 'chalecos', label: 'Chalecos' },
-    { id: 'ropa de trabajo', label: 'Ropa de Trabajo' },
-    { id: 'calzado', label: 'Calzado' },
-    { id: 'calcetines', label: 'Calcetines' },
-    { id: 'guantes', label: 'Guantes' },
-    { id: 'cascos', label: 'Cascos' },
-    { id: 'accesorios', label: 'Accesorios' },
-  ];
-
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-24">
-      {/* Premium Header */}
-      <div className="bg-white border-b border-gray-200/60 pt-16 pb-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] [background-size:16px_16px] opacity-30" />
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="min-h-screen bg-[#F8FAFC] pb-24 text-slate-900">
+      {/* Cabecera Limpia y Profesional (Sin botones de marcas ni scroll horizontal) */}
+      <div className="bg-white border-b border-slate-200/80 pt-10 pb-8 px-4 sm:px-6 lg:px-8 relative">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-bold tracking-widest text-indigo-600 uppercase mb-3">Equipamiento Profesional</p>
-              <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 tracking-tight">{displayTitle}</h1>
-            </div>
-            
-            {/* Brand Filter */}
-            <div className="flex bg-gray-100/80 p-1.5 rounded-2xl backdrop-blur-sm self-start">
-              {['ALL', 'Anbor', 'Forli'].map((brand) => (
-                <button
-                  key={brand}
-                  onClick={() => setSelectedBrand(brand)}
-                  className={`px-5 py-2.5 rounded-xl text-sm font-bold transition-all duration-300 ${
-                    selectedBrand === brand 
-                      ? 'bg-white text-indigo-900 shadow-sm ring-1 ring-gray-900/5' 
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-200/50'
-                  }`}
-                >
-                  {brand === 'ALL' ? 'Todas las Marcas' : brand}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Categories Filter Scroll with Arrows */}
-          <div className="mt-10 relative group">
-            {/* Left Gradient/Arrow */}
-            <div className="absolute left-0 top-0 bottom-4 w-16 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none flex items-center justify-start opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button 
-                onClick={() => scroll('left')}
-                className="pointer-events-auto bg-white border border-gray-200 shadow-md rounded-full p-2 -ml-2 text-indigo-600 hover:bg-indigo-50 hover:scale-110 transition-all"
-                aria-label="Desplazar a la izquierda"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
-              </button>
+              <nav className="flex items-center text-xs font-medium text-slate-500 mb-2 space-x-2">
+                <Link href="/" className="hover:text-[#3b6d9c] transition-colors">Inicio</Link>
+                <span className="text-slate-300 font-mono">/</span>
+                <Link href="/productos" className="hover:text-[#3b6d9c] transition-colors">Catálogo</Link>
+                {urlCategory && (
+                  <>
+                    <span className="text-slate-300 font-mono">/</span>
+                    <span className="text-slate-900 font-bold capitalize">{urlCategory}</span>
+                  </>
+                )}
+              </nav>
+              <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">{displayTitle}</h1>
             </div>
 
-            <div 
-              ref={scrollContainerRef}
-              className="flex overflow-x-auto pb-4 hide-scrollbar gap-3 -mx-4 px-4 sm:mx-0 sm:px-0 scroll-smooth"
-            >
-              {categories.map((cat) => (
-                <Link
-                  key={cat.id}
-                  href={cat.id === 'ALL' ? '/productos' : `/productos?categoria=${cat.id}`}
-                  className={`flex-none px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border ${
-                    (urlCategory || 'ALL') === cat.id 
-                      ? 'bg-indigo-600 border-indigo-600 text-white shadow-md shadow-indigo-600/20' 
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50/50'
-                  }`}
-                >
-                  {cat.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* Right Gradient/Arrow */}
-            <div className="absolute right-0 top-0 bottom-4 w-16 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none flex items-center justify-end opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <button 
-                onClick={() => scroll('right')}
-                className="pointer-events-auto bg-white border border-gray-200 shadow-md rounded-full p-2 -mr-2 text-indigo-600 hover:bg-indigo-50 hover:scale-110 transition-all"
-                aria-label="Desplazar a la derecha"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
-              </button>
-            </div>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 border border-slate-200 text-xs font-mono font-medium text-slate-600 self-start sm:self-auto">
+              <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              {filteredProducts.length} {filteredProducts.length === 1 ? 'artículo' : 'artículos'} disponibles
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-12 flex flex-col lg:flex-row gap-8">
+      {/* Contenedor Principal: Sidebar Izquierda + Catálogo */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 flex flex-col lg:flex-row gap-8 items-start">
         
-        {/* Sidebar Filters */}
-        <div className="w-full lg:w-64 shrink-0 space-y-8">
-          {/* Price Filter */}
-          {urlCategory && (
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-4">Precio Máximo</h3>
-              <div className="flex items-center gap-4 mb-4">
-                <span className="text-sm font-semibold text-gray-500">0€</span>
-                <input 
-                  type="range" 
-                  min="0" 
-                  max="500" 
-                  value={maxPrice} 
-                  onChange={(e) => setMaxPrice(Number(e.target.value))}
-                  className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
-                />
-                <span className="text-sm font-semibold text-indigo-600">{maxPrice}€</span>
-              </div>
+        {/* Sidebar Izquierda (Categorías Desplegables + Colores Verticales) */}
+        <aside className="w-full lg:w-72 shrink-0 space-y-6">
+          
+          {/* Bloque 1: Categorías y Subcategorías Desplegables */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 flex items-center gap-2">
+                <span>Categorías</span>
+              </h2>
+              {urlCategory && (
+                <Link 
+                  href="/productos" 
+                  className="text-[11px] font-bold text-[#3b6d9c] hover:underline"
+                >
+                  Ver todas
+                </Link>
+              )}
             </div>
-          )}
 
-          {/* Size Filter */}
-          {urlCategory && (
-            <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-              <h3 className="font-bold text-gray-900 mb-4">Talla</h3>
-              <div className="flex flex-wrap gap-2">
-                {['ALL', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43', '44', '45', '46'].map((size) => (
+            {/* Enlace a "Todos los productos" */}
+            <div className="mb-2">
+              <Link
+                href="/productos"
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-bold transition-all ${
+                  !urlCategory
+                    ? 'bg-[#3b6d9c] text-white shadow-xs'
+                    : 'text-slate-700 hover:bg-slate-100'
+                }`}
+              >
+                <span>Todos los Productos</span>
+                <span className={`text-[11px] font-mono px-1.5 py-0.5 rounded ${!urlCategory ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'}`}>
+                  {products.length}
+                </span>
+              </Link>
+            </div>
+
+            {/* Lista de Grupos Desplegables */}
+            <div className="space-y-1.5">
+              {SIDEBAR_CATEGORIES.map((group) => {
+                const isOpen = openGroups[group.id];
+                const hasActiveCategory = group.items.some((item) => item.slug.toLowerCase() === urlCategory?.toLowerCase());
+
+                return (
+                  <div key={group.id} className="border-b border-slate-100 last:border-0 pb-1.5 pt-1">
+                    <button
+                      onClick={() => toggleGroup(group.id)}
+                      className={`w-full flex items-center justify-between py-1.5 px-2 rounded-lg text-xs font-bold transition-all text-left ${
+                        hasActiveCategory ? 'text-[#3b6d9c]' : 'text-slate-800 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span className="truncate">{group.groupTitle}</span>
+                      <svg
+                        className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0 ml-2 ${
+                          isOpen ? 'rotate-180 text-[#3b6d9c]' : ''
+                        }`}
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+
+                    {/* Subcategorías anidadas */}
+                    {isOpen && (
+                      <ul className="mt-1 pl-2.5 space-y-1 border-l-2 border-slate-100 ml-2 animate-in fade-in duration-150">
+                        {group.items.map((sub) => {
+                          const isActive = urlCategory?.toLowerCase() === sub.slug.toLowerCase();
+                          return (
+                            <li key={sub.name}>
+                              <Link
+                                href={`/productos?categoria=${encodeURIComponent(sub.slug)}`}
+                                className={`block px-2.5 py-1.5 rounded-md text-xs transition-all ${
+                                  isActive
+                                    ? 'bg-[#3b6d9c]/10 text-[#3b6d9c] font-bold'
+                                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium'
+                                }`}
+                              >
+                                {sub.name}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bloque 2: Filtro de Colores (Ordenado verticalmente con cuadradito de color) */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                Filtrar por Color
+              </h2>
+              {selectedColor !== 'ALL' && (
+                <button
+                  onClick={() => setSelectedColor('ALL')}
+                  className="text-[11px] font-bold text-[#3b6d9c] hover:underline"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-1.5">
+              {COLOR_PALETTE.map((c) => {
+                const isSelected = selectedColor.toLowerCase() === c.id.toLowerCase();
+
+                return (
                   <button
-                    key={size}
-                    onClick={() => setSelectedSize(size)}
-                    className={`w-10 h-10 rounded-xl text-sm font-bold flex items-center justify-center transition-all ${
-                      selectedSize === size
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                        : 'bg-gray-50 text-gray-600 hover:bg-gray-200'
+                    key={c.id}
+                    onClick={() => setSelectedColor(c.id)}
+                    className={`w-full flex items-center justify-between p-2 rounded-xl text-xs font-semibold transition-all text-left ${
+                      isSelected
+                        ? 'bg-[#3b6d9c]/10 text-[#3b6d9c] ring-1 ring-[#3b6d9c]/30 font-bold'
+                        : 'text-slate-700 hover:bg-slate-50'
                     }`}
                   >
-                    {size === 'ALL' ? 'Todas' : size}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+                    <div className="flex items-center gap-3">
+                      {/* Cuadradito de color */}
+                      <span
+                        className="w-4 h-4 rounded-md shrink-0 shadow-xs border"
+                        style={{
+                          background: c.hex,
+                          borderColor: c.border,
+                        }}
+                      />
+                      <span>{c.name}</span>
+                    </div>
 
-          {/* Color Filter */}
-          <div className="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-            <h3 className="font-bold text-gray-900 mb-4">Color</h3>
-            <div className="flex flex-wrap gap-2">
-              {['ALL', 'Negro', 'Blanco', 'Azul', 'Gris', 'Rojo', 'Amarillo'].map((color) => (
+                    {isSelected && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-[#3b6d9c]" />
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Bloque 3: Filtro de Tallas */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <div className="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+              <h2 className="text-xs font-black uppercase tracking-wider text-slate-900">
+                Tallas Homologadas
+              </h2>
+              {selectedSize !== 'ALL' && (
                 <button
-                  key={color}
-                  onClick={() => setSelectedColor(color)}
-                  className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${
-                    selectedColor === color
-                      ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                      : 'bg-gray-50 text-gray-600 hover:bg-gray-200'
+                  onClick={() => setSelectedSize('ALL')}
+                  className="text-[11px] font-bold text-[#3b6d9c] hover:underline"
+                >
+                  Limpiar
+                </button>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-1.5">
+              {['ALL', 'S', 'M', 'L', 'XL', 'XXL', '38', '39', '40', '41', '42', '43', '44', '45', '46'].map((size) => (
+                <button
+                  key={size}
+                  onClick={() => setSelectedSize(size)}
+                  className={`min-w-[36px] h-8 px-2 rounded-lg text-xs font-bold border transition-all ${
+                    selectedSize === size
+                      ? 'border-[#3b6d9c] bg-[#3b6d9c] text-white shadow-xs'
+                      : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                   }`}
                 >
-                  {color === 'ALL' ? 'Todos' : color}
+                  {size === 'ALL' ? 'Todas' : size}
                 </button>
               ))}
             </div>
           </div>
-        </div>
+
+          {/* Bloque 4: Filtro de Precio */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm">
+            <h2 className="text-xs font-black uppercase tracking-wider text-slate-900 mb-3">
+              Precio Máximo
+            </h2>
+            <div className="space-y-2">
+              <input 
+                type="range" 
+                min="0" 
+                max="500" 
+                value={maxPrice} 
+                onChange={(e) => setMaxPrice(Number(e.target.value))}
+                className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#3b6d9c]"
+              />
+              <div className="flex justify-between text-xs font-bold text-slate-500">
+                <span>0€</span>
+                <span className="text-[#3b6d9c] font-black text-sm">{maxPrice}€</span>
+              </div>
+            </div>
+          </div>
+
+        </aside>
 
         {/* Product Grid */}
-        <div className="flex-1">
+        <div className="flex-1 w-full">
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32">
             <div className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4" />
@@ -382,7 +549,7 @@ function CatalogContent() {
 
                         {product.category && (
                           <div className="absolute top-4 right-4 z-20">
-                            <span className="bg-indigo-600/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm">
+                            <span className="bg-[#3b6d9c]/90 backdrop-blur-md text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-sm uppercase tracking-wider text-[10px]">
                               {product.category}
                             </span>
                           </div>
@@ -401,15 +568,15 @@ function CatalogContent() {
 
                       {/* Product Info */}
                       <div className="p-6 flex flex-col flex-1">
-                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-snug group-hover:text-indigo-600 transition-colors">
+                        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 leading-snug group-hover:text-[#3b6d9c] transition-colors">
                           {product.name}
                         </h3>
                         <div className="mt-auto flex items-end justify-between">
                           <div className="flex flex-col">
                             <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Precio B2B</span>
-                            <span className="text-2xl font-extrabold text-indigo-600">{price.toFixed(2)}&euro;</span>
+                            <span className="text-2xl font-extrabold text-[#3b6d9c]">{price.toFixed(2)}&euro;</span>
                           </div>
-                          <div className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-400 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                          <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#3b6d9c] group-hover:text-white transition-colors">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                           </div>
                         </div>
@@ -425,9 +592,9 @@ function CatalogContent() {
                 <button
                   onClick={() => fetchProducts(true)}
                   disabled={loadingMore}
-                  className="px-8 py-4 bg-white border-2 border-indigo-600 text-indigo-600 font-bold rounded-full hover:bg-indigo-50 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
+                  className="px-8 py-3.5 bg-white border-2 border-[#3b6d9c] text-[#3b6d9c] font-bold rounded-xl hover:bg-[#3b6d9c]/10 transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-3"
                 >
-                  {loadingMore && <div className="w-5 h-5 border-2 border-indigo-200 border-t-indigo-600 rounded-full animate-spin" />}
+                  {loadingMore && <div className="w-5 h-5 border-2 border-[#3b6d9c]/30 border-t-[#3b6d9c] rounded-full animate-spin" />}
                   {loadingMore ? 'Cargando...' : 'Ver Más Productos'}
                 </button>
               </div>
