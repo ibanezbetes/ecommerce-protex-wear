@@ -23,6 +23,9 @@ interface Product {
   description?: string;
   brand: string;
   category?: string;
+  categoryGroup?: string;
+  subcategory?: string;
+  pdfUrl?: string;
   variants: ProductVariant[];
 }
 
@@ -38,6 +41,9 @@ const GET_PRODUCT = `
       description
       brand
       category
+      categoryGroup
+      subcategory
+      pdfUrl
       variants {
         id
         sku
@@ -455,7 +461,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 </div>
 
                 <a
-                  href={`/api/pdf/technical-sheet?id=${encodeURIComponent(product.id)}`}
+                  href={product.pdfUrl || `/api/pdf/technical-sheet?id=${encodeURIComponent(product.id)}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {

@@ -21,9 +21,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!fileName.endsWith('.xls') && !fileName.endsWith('.xlsx')) {
+    if (!fileName.endsWith('.xls') && !fileName.endsWith('.xlsx') && !fileName.endsWith('.csv')) {
         return NextResponse.json(
-            { error: "Solo se admiten archivos Excel (.xls, .xlsx)" },
+            { error: "Solo se admiten archivos Excel (.xls, .xlsx, .csv)" },
             { status: 400 }
           );
     }

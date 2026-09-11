@@ -174,3 +174,107 @@ export function exportCustomerAnalyticsToExcel(
   const timestamp = new Date().toISOString().slice(0, 10);
   downloadCSV(csv, `${filename}_${timestamp}.csv`);
 }
+
+/**
+ * Generates and downloads the Official ProtexWear Product Catalog Excel Template
+ */
+export function downloadProtexProductTemplate() {
+  const headers = [
+    'Referencia Padre',
+    'Nombre',
+    'Marca',
+    'Categoría 1 (Familia)',
+    'Categoría 2 (Subcategoría)',
+    'Tallas (separadas por coma)',
+    'Color',
+    'Precio Venta (Sin IVA)',
+    'Ficha Técnica (URL PDF)',
+    'Imágenes (URLs)',
+    'Descripción'
+  ];
+
+  const sampleRows = [
+    [
+      'PW-BOTA-VOLCANO',
+      'Bota de Seguridad S3 SRC Hidrófuga Volcano',
+      'Protex Wear',
+      'Calzado de Seguridad',
+      'Botas de seguridad',
+      '38, 39, 40, 41, 42, 43, 44, 45, 46',
+      'Negro',
+      '38,95',
+      'https://protexwear.es/fichas/bota-volcano-s3.pdf',
+      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800, https://images.unsplash.com/photo-1549298916-b41d501d3772?w=800',
+      'Bota de seguridad profesional S3 SRC con puntera de composite no metálica y plantilla antiperforación textil. Corte en piel flor hidrófuga de alta resistencia. Suela de poliuretano bidensidad antideslizante certificada EN ISO 20345:2011.'
+    ],
+    [
+      'PW-PANT-STRETCH',
+      'Pantalón Multibolsillos Stretch Ripstop Pro',
+      'Protex Wear',
+      'Ropa de Trabajo',
+      'Pantalones de trabajo',
+      '38, 40, 42, 44, 46, 48, 50, 52',
+      'Azul Marino',
+      '27,50',
+      'https://protexwear.es/fichas/pantalon-stretch-pro.pdf',
+      'https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=800',
+      'Pantalón de trabajo técnico multibolsillos fabricado en tejido elástico Stretch 65% poliéster, 32% algodón y 3% elastano (240g/m²). Refuerzo en rodilleras y costuras triples de máxima durabilidad.'
+    ],
+    [
+      'PW-POLO-COOLPASS',
+      'Polo Técnico Transpirable Manga Corta',
+      'Protex Wear',
+      'Ropa de Trabajo',
+      'Polos y camisetas',
+      'S, M, L, XL, XXL, 3XL',
+      'Negro',
+      '12,80',
+      'https://protexwear.es/fichas/polo-coolpass.pdf',
+      'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=800',
+      'Polo técnico de alta transpirabilidad confeccionado en poliéster piqué con tratamiento antibacteriano y secado rápido. Cuello clásico acanalado con tapeta de 3 botones.'
+    ],
+    [
+      'PW-GUAN-CUT5',
+      'Guante de Protección Anticorte Nivel D / Cut 5',
+      'Protex Wear',
+      'Protección de Manos',
+      'Guantes anticorte',
+      '7 (S), 8 (M), 9 (L), 10 (XL), 11 (XXL)',
+      'Gris / Negro',
+      '4,85',
+      'https://protexwear.es/fichas/guante-cut5.pdf',
+      'https://images.unsplash.com/photo-1586864387967-d02ef85d93e8?w=800',
+      'Guante de seguridad de alta destreza con recubrimiento de microespuma de nitrilo en palma y fibra HPPE anticorte. Homologado según EN 388:2016 4X43D.'
+    ],
+    [
+      'PW-CASCO-EVO',
+      'Casco de Seguridad Industrial EVO3 con Ruleta',
+      'Protex Wear',
+      'Protección de Cabeza y Facial',
+      'Cascos de seguridad',
+      'Única',
+      'Blanco',
+      '14,20',
+      'https://protexwear.es/fichas/casco-evo3.pdf',
+      'https://images.unsplash.com/photo-1578873375969-d71a938c5387?w=800',
+      'Casco de protección para construcción e industria con arnés textil de 6 puntos de anclaje y ajuste mediante ruleta ergonómica. Certificado EN 397:2012.'
+    ],
+    [
+      'PW-CHAL-ALTA-VIS',
+      'Chaleco de Alta Visibilidad Clase 2 con Cintas Reflectantes',
+      'Protex Wear',
+      'Ropa de Trabajo',
+      'Ropa de alta visibilidad',
+      'M, L, XL, XXL',
+      'Amarillo Flúor',
+      '3,90',
+      'https://protexwear.es/fichas/chaleco-alta-visibilidad.pdf',
+      'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?w=800',
+      'Chaleco de seguridad reflectante homologado EN ISO 20471 Clase 2 con cierre de velcro y dos bandas reflectantes horizontales.'
+    ]
+  ];
+
+  const rows = sampleRows.map((row) => row.map(escapeCSV).join(';'));
+  const csv = [headers.map(escapeCSV).join(';'), ...rows].join('\r\n');
+  downloadCSV(csv, 'Plantilla_Oficial_Catalogo_ProtexWear.csv');
+}
