@@ -34,12 +34,97 @@ function LogoutIcon() {
   );
 }
 
+interface MegaMenuItem {
+  name: string;
+  href: string;
+}
+
+interface MegaMenuGroup {
+  groupTitle: string;
+  items: MegaMenuItem[];
+  extraSection?: {
+    title: string;
+    items: MegaMenuItem[];
+  };
+}
+
+const megaMenuCategories: MegaMenuGroup[] = [
+  {
+    groupTitle: 'Ropa de Trabajo',
+    items: [
+      { name: 'Pantalones de trabajo', href: '/productos?categoria=pantalones' },
+      { name: 'Ropa de alta visibilidad', href: '/productos?categoria=ropa' },
+      { name: 'Polos de trabajo', href: '/productos?categoria=camisetas' },
+      { name: 'Camisetas de trabajo', href: '/productos?categoria=camisetas' },
+      { name: 'Chalecos de trabajo', href: '/productos?categoria=chalecos' },
+      { name: 'Monos de trabajo', href: '/productos?categoria=ropa+de+trabajo' },
+      { name: 'Sudaderas y polares', href: '/productos?categoria=ropa' },
+      { name: 'Ropa térmica y frío', href: '/productos?categoria=ropa' },
+      { name: 'Ropa impermeable y lluvia', href: '/productos?categoria=ropa' },
+    ],
+  },
+  {
+    groupTitle: 'Calzado de Seguridad',
+    items: [
+      { name: 'Zapatos de seguridad S1P / S3', href: '/productos?categoria=calzado' },
+      { name: 'Botas de seguridad', href: '/productos?categoria=calzado' },
+      { name: 'Zapatillas de trabajo ligeras', href: '/productos?categoria=calzado' },
+      { name: 'Botas de agua y PVC', href: '/productos?categoria=calzado' },
+      { name: 'Calzado para hostelería y sanidad', href: '/productos?categoria=calzado' },
+      { name: 'Plantillas y calcetines técnicos', href: '/productos?categoria=calzado' },
+    ],
+  },
+  {
+    groupTitle: 'Protección de Manos',
+    items: [
+      { name: 'Guantes anticorte', href: '/productos?categoria=guantes' },
+      { name: 'Guantes de nitrilo y látex', href: '/productos?categoria=guantes' },
+      { name: 'Guantes térmicos para frío', href: '/productos?categoria=guantes' },
+      { name: 'Guantes de cuero y soldador', href: '/productos?categoria=guantes' },
+      { name: 'Guantes para riesgo químico', href: '/productos?categoria=guantes' },
+      { name: 'Guantes dieléctricos', href: '/productos?categoria=guantes' },
+      { name: 'Guantes desechables', href: '/productos?categoria=guantes' },
+    ],
+  },
+  {
+    groupTitle: 'Protección de Cabeza y Facial',
+    items: [
+      { name: 'Cascos de seguridad para obra', href: '/productos?categoria=cascos' },
+      { name: 'Gorras antigolpes', href: '/productos?categoria=cascos' },
+      { name: 'Gafas de seguridad panorámicas', href: '/productos?categoria=gafas' },
+      { name: 'Pantallas faciales y soldadura', href: '/productos?categoria=pantallas' },
+      { name: 'Mascarillas autofiltrantes FFP2 / FFP3', href: '/productos?categoria=mascarillas' },
+      { name: 'Semimáscaras con filtros de gas', href: '/productos?categoria=mascarillas' },
+      { name: 'Protectores auditivos y orejeras', href: '/productos?categoria=auditiva' },
+    ],
+  },
+  {
+    groupTitle: 'Sectores Especializados',
+    items: [
+      { name: 'Industria e Instaladores', href: '/productos?categoria=industria' },
+      { name: 'Construcción y Obra Pública', href: '/productos?categoria=construccion' },
+      { name: 'Hostelería, Cocina y Alimentación', href: '/productos?categoria=hosteleria' },
+      { name: 'Sanidad, Laboratorio y Estética', href: '/productos?categoria=sanidad' },
+      { name: 'Limpieza y Servicios', href: '/productos?categoria=limpieza' },
+    ],
+    extraSection: {
+      title: 'Protección en Alturas',
+      items: [
+        { name: 'Arneses de seguridad', href: '/productos?categoria=arneses' },
+        { name: 'Líneas de vida y cuerdas', href: '/productos?categoria=arneses' },
+        { name: 'Mosquetones y anticaídas', href: '/productos?categoria=arneses' },
+      ],
+    },
+  },
+];
+
 export default function Navbar() {
   const { user, isGuest, logout } = useAuth();
   const { openCart, itemCount: cartItemCount } = useCart();
   const pathname = usePathname();
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProductsHovered, setIsProductsHovered] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = async () => {
@@ -74,7 +159,103 @@ export default function Navbar() {
 
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center gap-6">
-            {['Productos', 'Categorías', 'Sobre Nosotros', 'Contacto'].map((item) => (
+            {/* Mega Menú de Productos al hacer hover */}
+            <div
+              className="relative flex items-center h-full"
+              onMouseEnter={() => setIsProductsHovered(true)}
+              onMouseLeave={() => setIsProductsHovered(false)}
+            >
+              <Link
+                href="/productos"
+                className={`text-[15px] font-medium py-7 inline-flex items-center gap-1 transition-colors ${
+                  pathname?.startsWith('/productos') || isProductsHovered ? 'text-indigo-600' : 'text-gray-700 hover:text-indigo-600'
+                }`}
+              >
+                <span>Productos</span>
+                <svg
+                  className={`w-4 h-4 transition-transform duration-200 ${isProductsHovered ? 'rotate-180 text-indigo-600' : 'text-gray-400'}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </Link>
+
+              {/* Mega Menú Desplegable */}
+              {isProductsHovered && (
+                <div 
+                  className="fixed left-0 right-0 top-[80px] bg-white border-b border-gray-200 shadow-2xl z-50 animate-in fade-in slide-in-from-top-1 duration-200"
+                  onMouseEnter={() => setIsProductsHovered(true)}
+                  onMouseLeave={() => setIsProductsHovered(false)}
+                >
+                  <div className="max-w-7xl mx-auto px-6 sm:px-8 py-8">
+                    <div className="grid grid-cols-5 gap-8">
+                      {megaMenuCategories.map((group) => (
+                        <div key={group.groupTitle} className="space-y-6">
+                          <div>
+                            <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 border-b border-gray-100 pb-2 mb-3">
+                              {group.groupTitle}
+                            </h3>
+                            <ul className="space-y-2.5">
+                              {group.items.map((item) => (
+                                <li key={item.name}>
+                                  <Link
+                                    href={item.href}
+                                    className="text-[13.5px] text-gray-600 hover:text-indigo-600 hover:translate-x-1 inline-block transition-all font-normal"
+                                    onClick={() => setIsProductsHovered(false)}
+                                  >
+                                    {item.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {group.extraSection && (
+                            <div className="pt-2">
+                              <h3 className="text-xs font-black uppercase tracking-wider text-gray-900 border-b border-gray-100 pb-2 mb-3">
+                                {group.extraSection.title}
+                              </h3>
+                              <ul className="space-y-2.5">
+                                {group.extraSection.items.map((item) => (
+                                  <li key={item.name}>
+                                    <Link
+                                      href={item.href}
+                                      className="text-[13.5px] text-gray-600 hover:text-indigo-600 hover:translate-x-1 inline-block transition-all font-normal"
+                                      onClick={() => setIsProductsHovered(false)}
+                                    >
+                                      {item.name}
+                                    </Link>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bottom Promo / Link Bar */}
+                    <div className="mt-8 pt-4 border-t border-gray-100 flex justify-between items-center bg-gray-50/70 -mx-6 sm:-mx-8 -mb-8 px-6 sm:px-8 py-3.5 rounded-b-lg">
+                      <p className="text-xs text-gray-500 font-medium">
+                        Protección laboral integral y EPIs certificados para cualquier sector industrial
+                      </p>
+                      <Link
+                        href="/productos"
+                        className="text-xs font-bold text-indigo-600 hover:text-indigo-700 inline-flex items-center gap-1.5"
+                        onClick={() => setIsProductsHovered(false)}
+                      >
+                        Ver todo el catálogo
+                        <span aria-hidden="true">&rarr;</span>
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {['Categorías', 'Sobre Nosotros', 'Contacto'].map((item) => (
               <Link
                 key={item}
                 href={`/${item.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(' ', '-')}`}
