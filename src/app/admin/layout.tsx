@@ -46,6 +46,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { path: '/admin', label: 'Dashboard', icon: Icons.Dashboard, exact: true },
     { path: '/admin/productos', label: 'Productos', icon: Icons.Products },
     { path: '/admin/pedidos', label: 'Pedidos', icon: Icons.Orders },
+    { path: '/admin/reportes', label: 'Reportes y Analíticas', icon: Icons.Reports },
     { path: '/admin/usuarios', label: 'Usuarios', icon: Icons.Users },
     { path: '/admin/importar', label: 'Importar Excel', icon: Icons.Upload },
   ];

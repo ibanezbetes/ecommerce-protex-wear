@@ -119,14 +119,10 @@ export default function ProfilePage() {
             </p>
           </div>
           
-          <div className="flex gap-4 md:flex-col sm:gap-6 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+          <div className="bg-gray-50 p-5 rounded-2xl border border-gray-100 flex items-center">
             <div>
               <span className="block text-xs font-semibold text-gray-400 uppercase mb-1">Usuario</span>
               <strong className="text-sm font-bold text-gray-900">{profile?.name || user?.email}</strong>
-            </div>
-            <div>
-              <span className="block text-xs font-semibold text-gray-400 uppercase mb-1">Secciones</span>
-              <strong className="text-sm font-bold text-gray-900">{activeTab === "data" ? "Datos Personales" : "Historial Pedidos"}</strong>
             </div>
           </div>
         </section>
