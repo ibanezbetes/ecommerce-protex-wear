@@ -664,9 +664,9 @@ export default function CheckoutPage() {
                   )}
 
                   {paymentMethod === 'invoice' && (
-                    <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                      <p className="text-sm text-blue-800 font-medium leading-relaxed">
-                        Se procesará tu pedido de forma inmediata y recibirás la factura en tu correo electrónico con las instrucciones para su abono a 30 días.
+                    <div className="mt-6 p-4 bg-indigo-50 border border-indigo-200 rounded-xl">
+                      <p className="text-sm text-indigo-900 font-medium leading-relaxed">
+                        Se tramitará y completará tu pedido de forma inmediata bajo tus condiciones de facturación y pago personalizado acordadas (sin pasar por pasarela de pago).
                       </p>
                     </div>
                   )}
@@ -704,7 +704,7 @@ export default function CheckoutPage() {
                         {paymentMethod === 'card' && 'Tarjeta de Crédito / Débito'}
                         {paymentMethod === 'bizum' && 'Pago por Bizum'}
                         {paymentMethod === 'bank_transfer' && 'Transferencia Bancaria'}
-                        {paymentMethod === 'invoice' && 'Pago a 30 días (Factura)'}
+                        {paymentMethod === 'invoice' && 'Pago personalizado'}
                       </p>
                       <h4 className="text-xs font-bold uppercase tracking-wider text-gray-500 mt-4 mb-2">Envío</h4>
                       <p className="font-bold text-gray-900">Agencia externa</p>
@@ -733,7 +733,7 @@ export default function CheckoutPage() {
                       disabled={isProcessing || !acceptedTerms}
                       className="flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-500/30 disabled:opacity-50 disabled:cursor-not-allowed group"
                     >
-                      {isProcessing ? 'Procesando segura...' : `Pagar ${total.toFixed(2)}€`}
+                      {isProcessing ? 'Procesando pedido...' : paymentMethod === 'invoice' ? 'Confirmar Pedido (Pago personalizado)' : `Pagar ${total.toFixed(2)}€`}
                       {!isProcessing && <CheckCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />}
                     </button>
                   </div>

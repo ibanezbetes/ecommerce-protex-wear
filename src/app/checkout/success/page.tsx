@@ -135,10 +135,10 @@ function CheckoutSuccessContent() {
             color: '#1e40af',
           }}>
             <h3 style={{ marginTop: 0, marginBottom: '0.5rem', color: '#1d4ed8', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <CheckCircle size={20} /> Pago a 30 Días
+              <CheckCircle size={20} /> Pago Personalizado Tramitado
             </h3>
             <p style={{ margin: 0, fontSize: '0.9375rem' }}>
-              Procesaremos tu pedido de inmediato. Recibirás la factura por correo electrónico con las instrucciones para abonarla en un plazo de 30 días.
+              Procesaremos tu pedido de inmediato sin necesidad de pago en pasarela. Recibirás los detalles y la factura por correo electrónico según las condiciones pactadas.
             </p>
           </div>
         )}

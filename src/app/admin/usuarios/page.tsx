@@ -184,6 +184,7 @@ export default function AdminUsuariosPage() {
                   <th className="px-6 py-4">ID / Nombre</th>
                   <th className="px-6 py-4">Email</th>
                   <th className="px-6 py-4">Rol</th>
+                  <th className="px-6 py-4 text-center">Pago Personalizado</th>
                   <th className="px-6 py-4 text-right">Acciones</th>
                 </tr>
               </thead>
@@ -200,6 +201,21 @@ export default function AdminUsuariosPage() {
                         {u.role || "USER"}
                       </span>
                     </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleCanPayLater(u)}
+                        className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold border transition-all ${
+                          u.can_pay_later
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100'
+                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                        }`}
+                        title={u.can_pay_later ? 'Desactivar Pago Personalizado' : 'Activar Pago Personalizado'}
+                      >
+                        <span className={`w-2.5 h-2.5 rounded-full ${u.can_pay_later ? 'bg-emerald-500 animate-pulse' : 'bg-gray-300'}`} />
+                        {u.can_pay_later ? 'Habilitado' : 'Deshabilitado'}
+                      </button>
+                    </td>
                     <td className="px-6 py-4 text-right flex items-center justify-end gap-3">
                       {u.role !== "ADMIN" && (
                         <button
@@ -209,16 +225,6 @@ export default function AdminUsuariosPage() {
                           Hacer Admin
                         </button>
                       )}
-                        <button
-                          onClick={() => handleToggleCanPayLater(u)}
-                          className={`inline-flex items-center px-3 py-1.5 text-sm font-semibold rounded-lg transition-colors ${
-                            u.can_pay_later 
-                              ? 'text-emerald-700 bg-emerald-100 hover:bg-emerald-200' 
-                              : 'text-gray-600 bg-gray-100 hover:bg-gray-200'
-                          }`}
-                        >
-                          {u.can_pay_later ? 'Pago 30 días: ON' : 'Pago 30 días: OFF'}
-                        </button>
                       <button
                         onClick={() => handleOpenSpecialPrice(u)}
                         className="inline-flex items-center px-3 py-1.5 text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors"
