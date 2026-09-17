@@ -72,7 +72,7 @@ const PAYMENT_METHODS: MethodOption[] = [
     ),
     title: 'Pago personalizado',
     subtitle: 'Tramitación directa sin pasarela de pago. Facturación según condiciones comerciales pactadas.',
-    badges: ['Cliente VIP / B2B', 'Sin pasarela', 'Pago aplazado'],
+    badges: ['Cliente VIP', 'Sin pasarela', 'Pago aplazado'],
     requiresCanPayLater: true,
   }
 ];

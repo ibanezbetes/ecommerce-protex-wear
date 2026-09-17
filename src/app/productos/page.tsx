@@ -573,7 +573,7 @@ function CatalogContent() {
                         </h3>
                         <div className="mt-auto flex items-end justify-between">
                           <div className="flex flex-col">
-                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Precio B2B</span>
+                            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Precio</span>
                             <span className="text-2xl font-extrabold text-[#3b6d9c]">{price.toFixed(2)}&euro;</span>
                           </div>
                           <div className="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-[#3b6d9c] group-hover:text-white transition-colors">

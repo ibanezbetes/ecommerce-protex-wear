@@ -131,7 +131,7 @@ export default function PoliticaPrivacidadPage() {
               <ul className="space-y-4">
                 <li className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-200 hover:bg-white hover:shadow-md transition-all">
                   <span className="w-2 h-2 mt-2 shrink-0 rounded-full bg-indigo-600" />
-                  <span className="text-sm"><strong className="text-gray-900">Datos identificativos:</strong> Nombre, apellidos, razón social de la empresa, NIF/CIF (esencial para la facturación B2B en España).</span>
+                  <span className="text-sm"><strong className="text-gray-900">Datos identificativos:</strong> Nombre, apellidos, razón social de la empresa, NIF/CIF (esencial para la facturación fiscal en España).</span>
                 </li>
                 <li className="flex gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 hover:border-indigo-200 hover:bg-white hover:shadow-md transition-all">
                   <span className="w-2 h-2 mt-2 shrink-0 rounded-full bg-indigo-600" />

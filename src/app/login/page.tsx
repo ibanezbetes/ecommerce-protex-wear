@@ -210,7 +210,7 @@ export default function LoginPage() {
             Protección para equipos que no paran.
           </h1>
           <p className="text-lg text-gray-300 leading-relaxed font-medium">
-            Accede a tus condiciones B2B, recupera pedidos y gestiona compras de equipamiento laboral con la misma seguridad que exiges en obra.
+            Accede a tu cuenta, revisa pedidos anteriores y gestiona tus compras de equipamiento laboral con total comodidad.
           </p>
         </div>
       </section>
@@ -232,7 +232,7 @@ export default function LoginPage() {
 
           <div className="mb-10 text-center md:text-left">
             <h2 className="text-3xl font-extrabold text-gray-900 mb-3 tracking-tight">
-              {requireNewPassword ? 'Actualizar Contraseña' : 'Acceso Clientes B2B'}
+              {requireNewPassword ? 'Actualizar Contraseña' : 'Iniciar Sesión'}
             </h2>
             <p className="text-gray-500 text-sm font-medium">
               {requireNewPassword 

@@ -4,6 +4,7 @@ import "./globals.css";
 import { ToastProvider } from "@/components/Feedback/ToastProvider";
 import { AppShell } from "@/components/layout/AppShell";
 import { CookieBanner } from "@/components/UI/CookieBanner";
+import { WhatsAppButton } from "@/components/common/WhatsAppButton";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -16,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Protex Wear - B2B/B2C",
-  description: "Portal B2B/B2C para Protex Wear",
+  title: "Protex Wear - Ropa de Trabajo y EPIs",
+  description: "Tienda online de equipamiento de protección individual, calzado de seguridad y vestuario laboral profesional.",
 };
 
 export default function RootLayout({
@@ -37,6 +38,7 @@ export default function RootLayout({
             {children}
           </AppShell>
           <CookieBanner />
+          <WhatsAppButton />
         </ToastProvider>
       </body>
     </html>

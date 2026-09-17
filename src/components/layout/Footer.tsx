@@ -26,7 +26,7 @@ export default function Footer() {
               />
             </Link>
             <p className="text-indigo-200/80 leading-relaxed mb-8 max-w-sm">
-              Tu tienda B2B de confianza para equipamiento de protección laboral. Seguridad, innovación y calidad para profesionales exigentes.
+              Tu tienda de confianza para equipamiento de protección laboral. Seguridad, innovación y calidad para profesionales y empresas.
             </p>
           </div>
 
@@ -96,9 +96,15 @@ export default function Footer() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
                 </div>
-                <p className="text-sm text-indigo-200/90 leading-relaxed pt-0.5">
+                <a
+                  href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-indigo-200/90 leading-relaxed pt-0.5 hover:text-white hover:underline transition-colors"
+                  title="Abrir ubicación en Google Maps"
+                >
                   {BUSINESS_CONFIG.address}
-                </p>
+                </a>
               </div>
               
               <div className="flex items-center gap-4">

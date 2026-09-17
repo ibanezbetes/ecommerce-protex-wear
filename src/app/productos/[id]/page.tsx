@@ -208,9 +208,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <main className="min-h-screen bg-[#F4F6F9] text-slate-900 pb-24 relative overflow-hidden">
-      {/* Trama milimétrica técnica industrial de fondo */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#00000008_1px,transparent_1px),linear-gradient(to_bottom,#00000008_1px,transparent_1px)] bg-[size:28px_28px] pointer-events-none" />
-
       {/* Barra Técnica Superior / Breadcrumb */}
       <div className="border-b border-slate-200/80 bg-white/70 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
@@ -335,20 +332,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               {product.name}
             </h1>
 
-            {/* Precio y Tarifa B2B */}
+            {/* Precio */}
             <div className="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 mb-5 flex items-baseline justify-between">
               <div>
-                <span className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight">
+                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                   {basePrice.toFixed(2)}&euro;
                 </span>
                 <span className="block text-xs font-semibold text-slate-500 mt-0.5">
                   {priceWithTax.toFixed(2)}&euro; con IVA incluido
                 </span>
               </div>
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                Stock Disponible
-              </span>
             </div>
 
             {/* Descripción Corta */}
@@ -468,8 +461,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="mt-14 lg:mt-20 pt-8 border-t border-slate-200/80">
           <div className="max-w-5xl mx-auto">
             
-            {/* Barra de Pestañas Horizontales */}
-            <div className="flex items-center justify-center sm:justify-start border-b border-slate-200 gap-6 sm:gap-10 text-sm sm:text-base font-semibold">
+            {/* Barra de Pestañas Horizontales Centradas */}
+            <div className="flex items-center justify-center border-b border-slate-200 gap-6 sm:gap-12 text-sm sm:text-base font-semibold">
               <button
                 type="button"
                 onClick={() => setActiveInfoTab('descripcion')}

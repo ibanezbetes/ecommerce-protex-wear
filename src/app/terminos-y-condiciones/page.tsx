@@ -96,7 +96,7 @@ export default function TerminosCondicionesPage() {
                 Las presentes Condiciones Generales de Venta (en adelante, "Términos y Condiciones") regulan de manera exclusiva las relaciones comerciales entre <strong className="text-gray-900">{BUSINESS_CONFIG.name}</strong> (con CIF {BUSINESS_CONFIG.cif} y domicilio social en {BUSINESS_CONFIG.address}) y cualquier persona física o jurídica (en adelante, "el Cliente") que realice la adquisición de equipos de protección individual (EPIs), vestuario laboral y accesorios a través del portal de comercio electrónico <a href="/" className="text-indigo-600 font-bold hover:underline">protexwear.es</a>.
               </p>
               <p>
-                El uso del sitio web, el registro en el portal B2B/B2C, así como la confirmación de cualquier pedido mediante la pasarela de compra implica la aceptación <strong className="text-gray-900">plena, explícita y sin reservas</strong> por parte del Cliente de todos y cada uno de los términos detallados en este documento.
+                El uso del sitio web, el registro de usuario, así como la confirmación de cualquier pedido mediante la pasarela de compra implica la aceptación <strong className="text-gray-900">plena, explícita y sin reservas</strong> por parte del Cliente de todos y cada uno de los términos detallados en este documento.
               </p>
             </section>
 
@@ -112,7 +112,7 @@ export default function TerminosCondicionesPage() {
               <p className="mb-4">
                 Todos los contenidos mostrados en este sitio web —incluyendo, a título enunciativo pero no limitativo: designs, códigos de programación, logotipos, imagotipos, nombres comerciales, fichas técnicas de seguridad, imágenes de catálogo y descripciones de producto— están sujetos a derechos de propiedad intelectual e industrial titularidad de <strong className="text-gray-900">{BUSINESS_CONFIG.name}</strong> o de terceras marcas de las cuales disponemos de licencia y autorización de comercialización (como 3M, Ansell, Fal Seguridad, y Portwest).
               </p>
-              <p>
+              <p className="mb-4">
                 Queda expresamente prohibida la reproducción, distribución, comunicación pública, extracción total o parcial o modificación de cualquier elemento del portal sin el consentimiento formal y por escrito de la dirección de Protex Wear.
               </p>
             </section>
@@ -127,7 +127,7 @@ export default function TerminosCondicionesPage() {
                 </h2>
               </div>
               <p className="mb-4">
-                Los precios de los productos ofertados en Protex Wear se indican en euros (€). Dependiendo del perfil del cliente (B2B Corporativo registrado o B2C Cliente Final), las tarifas podrán mostrarse con o sin el Impuesto sobre el Valor Añadido (IVA) vigente en España, lo cual se desglosará de manera transparente en la cesta y checkout antes de la confirmación final.
+                Los precios de los productos ofertados en Protex Wear se indican en euros (€). Las tarifas desglosan el Impuesto sobre el Valor Añadido (IVA) de manera transparente en la ficha, cesta y checkout antes de la confirmación final de cada pedido.
               </p>
               <p className="font-bold text-gray-900 mb-4">
                 Medios de Pago Soportados en Pasarela:

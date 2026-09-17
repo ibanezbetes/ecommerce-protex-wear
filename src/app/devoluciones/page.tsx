@@ -137,7 +137,7 @@ export default function DevolucionesPage() {
                 </h2>
               </div>
               <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 text-amber-800 p-6 rounded-r-2xl font-medium text-sm leading-relaxed">
-                <strong className="block text-amber-900 text-base mb-1">ATENCIÓN AL CLIENTE B2B / CORPORATIVO:</strong> 
+                <strong className="block text-amber-900 text-base mb-1">INFORMACIÓN IMPORTANTE:</strong> 
                 Conforme al artículo 103 de la Ley de Consumidores y Usuarios, el derecho de desistimiento <strong className="text-amber-900">no se aplicará</strong> a bienes confeccionados conforme a las especificaciones del cliente o claramente personalizados.
               </div>
               <p>

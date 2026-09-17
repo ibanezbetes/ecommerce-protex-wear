@@ -17,7 +17,7 @@ export const BUSINESS_CONFIG = {
   /** CIF de la empresa */
   cif: 'B72983661',
   /** Dirección legal de la empresa */
-  address: 'CALLE L (POLÍGONO INDUSTRIAL MALPICA II), NAV 1, 50016 Zaragoza, España',
+  address: 'Polígono Industrial Malpica, Calle de la letra L, Nº6, Nave 1, 50016 Zaragoza, España',
 
   /** Email de contacto para pedidos */
   email: 'info@protexwear.es',
