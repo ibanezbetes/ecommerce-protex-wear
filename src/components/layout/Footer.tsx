@@ -97,7 +97,7 @@ export default function Footer() {
                   </svg>
                 </div>
                 <a
-                  href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+                  href={BUSINESS_CONFIG.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="text-sm text-indigo-200/90 leading-relaxed pt-0.5 hover:text-white hover:underline transition-colors"
