@@ -275,7 +275,7 @@ export default function ProfilePage() {
 
                       <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                         <div>
-                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Precio B2B</span>
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Precio</span>
                           <span className="text-lg font-black text-gray-900">{fav.price.toFixed(2)} €</span>
                         </div>
                         <Link

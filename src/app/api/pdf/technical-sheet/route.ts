@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
 
       // Pie de página
       doc.fontSize(8).fillColor('#9ca3af').text(
-        'Documento generado automáticamente por Protex Wear B2B E-Commerce. Certificación sujeta a las normativas de seguridad laboral vigentes.',
+        'Documento generado automáticamente por Protex Wear E-Commerce. Certificación sujeta a las normativas de seguridad laboral vigentes.',
         40,
         770,
         { align: 'center', width: 515 }

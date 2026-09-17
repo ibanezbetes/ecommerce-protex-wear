@@ -19,7 +19,7 @@ const features = [
     ),
   },
   {
-    title: 'Envío Rápido B2B',
+    title: 'Envío Rápido',
     desc: 'Entregas garantizadas en 24-48h. Envío gratuito en pedidos superiores a 100€.',
     icon: (
       <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -166,11 +166,11 @@ export default function HomePage() {
               ¿Necesitas equipar a toda tu empresa?
             </h2>
             <p className="text-lg md:text-xl text-gray-300 mb-12 max-w-2xl mx-auto font-medium">
-              Abre tu cuenta B2B hoy mismo y obtén tarifas exclusivas, gestión multi-usuario y soporte prioritario.
+              Abre tu cuenta hoy mismo y obtén tarifas exclusivas, gestión ágil de pedidos y soporte prioritario.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link href="/register" className="px-8 py-4 bg-white text-indigo-900 font-bold rounded-full hover:bg-gray-100 transition-colors shadow-lg hover:shadow-xl w-full sm:w-auto">
-                Crear Cuenta B2B
+                Crear Cuenta
               </Link>
               <a href="tel:+34876441275" className="px-8 py-4 bg-transparent border border-white/30 text-white font-bold rounded-full hover:bg-white/10 transition-colors w-full sm:w-auto flex items-center justify-center gap-2">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" /></svg>

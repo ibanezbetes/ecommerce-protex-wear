@@ -558,7 +558,7 @@ export default function CheckoutPage() {
                         <input type="text" autoComplete="organization" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.company || ''} onChange={e => handleAddressChange('company', e.target.value)} placeholder="Protex S.L." />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-sm font-bold text-gray-700">NIF/CIF/DNI (Factura B2B)</label>
+                        <label className="text-sm font-bold text-gray-700">NIF/CIF/DNI (Para la factura)</label>
                         <input type="text" className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 focus:bg-white focus:ring-2 focus:ring-indigo-600 outline-none transition-all" value={shippingAddress.cif || ''} onChange={e => handleAddressChange('cif', e.target.value)} placeholder="B12345678" />
                       </div>
                     </div>

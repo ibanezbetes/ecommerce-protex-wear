@@ -55,8 +55,8 @@ export default function RegisterPage() {
         Password: password,
         UserAttributes: [
           { Name: 'email', Value: email },
-          { Name: 'name', Value: accountType === 'B2B' ? `${name} (B2B)` : name },
-          // Solo guardar CIF si es B2B
+          { Name: 'name', Value: name },
+          // Guardar CIF si es Empresa
           ...(accountType === 'B2B' ? [{ Name: 'nickname', Value: cif }] : []),
         ],
       });

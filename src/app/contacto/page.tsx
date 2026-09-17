@@ -185,15 +185,24 @@ export default function ContactPage() {
               <h3 className="text-xl font-bold text-gray-900 mb-6">Información de Contacto</h3>
               
               <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
+                <a
+                  href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-4 p-3 -m-3 rounded-2xl hover:bg-indigo-50/50 transition-colors group cursor-pointer"
+                  title="Abrir ubicación en Google Maps"
+                >
+                  <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-indigo-600 group-hover:text-white transition-colors shadow-xs">
                     <MapPin className="w-6 h-6" />
                   </div>
-                  <div>
-                    <h4 className="font-bold text-gray-900">Ubicación Central</h4>
-                    <p className="text-gray-500 mt-1">{BUSINESS_CONFIG.address}</p>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold text-gray-900 group-hover:text-indigo-600 transition-colors">Ubicación Central</h4>
+                      <span className="text-[11px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md">Ver en Maps ↗</span>
+                    </div>
+                    <p className="text-gray-600 mt-1 text-sm leading-relaxed">{BUSINESS_CONFIG.address}</p>
                   </div>
-                </div>
+                </a>
 
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center flex-shrink-0">
@@ -243,8 +252,8 @@ export default function ContactPage() {
           </div>
         </div>
 
-        {/* Full Width Map Bottom */}
-        <div className="mt-12 bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 p-2 overflow-hidden">
+        {/* Full Width Map Bottom with Interactive Button Overlay */}
+        <div className="mt-12 bg-white rounded-3xl shadow-xl shadow-gray-200/40 border border-gray-100 p-2 overflow-hidden relative group">
           <iframe
             src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d2980.96198887354!2d-0.794688223926731!3d41.656563271266975!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zNDHCsDM5JzIzLjYiTiAwwrA0NyczMS42Ilc!5e0!3m2!1ses!2ses!4v1764322231677!5m2!1ses!2ses"
             width="100%"
@@ -256,6 +265,16 @@ export default function ContactPage() {
             className="w-full filter contrast-100"
             title="Ubicación Protexwear"
           ></iframe>
+          
+          <a
+            href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute bottom-6 right-6 bg-white/95 hover:bg-white text-gray-900 font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-xl border border-gray-200 flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95"
+          >
+            <MapPin className="w-4 h-4 text-indigo-600" />
+            <span>Abrir en Google Maps</span>
+          </a>
         </div>
       </div>
     </main>
