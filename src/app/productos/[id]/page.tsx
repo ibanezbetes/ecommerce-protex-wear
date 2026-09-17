@@ -5,6 +5,7 @@ import { graphqlFetch } from '@/services/graphqlClient';
 import { MOCK_PRODUCTS } from '@/utils/mockCatalog';
 import { useAuth } from '@/store/useAuth';
 import { useCart } from '@/store/useCart';
+import { useFavorites } from '@/store/useFavorites';
 import { useToast } from '@/components/Feedback/ToastProvider';
 import { Download, Heart, Minus, Plus, ShoppingCart, Truck, X, ChevronLeft, ChevronRight, ZoomIn, ShieldCheck, Award, FileText } from 'lucide-react';
 
@@ -62,6 +63,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   const { user } = useAuth();
   const addItem = useCart((state) => state.addItem);
+  const { toggleFavorite, isFavorite: checkIsFavorite } = useFavorites();
   const toast = useToast();
 
   const [product, setProduct] = useState<Product | null>(null);
@@ -70,8 +72,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [selectedColor, setSelectedColor] = useState<string>('');
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
-  const [isFavorite, setIsFavorite] = useState(false);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+
+  const isFavorite = product ? checkIsFavorite(product.id, user?.email || user?.id) : false;
 
   useEffect(() => {
     const loadProduct = async () => {
@@ -173,6 +176,33 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       title: 'Añadido a la cesta',
       message: `${quantity}x ${product.name} añadido a tu pedido.`,
     });
+  };
+
+  const handleToggleFavorite = () => {
+    if (!product) return;
+    const isNowFav = toggleFavorite(
+      {
+        id: product.id,
+        name: product.name,
+        brand: product.brand,
+        category: product.category,
+        price: basePrice,
+        image: mainImage,
+      },
+      user?.email || user?.id
+    );
+
+    if (isNowFav) {
+      toast.success({
+        title: 'Añadido a Favoritos',
+        message: `${product.name} se ha guardado en tu lista de favoritos.`,
+      });
+    } else {
+      toast.info({
+        title: 'Eliminado de Favoritos',
+        message: `${product.name} se ha quitado de tus favoritos.`,
+      });
+    }
   };
 
   return (
@@ -412,15 +442,16 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </button>
 
               <button
-                onClick={() => setIsFavorite(!isFavorite)}
+                onClick={handleToggleFavorite}
                 className={`w-12 h-12 rounded-xl flex items-center justify-center border transition-all ${
                   isFavorite 
-                    ? 'bg-amber-400 border-amber-400 text-slate-950 shadow-xs' 
-                    : 'bg-amber-400 hover:bg-amber-500 border-amber-400 text-slate-950 shadow-xs'
+                    ? 'bg-red-50 hover:bg-red-100 border-red-200 text-red-500 shadow-xs' 
+                    : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700 shadow-xs'
                 }`}
-                title="Añadir a favoritos"
+                title={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
+                aria-label={isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
               >
-                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-slate-950' : ''}`} />
+                <Heart className={`w-5 h-5 transition-transform active:scale-125 ${isFavorite ? 'fill-red-500 text-red-500' : ''}`} />
               </button>
             </div>
 

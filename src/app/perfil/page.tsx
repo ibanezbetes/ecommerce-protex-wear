@@ -4,21 +4,25 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useAuth } from "@/store/useAuth";
+import { useFavorites } from "@/store/useFavorites";
 import { userOperations } from "@/services/graphqlClient";
 import { useRouter } from "next/navigation";
-import { User, Package, MapPin, Loader2, Save, CreditCard, ChevronDown, ChevronUp } from "lucide-react";
+import { User, Package, MapPin, Loader2, Save, CreditCard, ChevronDown, ChevronUp, Heart, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
 
 export default function ProfilePage() {
   const { user, isGuest } = useAuth();
+  const { getFavorites, removeFavorite } = useFavorites();
   const router = useRouter();
 
-  const [activeTab, setActiveTab] = useState<"data" | "orders">("data");
+  const [activeTab, setActiveTab] = useState<"favorites" | "orders" | "data">("favorites");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   
   const [profile, setProfile] = useState<any>(null);
   const [orders, setOrders] = useState<any[]>([]);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
+
+  const favorites = getFavorites(user?.email || user?.id);
 
   const toggleOrder = (orderId: string) => {
     setExpandedOrderId(prev => prev === orderId ? null : orderId);
@@ -128,28 +132,167 @@ export default function ProfilePage() {
         </section>
 
         {/* Tabs */}
-        <div className="flex gap-2 p-1.5 bg-white rounded-2xl shadow-sm border border-gray-100 w-fit mx-auto md:mx-0">
+        <div className="flex flex-wrap gap-2 p-1.5 bg-white rounded-2xl shadow-sm border border-gray-100 w-fit mx-auto md:mx-0">
           <button
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
-              activeTab === "data" 
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === "favorites" 
               ? "bg-gray-900 text-white shadow-md" 
               : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
             }`}
-            onClick={() => setActiveTab("data")}
+            onClick={() => setActiveTab("favorites")}
           >
-            Mis Datos
+            <Heart className={`w-4 h-4 ${activeTab === "favorites" ? "text-red-400 fill-red-400" : "text-gray-400"}`} />
+            <span>Mis Favoritos</span>
+            {favorites.length > 0 && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === "favorites" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700"
+              }`}>
+                {favorites.length}
+              </span>
+            )}
           </button>
           <button
-            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
               activeTab === "orders" 
               ? "bg-gray-900 text-white shadow-md" 
               : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
             }`}
             onClick={() => setActiveTab("orders")}
           >
-            Mis Pedidos
+            <Package className="w-4 h-4" />
+            <span>Mis Pedidos</span>
+            {orders.length > 0 && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                activeTab === "orders" ? "bg-white/20 text-white" : "bg-gray-100 text-gray-700"
+              }`}>
+                {orders.length}
+              </span>
+            )}
+          </button>
+          <button
+            className={`px-6 py-2.5 rounded-xl text-sm font-bold transition-all flex items-center gap-2 ${
+              activeTab === "data" 
+              ? "bg-gray-900 text-white shadow-md" 
+              : "text-gray-500 hover:text-gray-900 hover:bg-gray-50"
+            }`}
+            onClick={() => setActiveTab("data")}
+          >
+            <User className="w-4 h-4" />
+            <span>Mis Datos</span>
           </button>
         </div>
+
+        {/* Tab Content: Favorites */}
+        {activeTab === "favorites" && (
+          <div className="bg-white rounded-[2rem] p-6 sm:p-8 shadow-sm border border-gray-100 animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100 mb-6">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                  <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                  Mis Artículos Favoritos
+                </h2>
+                <p className="text-sm text-gray-500 mt-1">
+                  Artículos y EPIs guardados en tu cuenta para comprar o consultar rápidamente.
+                </p>
+              </div>
+              {favorites.length > 0 && (
+                <span className="text-xs font-semibold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 self-start sm:self-auto">
+                  {favorites.length} {favorites.length === 1 ? "artículo guardado" : "artículos guardados"}
+                </span>
+              )}
+            </div>
+
+            {favorites.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center text-red-400 mb-6 shadow-inner">
+                  <Heart size={36} className="fill-red-100 stroke-red-400" />
+                </div>
+                <h3 className="text-2xl font-extrabold text-gray-900 mb-2">No tienes productos favoritos</h3>
+                <p className="text-gray-500 max-w-md mb-6 leading-relaxed">
+                  Aún no has guardado ningún artículo. Explora nuestro catálogo y pulsa el icono del corazón para guardar tus prendas y equipos favoritos aquí.
+                </p>
+                <Link
+                  href="/productos"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-bold rounded-xl shadow-md transition-all active:scale-[0.98]"
+                >
+                  <ShoppingBag size={18} />
+                  <span>Explorar Catálogo</span>
+                </Link>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {favorites.map((fav) => (
+                  <div
+                    key={fav.id}
+                    className="group relative bg-white border border-gray-200 rounded-2xl overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 flex flex-col"
+                  >
+                    {/* Botón eliminar favorito flotante */}
+                    <button
+                      onClick={() => removeFavorite(fav.id, user?.email || user?.id)}
+                      className="absolute top-3 right-3 z-20 w-8 h-8 rounded-full bg-white/90 hover:bg-red-50 text-gray-400 hover:text-red-500 backdrop-blur-sm border border-gray-200 flex items-center justify-center transition-colors shadow-sm"
+                      title="Eliminar de favoritos"
+                      aria-label="Eliminar de favoritos"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+
+                    {/* Contenedor de Imagen */}
+                    <Link
+                      href={`/productos/${fav.id}`}
+                      className="relative aspect-square bg-slate-50 overflow-hidden flex items-center justify-center p-4 block"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={fav.image || "https://via.placeholder.com/600x800?text=Protex+Wear"}
+                        alt={fav.name}
+                        className="w-full h-full object-contain mix-blend-multiply group-hover:scale-105 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.src = "https://via.placeholder.com/600x800?text=Protex+Wear";
+                        }}
+                      />
+                      {fav.brand && (
+                        <div className="absolute top-3 left-3 bg-gray-900 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wider">
+                          {fav.brand}
+                        </div>
+                      )}
+                    </Link>
+
+                    {/* Información y Acciones */}
+                    <div className="p-5 flex flex-col flex-1 justify-between gap-4">
+                      <div>
+                        {fav.category && (
+                          <span className="text-[11px] font-bold text-[#3b6d9c] uppercase tracking-wider block mb-1">
+                            {fav.category}
+                          </span>
+                        )}
+                        <Link
+                          href={`/productos/${fav.id}`}
+                          className="font-bold text-gray-900 hover:text-[#3b6d9c] transition-colors line-clamp-2 text-sm leading-snug"
+                        >
+                          {fav.name}
+                        </Link>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-gray-400 block">Precio B2B</span>
+                          <span className="text-lg font-black text-gray-900">{fav.price.toFixed(2)} €</span>
+                        </div>
+                        <Link
+                          href={`/productos/${fav.id}`}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-slate-900 hover:bg-[#3b6d9c] text-white text-xs font-bold rounded-xl transition-colors shadow-xs"
+                        >
+                          <span>Ver producto</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Tab Content: Data */}
         {activeTab === "data" && (
