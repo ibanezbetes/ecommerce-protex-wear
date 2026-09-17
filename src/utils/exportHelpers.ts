@@ -35,9 +35,13 @@ export function exportOrdersToExcel(orders: any[], filename = 'reporte_pedidos_p
     'Email',
     'Estado',
     'Método Pago',
-    'Total (€)',
-    'Nº Artículos',
-    'Detalle Artículos',
+    'Total Pedido (€)',
+    'Nº Artículos Pedido',
+    'Artículo / Producto',
+    'SKU / Ref',
+    'Cantidad',
+    'Precio Unitario (€)',
+    'Total Línea (€)',
     'Dirección Envío',
     'Ciudad',
     'Código Postal',
@@ -46,32 +50,69 @@ export function exportOrdersToExcel(orders: any[], filename = 'reporte_pedidos_p
     'Teléfono'
   ];
 
-  const rows = orders.map((order) => {
-    const itemsSummary = (order.items || [])
-      .map((item: any) => `${item.name || item.productId} (x${item.quantity}) - €${(item.priceAtPurchase || 0).toFixed(2)}`)
-      .join(' | ');
+  const rows: string[] = [];
 
+  orders.forEach((order) => {
     const totalItems = (order.items || []).reduce((sum: number, item: any) => sum + (item.quantity || 1), 0);
     const dateFormatted = order.orderDate ? new Date(order.orderDate).toLocaleString('es-ES') : '';
     const addr = order.shippingAddress || {};
 
-    return [
+    const baseOrderColumns = [
       order.id || '',
       dateFormatted,
       order.customerName || '',
       order.customerEmail || '',
       order.status || '',
       order.paymentMethod || '',
-      (order.totalAmount || 0).toFixed(2).replace('.', ','), // Semicolon format with comma for European Excel
-      totalItems,
-      itemsSummary,
+      (order.totalAmount || 0).toFixed(2).replace('.', ','),
+      totalItems
+    ];
+
+    const addressColumns = [
       addr.street || '',
       addr.city || '',
       addr.postalCode || '',
       addr.country || '',
       addr.cif || '',
       addr.phone || ''
-    ].map(escapeCSV).join(';');
+    ];
+
+    const items = order.items && order.items.length > 0 ? order.items : null;
+
+    if (items) {
+      items.forEach((item: any) => {
+        const itemQty = item.quantity || 1;
+        const itemPrice = Number(item.priceAtPurchase ?? item.price ?? 0);
+        const lineTotal = itemQty * itemPrice;
+        const itemName = item.name || item.productName || item.productId || 'Artículo';
+        const itemSku = item.sku || item.variantId || item.productId || '-';
+
+        const row = [
+          ...baseOrderColumns,
+          itemName,
+          itemSku,
+          itemQty,
+          itemPrice.toFixed(2).replace('.', ','),
+          lineTotal.toFixed(2).replace('.', ','),
+          ...addressColumns
+        ].map(escapeCSV).join(';');
+
+        rows.push(row);
+      });
+    } else {
+      // Pedido sin artículos desglosados
+      const row = [
+        ...baseOrderColumns,
+        'Sin artículos',
+        '-',
+        0,
+        '0,00',
+        '0,00',
+        ...addressColumns
+      ].map(escapeCSV).join(';');
+
+      rows.push(row);
+    }
   });
 
   const csv = [headers.map(escapeCSV).join(';'), ...rows].join('\r\n');
