@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 
 /**
  * Botón Flotante de WhatsApp para Contacto Directo
- * Número de atención: +34 628 85 45 00
+ * Número de atención: +34 876 44 12 75
  */
 export function WhatsAppButton() {
   const [isHovered, setIsHovered] = useState(false);
-  const phoneNumber = '34628854500';
+  const phoneNumber = '34876441275';
   const whatsappUrl = `https://wa.me/${phoneNumber}`;
 
   return (
@@ -33,8 +33,8 @@ export function WhatsAppButton() {
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         className="w-14 h-14 sm:w-15 sm:h-15 rounded-full bg-[#25D366] hover:bg-[#20bd5a] text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-transform duration-200 hover:scale-105 active:scale-95 group"
-        aria-label="Abrir conversación en WhatsApp con Protex Wear (+34 628 85 45 00)"
-        title="Contactar por WhatsApp (+34 628 85 45 00)"
+        aria-label="Abrir conversación en WhatsApp con Protex Wear (+34 876 44 12 75)"
+        title="Contactar por WhatsApp (+34 876 44 12 75)"
       >
         {/* Icono oficial SVG de WhatsApp */}
         <svg
