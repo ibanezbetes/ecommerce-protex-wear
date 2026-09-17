@@ -333,7 +333,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </h1>
 
             {/* Precio */}
-            <div className="mb-5">
+            <div className="mb-6">
               <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 {basePrice.toFixed(2)}&euro;
               </span>
@@ -341,11 +341,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 {priceWithTax.toFixed(2)}&euro; con IVA incluido
               </span>
             </div>
-
-            {/* Descripción Corta */}
-            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed pb-5 border-b border-slate-100 mb-6 font-normal">
-              {shortDescription}
-            </p>
 
             {/* Selector de Color (si aplica) */}
             {availableColors.length > 1 && (
