@@ -333,15 +333,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </h1>
 
             {/* Precio */}
-            <div className="bg-slate-50/90 border border-slate-200/80 rounded-xl p-4 mb-5 flex items-baseline justify-between">
-              <div>
-                <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                  {basePrice.toFixed(2)}&euro;
-                </span>
-                <span className="block text-xs font-semibold text-slate-500 mt-0.5">
-                  {priceWithTax.toFixed(2)}&euro; con IVA incluido
-                </span>
-              </div>
+            <div className="mb-5">
+              <span className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                {basePrice.toFixed(2)}&euro;
+              </span>
+              <span className="block text-xs font-semibold text-slate-500 mt-0.5">
+                {priceWithTax.toFixed(2)}&euro; con IVA incluido
+              </span>
             </div>
 
             {/* Descripción Corta */}

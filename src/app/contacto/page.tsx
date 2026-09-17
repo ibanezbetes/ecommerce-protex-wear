@@ -186,7 +186,7 @@ export default function ContactPage() {
               
               <div className="space-y-6">
                 <a
-                  href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+                  href={BUSINESS_CONFIG.mapsUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-start gap-4 p-3 -m-3 rounded-2xl hover:bg-indigo-50/50 transition-colors group cursor-pointer"
@@ -267,7 +267,7 @@ export default function ContactPage() {
           ></iframe>
           
           <a
-            href="https://maps.google.com/?q=Pol%C3%ADgono+Industrial+Malpica%2C+Calle+de+la+letra+L%2C+N%C2%BA6%2C+Nave+1%2C+50016+Zaragoza"
+            href={BUSINESS_CONFIG.mapsUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="absolute bottom-6 right-6 bg-white/95 hover:bg-white text-gray-900 font-bold text-xs sm:text-sm px-5 py-3 rounded-2xl shadow-xl border border-gray-200 flex items-center gap-2.5 transition-all hover:scale-105 active:scale-95"
