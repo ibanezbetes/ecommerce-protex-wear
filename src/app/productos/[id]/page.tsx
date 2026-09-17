@@ -73,6 +73,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
   const [quantity, setQuantity] = useState<number>(1);
   const [isZoomOpen, setIsZoomOpen] = useState(false);
+  const [activeInfoTab, setActiveInfoTab] = useState<'descripcion' | 'normativas' | 'marca' | 'descargas'>('descripcion');
 
   const isFavorite = product ? checkIsFavorite(product.id, user?.email || user?.id) : false;
 
@@ -463,68 +464,193 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
         </div>
 
-        {/* Sección Inferior: 2 Cajas Técnicas Independientes y Centradas */}
-        <div className="mt-12 lg:mt-16 pt-8 border-t border-slate-200/80">
-          <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8 items-stretch">
+        {/* Sección Inferior: Pestañas de Información estilo Safeguru */}
+        <div className="mt-14 lg:mt-20 pt-8 border-t border-slate-200/80">
+          <div className="max-w-5xl mx-auto">
             
-            {/* Caja 1: Documentación Oficial y Ficha Técnica */}
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="inline-flex items-center gap-2 text-[#3b6d9c] text-xs font-bold uppercase tracking-widest mb-3">
-                  <ShieldCheck className="w-4 h-4" />
-                  <span>Documentación Oficial</span>
-                </div>
-                <h2 className="text-xl font-black text-slate-900 tracking-tight mb-2">
-                  Ficha Técnica y Homologación
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-500 leading-relaxed mb-6">
-                  Dossier oficial con estándares de confección, normativas laborales aplicadas y especificaciones del fabricante.
-                </p>
-              </div>
+            {/* Barra de Pestañas Horizontales */}
+            <div className="flex items-center justify-center sm:justify-start border-b border-slate-200 gap-6 sm:gap-10 text-sm sm:text-base font-semibold">
+              <button
+                type="button"
+                onClick={() => setActiveInfoTab('descripcion')}
+                className={`pb-3.5 transition-all relative cursor-pointer ${
+                  activeInfoTab === 'descripcion'
+                    ? 'text-slate-950 font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Descripción
+                {activeInfoTab === 'descripcion' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b] rounded-full" />
+                )}
+              </button>
 
-              <div className="space-y-3 pt-4 border-t border-slate-100">
-                <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <FileText className="w-4 h-4 text-[#3b6d9c]" />
-                    <span className="font-semibold text-slate-700">Formato PDF · A4</span>
-                  </div>
-                  <span className="font-mono text-[11px] text-slate-400">v2.4</span>
-                </div>
+              <button
+                type="button"
+                onClick={() => setActiveInfoTab('normativas')}
+                className={`pb-3.5 transition-all relative cursor-pointer ${
+                  activeInfoTab === 'normativas'
+                    ? 'text-slate-950 font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Normativas
+                {activeInfoTab === 'normativas' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b] rounded-full" />
+                )}
+              </button>
 
-                <a
-                  href={product.pdfUrl || `/api/pdf/technical-sheet?id=${encodeURIComponent(product.id)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => {
-                    toast.info({
-                      title: 'Ficha técnica',
-                      message: 'Descargando ficha técnica oficial en PDF...',
-                    });
-                  }}
-                  className="w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5 bg-[#3b6d9c] hover:bg-[#335e87] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md hover:shadow-[#3b6d9c]/20 transition-all active:scale-[0.99]"
-                >
-                  <Download className="w-4 h-4 text-white stroke-[2.5]" />
-                  <span>Descargar Ficha Técnica (PDF)</span>
-                </a>
-              </div>
+              <button
+                type="button"
+                onClick={() => setActiveInfoTab('marca')}
+                className={`pb-3.5 transition-all relative cursor-pointer ${
+                  activeInfoTab === 'marca'
+                    ? 'text-slate-950 font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Marca
+                {activeInfoTab === 'marca' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b] rounded-full" />
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveInfoTab('descargas')}
+                className={`pb-3.5 transition-all relative cursor-pointer ${
+                  activeInfoTab === 'descargas'
+                    ? 'text-slate-950 font-bold'
+                    : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                Descargas
+                {activeInfoTab === 'descargas' && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#f59e0b] rounded-full" />
+                )}
+              </button>
             </div>
 
-            {/* Caja 2: Especificaciones de Fabricación y Descripción */}
-            <div className="bg-white border border-slate-200/90 rounded-2xl p-6 sm:p-8 shadow-sm flex flex-col">
-              <div className="inline-flex items-center gap-2 text-[#3b6d9c] text-xs font-bold uppercase tracking-widest mb-3">
-                <Award className="w-4 h-4" />
-                <span>Especificaciones de Fabricación</span>
-              </div>
-              <h3 className="text-xl font-black text-slate-900 tracking-tight mb-4">
-                Detalles del Producto y Materiales
-              </h3>
+            {/* Contenido de la Pestaña Activa */}
+            <div className="py-8 text-sm sm:text-base leading-relaxed text-slate-700 animate-in fade-in duration-300">
+              
+              {/* Pestaña: Descripción */}
+              {activeInfoTab === 'descripcion' && (
+                <div className="space-y-4 max-w-4xl">
+                  {product.description ? (
+                    <div
+                      className="prose prose-slate max-w-none text-slate-700 leading-relaxed font-normal"
+                      dangerouslySetInnerHTML={{
+                        __html: product.description,
+                      }}
+                    />
+                  ) : (
+                    <p className="text-slate-500 italic">No hay descripción detallada disponible para este artículo.</p>
+                  )}
+                </div>
+              )}
 
-              <div
-                className="prose prose-sm text-slate-600 max-w-none leading-relaxed space-y-2.5 font-normal overflow-y-auto"
-                dangerouslySetInnerHTML={{
-                  __html: product.description || '<p>No hay descripción adicional disponible para este producto.</p>',
-                }}
-              />
+              {/* Pestaña: Normativas */}
+              {activeInfoTab === 'normativas' && (
+                <div className="space-y-6 max-w-3xl">
+                  {(() => {
+                    const desc = product.description || '';
+                    const regex = /(EN\s+ISO\s+[0-9A-Za-z:/+.-]+|EN\s+[0-9A-Za-z:/+.-]+|ISO\s+[0-9A-Za-z:/+.-]+|UNE-EN\s+[0-9A-Za-z:/+.-]+)/gi;
+                    const matches = desc.match(regex);
+                    const list = matches ? Array.from(new Set(matches.map(m => m.trim()))) : [];
+
+                    if (list.length > 0) {
+                      return (
+                        <ul className="list-disc list-inside space-y-2.5 text-slate-800 font-medium">
+                          {list.map((norm, idx) => (
+                            <li key={idx} className="leading-snug">{norm}</li>
+                          ))}
+                        </ul>
+                      );
+                    }
+
+                    return (
+                      <div className="space-y-3">
+                        <ul className="list-disc list-inside space-y-2 text-slate-800 font-medium">
+                          <li>Cumplimiento del Reglamento (UE) 2016/425 sobre Equipos de Protección Individual (EPI)</li>
+                          <li>Marcado CE de Conformidad Europea</li>
+                          <li>Estándar industrial de confección técnica y seguridad laboral</li>
+                        </ul>
+                        <p className="text-xs text-slate-500 pt-2">
+                          Para verificar las normas técnicas específicas y certificados de laboratorio de este modelo, consulta el documento en la pestaña de <strong>Descargas</strong>.
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {/* Pestaña: Marca */}
+              {activeInfoTab === 'marca' && (
+                <div className="space-y-6 max-w-3xl">
+                  <div className="flex items-center gap-3">
+                    <span className="px-3 py-1 bg-slate-900 text-white font-mono text-xs font-bold uppercase tracking-wider rounded-md">
+                      {product.brand}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200/80 px-2.5 py-1 rounded-full">
+                      <ShieldCheck className="w-3.5 h-3.5" /> Fabricante Homologado
+                    </span>
+                  </div>
+
+                  <p className="text-slate-700 leading-relaxed text-sm sm:text-base">
+                    <strong>{product.brand}</strong> es una firma especializada en equipamiento laboral, uniformidad profesional y soluciones de seguridad industrial (EPI). Todos sus productos cumplen rigurosos estándares de fabricación para garantizar la máxima protección, comodidad y durabilidad en el entorno de trabajo.
+                  </p>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 border-t border-slate-200/60">
+                    <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-xs">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-1">Garantía Oficial</div>
+                      <div className="text-xs text-slate-500">Distribución directa 100% original con trazabilidad y soporte técnico.</div>
+                    </div>
+                    <div className="p-4 bg-white rounded-xl border border-slate-200/80 shadow-xs">
+                      <div className="text-xs font-bold uppercase tracking-wider text-slate-900 mb-1">Calidad Industrial</div>
+                      <div className="text-xs text-slate-500">Tejidos y componentes ensayados para resistir uso continuo y lavado profesional.</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Pestaña: Descargas */}
+              {activeInfoTab === 'descargas' && (
+                <div className="space-y-6 max-w-2xl">
+                  <p className="text-slate-600 text-sm">
+                    Accede a la documentación técnica oficial del fabricante para consultar especificaciones de patronaje, niveles de protección certificados y directrices de mantenimiento.
+                  </p>
+
+                  <div className="p-5 rounded-2xl bg-white border border-slate-200/90 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                    <div className="flex items-center gap-3.5">
+                      <div className="w-12 h-12 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center text-red-600 flex-shrink-0">
+                        <FileText className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold text-slate-900">Ficha Técnica Oficial y Homologación</h4>
+                        <span className="text-xs text-slate-500 font-medium">Documento PDF · Formato A4 · Versión Completa</span>
+                      </div>
+                    </div>
+
+                    <a
+                      href={product.pdfUrl || `/api/pdf/technical-sheet?id=${encodeURIComponent(product.id)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => {
+                        toast.info({
+                          title: 'Ficha técnica',
+                          message: 'Descargando ficha técnica oficial en PDF...',
+                        });
+                      }}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-[#3b6d9c] hover:bg-[#335e87] text-white text-xs sm:text-sm font-bold rounded-xl shadow-sm transition-all active:scale-[0.98] shrink-0"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span>Descargar PDF</span>
+                    </a>
+                  </div>
+                </div>
+              )}
+
             </div>
 
           </div>
